@@ -1,6 +1,6 @@
 /**
  * Set default value for input elements
- * js-core varsion: 2.7.6
+ * js-core version: 2.7.6
  */
 core.prototype.defaultValue = function(str) {
 	if(!this.node.value) this.node.value = str;
