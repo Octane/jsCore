@@ -1,4 +1,4 @@
-/* js-core JavaScript framework, version 2.7.6 RC2
+/* js-core JavaScript framework, version 2.7.6 RC3
    Copyright (c) 2009 Dmitry Korobkin
    Released under the MIT License.
    More information: http://www.js-core.ru/
@@ -36,11 +36,6 @@ core.extend(core, {
 	},
 	insert: function(node, arg, before) {
 		return node.insertBefore(this.create(arg), before);
-	},
-	sibling: function(node, dir, tag) {
-		if(tag) tag = tag.toUpperCase();
-		while(node = node[dir]) if(node.nodeType == 1 && (tag ? node.tagName === tag : true)) break;
-		return node;
 	},
 	bind: win.addEventListener ? function(node, type, listener) {
 		node.addEventListener(type, listener, false);
@@ -93,14 +88,14 @@ core.extend(core, {
 	tags: function(tags) {
 		return new core(doc).child(tags, true);
 	},
-	find: function(attrs, tag) {
-		return new core(doc).find(attrs, tag);
+	find: function(attrs, tags) {
+		return new core(doc).find(attrs, tags);
 	},
-	findAttr: function(attr, values, tag) {
-		return new core(doc).findAttr(attr, values, tag);
+	findAttr: function(attr, values, tags) {
+		return new core(doc).findAttr(attr, values, tags);
 	},
-	findClass: function(classes, tag) {
-		return new core(doc).findClass(classes, tag);
+	findClass: function(classes, tags) {
+		return new core(doc).findClass(classes, tags);
 	},
 	makeArray: ie ? function(list) {
 		var i = -1, length = list.length, array = [];
@@ -162,12 +157,6 @@ core.prototype = {
 	insertBefore: function(arg) {
 		var node = core.id(arg);
 		return new core(core.insert(node.parentNode, this.node, node));
-	},
-	next: function(tag) {
-		return new core(core.sibling(this.node, 'nextSibling', tag));
-	},
-	prev: function(tag) {
-		return new core(core.sibling(this.node, 'previousSibling', tag));
 	},
 	clone: function(bool) {
 		return new core(this.node.cloneNode(bool !== false));
@@ -234,13 +223,11 @@ core.prototype = {
 	}('preventDefaultOn'),
 	bind: function(type, listener, def) {
 		core.bind(this.node, type, listener);
-		if(def !== undefined) this.useDefault(type, def);
-		return this;
+		return def !== undefined ? this.useDefault(type, def) : this;
 	},
 	unbind: function(type, listener, def) {
 		core.unbind(this.node, type, listener);
-		if(def !== undefined) this.useDefault(type, def);
-		return this;
+		return def !== undefined ? this.useDefault(type, def) : this;
 	},
 	exist: function(exist, die) {
 		if(exist && this.node) exist.call(this.node);
@@ -322,9 +309,8 @@ core.prototype = {
 		return this;
 	},
 	removeAttr: function(attrs) {
-		core.forEach(core.toArray(attrs), function(attr) {
-			this[attr] = null;
-		}, this.node);
+		var i = (attrs = core.toArray(attrs)).length;
+		while(i--) this.node[attrs[i]] = null;
 		return this;
 	},
 	val: function(str) {
@@ -358,13 +344,10 @@ core.prototype = {
 			return this;
 		};
 	}(ie ? function() {
-		function changeOpacity(node, level) {
-			var alpha = node.filters['DXImageTransform.Microsoft.alpha'] || node.filters.alpha;
-			alpha ? alpha.opacity = level * 100 : node.style.filter += ' progid:DXImageTransform.Microsoft.Alpha(opacity=' + level * 100 + ')';
-		}
 		return function(node, properties) {
 			if(properties.opacity != undefined) {
-				changeOpacity(node, properties.opacity);
+				var alpha = node.filters['DXImageTransform.Microsoft.alpha'] || node.filters.alpha;
+				alpha ? alpha.opacity = properties.opacity * 100 : node.style.filter += ' progid:DXImageTransform.Microsoft.Alpha(opacity=' + properties.opacity * 100 + ')';
 				delete properties.opacity;
 			}
 			if(properties.cssFloat) {
@@ -399,9 +382,11 @@ core.prototype = {
 		return this.css({display: type || 'block', visibility: 'visible'});
 	},
 	visible: function() {
-		return this.css(['display']) !== 'none' && this.css(['visibility']) !== 'hidden';
+		var props = this.css(['display', 'visibility']);
+		return props[0] !== 'none' && props[1] !== 'hidden';
 	},
 	toggle: function(type) {
+
 		return this.visible() ? this.hide() : this.show(type);
 	},
 	enabled: function(bool) {
@@ -418,8 +403,8 @@ core.prototype = {
 	serialize: function() {
 		return this.node.outerHTML || new XMLSerializer().serializeToString(this.node);
 	},
-	find: function(attrs, tag) {
-		var i = -1, n = 0, list = this.child(tag, true).items, length = list.length, key, array = [];
+	find: function(attrs, tags) {
+		var i = -1, n = 0, list = this.child(tags, true).items, length = list.length, key, array = [];
 		if(attrs.split || attrs.join) {
 			var j, k = (attrs = core.toArray(attrs)).length;
 			while(++i < length) {
@@ -441,8 +426,8 @@ core.prototype = {
 		}
 		return new core.list(array, false);
 	},
-	findAttr: function(attr, values, tag) {
-		var i = -1, j, n = 0, k = (values = core.toArray(values)).length, list = this.child(tag, true).items, length = list.length, key, value, array = [];
+	findAttr: function(attr, values, tags) {
+		var i = -1, j, n = 0, k = (values = core.toArray(values)).length, list = this.child(tags, true).items, length = list.length, key, value, array = [];
 		while(++i < length) {
 			j = k;
 			key = false;
@@ -455,31 +440,93 @@ core.prototype = {
 		}
 		return new core.list(array, false);		
 	},
-	child: function(tags, depth) {
-		var i = -1, list = [], filter = false;
-		if(tags === true || (!tags && depth)) list = this.node.getElementsByTagName('*');
-		else if(tags) {
-			if(depth) {
-				i = (tags = core.toArray(tags)).length;
-				if(i == 1) list = this.node.getElementsByTagName(tags[0]);
-				else while(i--) list = list.concat(core.makeArray(this.node.getElementsByTagName(tags[i])));
+	child: function(find) {
+		return function(tags, depth) {
+			var i = -1, list = [], filter = false;
+			if(tags === true || (!tags && depth)) list = this.node.getElementsByTagName('*');
+			else if(tags) {
+				if(depth) list = (i = (tags = core.toArray(tags)).length) == 1 ? this.node.getElementsByTagName(tags[0]) : find(this.node, tags, i);
+				else {
+					var child = this.node.childNodes, length = child.length, j = 0;
+					tags = ' ' + (tags.join ? tags.join(' ') : tags).toUpperCase() + ' ';
+					while(++i < length) if(tags.indexOf(' ' + child[i].tagName + ' ') != -1) list[j++] = child[i];
+				}
 			}
 			else {
-				var child = this.node.childNodes, length = child.length, j = 0;
-				tags = ' ' + (tags.join ? tags.join(' ') : tags).toUpperCase() + ' ';
-				while(++i < length) if(tags.indexOf(' ' + child[i].tagName + ' ') != -1) list[j++] = child[i];
+				list = this.node.childNodes;
+				filter = null;
 			}
+			return new core.list(list, filter);
 		}
-		else {
-			list = this.node.childNodes;
-			filter = null;
+	}(doc.querySelectorAll ? function(node, tags) {
+		return node.querySelectorAll(tags.join(','));
+	} : function(node, tags, i) {
+		var list = [];
+		while(i--) list = list.concat(core.makeArray(node.getElementsByTagName(tags[i])));
+		return list;
+	}),
+	findClass: doc.querySelectorAll ? function(classes, tags) {
+		var selector = [];
+		classes = core.toArray(classes);
+		if(tags) {
+			var i, length = classes.length, j, k = 0;
+			i = (tags = core.toArray(tags)).length;
+			while(i--) {
+				j = length;
+				while(j--) selector[k++] = tags[i] + '.' + classes[j];
+			}
+			selector = selector.join(',');
 		}
-		return new core.list(list, filter);
-	},
-	findClass: function(classes, tag) {
-		return this.findAttr('className', classes, tag);
+		else selector = '.' + classes.join(',.');
+		return new core.list(this.node.querySelectorAll(selector), false);
+	} : function(classes, tags) {
+		return this.findAttr('className', classes, tags);
 	}
 };
+core.extend(core.prototype, function(traversal, sibling, child) {
+	if(doc.createElement('div').firstElementChild !== undefined) {
+		traversal = {next: 'nextElementSibling', prev: 'previousElementSibling', first: 'firstElementChild', last: 'lastElementChild'};
+		sibling = function(node, dir, tag) {
+			if(tag) {
+				tag = tag.toUpperCase();
+				while(node = node[dir]) if(node.tagName === tag) break;
+				return node;
+			}
+			else return node[dir];
+		};
+		child = function(node, dir, tag) {
+			return node ? (tag && node.tagName !== tag.toUpperCase() ? sibling(node, traversal[dir], tag) : node) : null;
+		};
+	}
+	else {
+		traversal = {next: 'nextSibling', prev: 'previousSibling', first: 'firstChild', last: 'lastChild'};
+		sibling = function(node, dir, tag) {
+			if(tag) tag = tag.toUpperCase();
+			while(node = node[dir]) if(node.nodeType == 1 && (tag ? node.tagName === tag : true)) break;
+			return node;
+		};
+		child = function(node, dir, tag) {
+			return node && node.nodeType != 1 || (tag ? tag.toUpperCase() !== node.tagName : true) ? sibling(node, traversal[dir], tag) : node;
+		};
+	}
+	return {
+		next: function(tag) {
+			return new core(sibling(this.node, traversal.next, tag));
+		},
+		prev: function(tag) {
+			return new core(sibling(this.node, traversal.prev, tag));
+		},
+		firstChild: function(tag) {
+			return new core(child(this.node[traversal.first], 'next', tag));
+		},
+		lastChild: function(tag) {
+			return new core(child(this.node[traversal.last], 'prev', tag));
+		},
+		nthChild: function(index, tags, depth) {
+			return this.child(tags, depth).item(index);
+		}
+	};
+}());
 core.list.prototype = {
 	item: function(i) {
 		return new core(this.items[i]);
@@ -491,9 +538,9 @@ core.list.prototype = {
 		return this.items.length;
 	}
 };
-core.extend(core.list.prototype, function() {
+core.extend(core.list.prototype, function(slice) {
 	function check(args) {
-		var length = (args = Array.prototype.slice.call(args, 1)).length < 2;
+		var length = (args = slice.call(args, 1)).length < 2;
 		return length ? {method: 'call', args: args[0]} : {method: 'apply', args: args};
 	}
 	core.forEach('resize,scroll,blur,focus,error,load,unload,click,dblclick,mousedown,mouseup,mousemove,mouseover,mouseout,keydown,keypress,keyup,change,select,submit,reset'.split(','), function(listener) {
@@ -541,7 +588,7 @@ core.extend(core.list.prototype, function() {
 			return this;
 		}
 	};
-}());
+}(Array.prototype.slice));
 core.timer.prototype = {
 	start: function(timer) {
 		if(!this.enabled) {
