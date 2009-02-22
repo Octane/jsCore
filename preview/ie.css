@@ -1,0 +1,28 @@
+#header h1 {
+_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="preview/logo.png", sizingMethod="crop");
+}
+#content .example h2, #content .example ol {
+_zoom: 1;
+_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="preview/dark.png", sizingMethod="crop");
+}
+#header h1 a:link, #header h1 a:visited, #content .example h2, #content .example ol {
+_background: none;
+}
+#content .example div.code label, #content .example div.result label {
+_margin-left: -7px;
+}
+#content .example span.button {
+_right: 8px;
+}
+#content .example div.result pre {
+white-space: normal;
+}
+#content .example div pre, #content .example div.dom code {
+zoom: 1;
+}
+#content .example span.hover {
+background: #0b66ab;
+}
+#content .example span.active {
+background: #0a568f;
+}
