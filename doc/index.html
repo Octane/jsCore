@@ -1,0 +1,2057 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Документация js-core 2.7.8</title>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div class="container">
+	<div class="content">
+		<h1>Содержание</h1>
+		<ul>
+			<li><a href="#js-core-main-function-and-caching">Функция $(…)&nbsp;— получение элемента по&nbsp;идентификатору, кэширование</a></li>
+			<li><a href="#js-core-chaining">Цепочки&nbsp;— последовательный вызов методов</a></li>
+			<li><a href="#js-core-context">Текущий элемент, контекст вызова</a></li>
+			<li> <a href="#js-core-events">Обработка событий</a>
+				<ul>
+					<li><a href="#js-core-events-bind">Добавление/удаление обработчиков событий</a>
+						<ul>
+							<li><a href="#js-core-events-short-bind">Сокращенная запись добавления обработчиков событий</a></li>
+						</ul>
+					</li>
+					<li><a href="#js-core-events-object">Работа с&nbsp;объектом-событие</a>
+						<ul>
+							<li><a href="#js-core-events-object-mouse">События мыши</a></li>
+							<li><a href="#js-core-events-object-keyboard">События клавиатуры</a></li>
+							<li><a href="#js-core-events-object-default-and-bubbling">Стандартное действие браузера и&nbsp;всплывание событий</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li><a href="#js-core-node-list">Работа со&nbsp;списками элементов</a></li>
+			<li> <a href="#js-core-methods">Методы js-core</a>
+				<ul>
+					<li><a href="#js-core-methods-core-prototype">Методы доступные через&nbsp;прототип функции core(…) или&nbsp;$(…)</a></li>
+					<li><a href="#js-core-methods-core">Методы и&nbsp;атрибуты объекта core или&nbsp;$</a></li>
+					<li><a href="#js-core-methods-timer">Методы работы с&nbsp;таймером</a></li>
+					<li><a href="#js-core-methods-list">Методы работы со&nbsp;списками узлов</a></li>
+					<li><a href="#js-core-methods-event">Методы работы с&nbsp;объектом-событие</a></li>
+					<li><a href="#js-core-methods-ajax">Методы работы c&nbsp;AJAX</a></li>
+				</ul>
+			</li>
+			<li><a href="#js-core-writing-extensions">Создание расширений для&nbsp;js-core</a></li>
+			<li><a href="#js-core-examples">Демонстрация</a></li>
+			<li><a href="#js-core-features">Что&nbsp;дальше?</a></li>
+			<li><a href="#js-core-download">Скачать</a></li>
+		</ul>
+	</div>
+	<h1>js-core JavaScript framework</h1>
+	<p><img src="logo.png" alt="logo" /> «<dfn>js-core</dfn>»&nbsp;— это&nbsp;небольшой, но&nbsp;многофункциональный JavaScript framework, обеспечивающий кросс-браузерную работу с&nbsp;<abbr title="Document Object Model">DOM</abbr>, <abbr title="Cascading Style Sheets">CSS</abbr> и&nbsp;<abbr title="Asynchronous JavaScript and Extensible Markup Language">AJAX</abbr>. Фреймворк не&nbsp;вызывает конфликтов с&nbsp;другими скриптами и&nbsp;может использоваться в&nbsp;проектах любой сложности. Структура js-core обеспечивает удобный механизм расширения стандартного функционала.</p>
+	<p>Версия&nbsp;2.7.8 вышла 26&nbsp;февраля 2009&nbsp;года.</p>
+	<h2>Список изменений</h2>
+	<p><strong>2.7.8</strong></p>
+	<ul>
+		<li>Методы <code>find</code> и&nbsp;<code>findAttr</code> теперь&nbsp;тоже&nbsp;используют <code>querySelectorAll</code>, когда&nbsp;это&nbsp;возможно.</li>
+	</ul>
+	<p><strong>2.7.7</strong></p>
+	<ul>
+		<li>Метод <code>child</code> теперь&nbsp;использует, когда это&nbsp;возможно, встроенный метод <code>children</code>, что&nbsp;позволяет увеличить скорость поиска дочерних элементов.</li>
+		<li>Метод <code>parent</code> теперь&nbsp;может&nbsp;принимать в&nbsp;качестве аргумента имя&nbsp;тега и&nbsp;выполняет поиск вверх по&nbsp;<abbr title="Document Object Model">DOM</abbr>-дереву.</li>
+		<li>Метод <code>findClass</code>, помимо <code>querySelectorAll</code>, теперь&nbsp;может&nbsp;использовать и&nbsp;<code>getElementsByClassName</code>.</li>
+		<li>Метод <code>visible</code> теперь&nbsp;работает по&nbsp;принципу одноименного фильтра в&nbsp;jQuery&nbsp;1.3.2, проверяет не&nbsp;нуливые&nbsp;ли <code>offsetWidth</code> и&nbsp;<code>offsetHeight</code> элемента.</li>
+		<li>Методы <code>hide</code>, <code>show</code> и&nbsp;<code>toggle</code> теперь&nbsp;изменяют только&nbsp;<abbr title="Cascading Style Sheets">CSS</abbr>-свойство <code>display</code>.</li>
+		<li>Добавлены методы <code>store</code> и&nbsp;<code>restore</code> для&nbsp;сохранения текущего состояния цепочки вызовов.</li>
+		<li>Метод <code>core.tag</code> был удален.</li>
+	</ul>
+	<p><strong>2.7.6</strong></p>
+	<ul>
+		<li>Методы <code>findClass</code> и&nbsp;<code>child</code> переписаны с&nbsp;использование «<a href="http://www.w3.org/TR/selectors-api/" rel="external nofollow">Selectors API</a>» для&nbsp;увеличения скорости поиска элементов.</li>
+		<li>Методы <code>next</code>, <code>prev</code> и&nbsp; <code>core.clear</code>, а&nbsp;так&nbsp;же&nbsp;новые методы: <code>firstChild</code>, <code>lastChild</code> и&nbsp;<code>nthChild</code>&nbsp;— используют интерфейс «<a href="http://www.w3.org/TR/ElementTraversal/" rel="external nofollow">Element&nbsp;Traversal</a>», для&nbsp;достижения максимальной производительности.</li>
+		<li>Удален метод <code>core.sibling</code>.</li>
+		<li>Добавлен метод <code>position</code> для&nbsp;рассчета <code>offsetTop/offsetLeft</code> относительно <code>offsetParent</code>.</li>
+		<li>Полностью переработан код метода <code>core.prototype.css</code>, в&nbsp;связи&nbsp;с&nbsp;чем, были&nbsp;удалены методы <code>core.prototype.opacity</code> и&nbsp;<code>core.css</code>. Теперь&nbsp;установка уровня непрозрачности в&nbsp;<abbr title="Internet Explorer">IE</abbr> не&nbsp;сбрасывает остальные фильтры. Изменить значение одного <abbr title="Cascading Style Sheets">CSS</abbr>-свойства теперь&nbsp;можно следующим образом: <code>$(…).css('property', 'value')</code>.</li>
+		<li>Добавлена возможность изменить один атрибут, без&nbsp;создания объекта с&nbsp;параметрами: <code>$(…).attr('attribute', 'value')</code>.</li>
+		<li>Удалено несколько лишних анонимных функций-обёрток.</li>
+		<li>Исправлены неработающие конструкции вида <code>$(…).click('toggleClass',&nbsp;'highlight')</code>.</li>
+		<li>Исправлена ошибка определения уровня непрозрачности элемента в&nbsp;<abbr title="Internet Explorer">IE</abbr>.</li>
+	</ul>
+	<h3 id="js-core-main-function-and-caching">Функция $(…)&nbsp;— получение элемента по&nbsp;идентификатору, кэширование</h3>
+	<p>Допустим, у&nbsp;нас&nbsp;есть&nbsp;следующий XHTML-код:</p>
+	<pre><code class="html">&lt;div id=&quot;container&quot;&gt;&lt;/div&gt;</code></pre>
+	<p>Чтобы получить ссылку на&nbsp;узел <code>&lt;div&gt;</code>; с&nbsp;идентификатором <code>container</code>, в&nbsp;JavaScript предусмотрен метод <code>getElementById(…)</code> объекта <code>document</code>:</p>
+	<pre><code class="javascript">var node = document.getElementById('container');</code></pre>
+	<p>Существует очень распространенная функция, сокращающая эту&nbsp;запись:</p>
+	<pre><code class="javascript">function $(id) {
+ return document.getElementById(id);
+}</code></pre>
+	<p>Или&nbsp;более&nbsp;сложный вариант:</p>
+	<pre><code class="javascript">function $(arg) {
+ return typeof arg == 'string' ? document.getElementById(arg) : arg;
+}</code></pre>
+	<p>В&nbsp;таком&nbsp;виде функция <code>$(…)</code> просто&nbsp;сокращает запись метода <code>getElementById(…)</code>, предавая прямую ссылку на&nbsp;узел.</p>
+	<p>В&nbsp;js-core функции <code>core(…)</code> и&nbsp;<code>$(…)</code> эквивалентны, и&nbsp;возвращают новую&nbsp;копию объекта <code>core</code>, содержащую ссылку на&nbsp;указанный&nbsp;узел. Таким&nbsp;образом, через&nbsp;прототип объекта <code>core</code> для&nbsp;этого&nbsp;узла становится доступен набор методов, позволяющих производить манипуляции с&nbsp;DOM, добавлять обработчики событий и&nbsp;изменять стили элемента.</p>
+	<p>Выполним следующий код, с&nbsp;использованием фреймворка:</p>
+	<pre><code class="javascript">var obj = $('container')
+
+// или
+var obj = core('container')
+
+// или
+var obj = new $('container')
+
+// или
+var obj = new core('container')</code></pre>
+	<p>Все&nbsp;эти&nbsp;варианты абсолютно равнозначны, только, последние&nbsp;2 теоретически должны выполнится быстрее, т.&nbsp;к.&nbsp;первые просто рекурсивно вызывают функцию <code>core</code> в&nbsp;конструкторе&nbsp;<code>new</code>. В&nbsp;результате переменная&nbsp;<code>obj</code> будет&nbsp;ссылкой на&nbsp;объект следующего вида:</p>
+	<pre><code class="javascript">{node: HTMLDivElement}</code></pre>
+	<p>Такой&nbsp;объект можно&nbsp;бы&nbsp;было&nbsp;получить, например, такми&nbsp;образом:</p>
+	<pre><code class="javascript">var obj = {node: document.getElementById('container')}</code></pre>
+	<p>Но&nbsp;у&nbsp;созданного при&nbsp;помощи функции <code>core(…)</code> или&nbsp;<code>$(…)</code>, входящих в&nbsp;состав&nbsp;js-core, объекта есть&nbsp;одно&nbsp;важное отличие&nbsp;— наличие специальных методов в&nbsp;прототипе, доступ к&nbsp;которым осуществляется так&nbsp;же,&nbsp;как&nbsp;и&nbsp;к&nbsp;любым другим&nbsp;методам объектов в&nbsp;JavaScript:</p>
+	<pre><code class="javascript">$('container').hide()
+
+// или
+$('container')['hide']()</code></pre>
+	<p>Забегая вперед, скажу, что&nbsp;метод <code>hide(…)</code> просто&nbsp;скрывает указанный элемент.</p>
+	<p>Чтобы&nbsp;получить прямую ссылку на&nbsp;DOM-узел, достаточно написать:</p>
+	<pre><code class="javascript">var node = $('container').node</code></pre>
+	<p>Так&nbsp;же&nbsp;в&nbsp;любой момент можно&nbsp;беспрепятственно воспользоваться этой&nbsp;ссылкой в&nbsp;уже&nbsp;созданном, функциями <code>core(…)</code> или&nbsp;<code>$(…)</code>, объекте:</p>
+	<pre><code class="javascript">var obj = $('container')
+var node = obj.node</code></pre>
+	<p>Если&nbsp;отправить в&nbsp;функцию <code>core(…)</code> или&nbsp;<code>$(…)</code> не&nbsp;строку, содержащую имя&nbsp;идентификатора узла, а&nbsp;ссылку на&nbsp;узел, то&nbsp;она&nbsp;автоматически будет запомнена в&nbsp;том же&nbsp;атрибуте <code>node</code>:</p>
+	<pre><code class="javascript">var obj = $(document.getElementById('container'))
+alert(obj.node.id) // выдаст сообщение &quot;container&quot;</code></pre>
+	<p>Все&nbsp;ссылки на&nbsp;элементы, полученные по&nbsp;идентификатору, помещаются в&nbsp;кэш. Кэш очищается каждый&nbsp;раз, когда&nbsp;выполняется удаление DOM-узлов или&nbsp;изменение идентификатора средствами фреймворка. Если&nbsp;вы&nbsp;производили какие-либо манипуляции с&nbsp;DOM и&nbsp;у&nbsp;вас&nbsp;возникли проблемы из-за&nbsp;наличия в&nbsp;кэше ссылок на&nbsp;удаленные узлы, достаточно просто инициализировать кэш ссылкой на&nbsp;новый объект:</p>
+	<pre><code class="javascript">$.cache = {}</code></pre>
+	<p>Или&nbsp;выполнить функцию <code>$.clear(…)</code>, передав в&nbsp;нее в&nbsp;качестве аргумента, ссылку на&nbsp;изменяемый узел:</p>
+	<pre><code class="javascript">$.clear(document.getElementById('container'))</code></pre>
+	<p>Если&nbsp;вы&nbsp;уже&nbsp;используете функцию <code>$(…)</code>, то&nbsp;js-core не&nbsp;заменит&nbsp;её, если&nbsp;она&nbsp;будет&nbsp;создана до&nbsp;подключения фреймворка. В&nbsp;этом случае можно использовать функцию <code>core(…)</code> или&nbsp;заключить код, использующий js-core в&nbsp;функцию-обертку:</p>
+	<pre><code class="javascript">(function($) {
+ // Здесь $(…) — функция фреймворка &quot;js-core&quot;
+})(core);</code></pre>
+	<h3 id="js-core-chaining">Цепочки&nbsp;— последовательный вызов методов</h3>
+	<p>JavaScript позволяет реализовать последовательный вызов методов, называемый «цепочками вызовов». В&nbsp;js-core активно используется эта&nbsp;возможно, что&nbsp;позволяет в&nbsp;некоторых случаях обойтись без&nbsp;дополнительных переменных. Рассмотрим это&nbsp;на&nbsp;простом примере, добавим элементу с&nbsp;идентификатором <code>container</code> CSS-класс <code>highlight</code> и&nbsp;какой-то текст:</p>
+	<pre><code class="javascript">$('container').addClass('highlight').text('Пример')
+
+// или
+$('container').text('Пример').addClass('highlight')</code></pre>
+	<p>В&nbsp;какой последовательности вызывать методы, работающие с&nbsp;одним&nbsp;и&nbsp;тем&nbsp;же&nbsp;узлом, в&nbsp;данном случае, не&nbsp;имеет&nbsp;значения.</p>
+	<p>В&nbsp;результате получим:</p>
+	<pre><code class="html">&lt;div id=&quot;container&quot; class=&quot;highlight&quot;&gt;Пример&lt;/div&gt;</code></pre>
+	<p>Цепочку можно&nbsp;продолжать, вызывая доступные методы.</p>
+	<p>Если&nbsp;все-таки необходимо запомнить ссылку на&nbsp;объект в&nbsp;переменную, то&nbsp;можно сделать это&nbsp;несколькими способами:</p>
+	<pre><code class="javascript">var obj = $('container')
+obj.addClass('highlight').text('Пример')
+
+// или
+var obj = $('container').text('Пример').addClass('highlight')</code></pre>
+	<p>Второй вариант возможен ввиду&nbsp;того, что&nbsp;методы возвращают объект, созданный на&nbsp;первом звене цепочки вызовов. Но,&nbsp;так&nbsp;происходит не&nbsp;всегда, в&nbsp;фреймворке есть&nbsp;функции, которые&nbsp;могут либо&nbsp;обрывать цепочку, возвращая какое-то&nbsp;значение, либо&nbsp;продолжать цепочку, но&nbsp;работая уже&nbsp;с&nbsp;новым объектом.</p>
+	<p>Допустим, у&nbsp;нас&nbsp;есть&nbsp;следующий XHTML-код:</p>
+	<pre><code class="html">&lt;div id=&quot;container&quot;&gt;Пример&lt;/div&gt;</code></pre>
+	<p>Добавим элементу с&nbsp;идентификатором <code>container</code> CSS-класс <code>highlight</code> и&nbsp;сохраним в&nbsp;переменную содержащийся в&nbsp;нем&nbsp;текст:</p>
+	<pre><code class="javascript">var text = $('container').addClass('highlight').text()
+alert(text) // выдаст сообщение &quot;Пример&quot;</code></pre>
+	<p>Вызванный метод <code>text()</code>, без&nbsp;параметров, обрывает цепочку и&nbsp;возвращает <code>innerText</code> текущего узла.</p>
+	<p>Другой тип функций передает в&nbsp;цепочке новый объект, содержащий, например, ссылку на&nbsp;добавленный элемент:</p>
+	<pre><code class="javascript">var obj = $('container').addClass('highlight').append('span')</code></pre>
+	<p>В&nbsp;результате в&nbsp;переменной <code>obj</code>&nbsp;будет&nbsp;находиться ссылка на&nbsp;<code>HTMLSpanElement</code>, а&nbsp;не&nbsp;<code>HTMLDivElement</code>, таким&nbsp;образом, можно&nbsp;продолжить цепочку:</p>
+	<pre><code class="javascript">var obj = $('container').addClass('highlight').append('span').text('Добавленный текст')</code></pre>
+	<p>Переменная <code>obj</code>&nbsp;все&nbsp;так&nbsp;же&nbsp;будет&nbsp;содержать ссылку на&nbsp;<code>HTMLSpanElement</code>, так&nbsp;как&nbsp;метод <code>text</code> вернет предыдущий в&nbsp;цепочке объект, созданный функцией <code>append(…)</code>.</p>
+	<p>XHTML-код приобретет следующий вид:</p>
+	<pre><code class="html">&lt;div id=&quot;container&quot; class=&quot;highlight&quot;&gt;
+ Пример
+ &lt;span&gt;Добавленный текст&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+	<h3 id="js-core-context">Текущий элемент, контекст вызова</h3>
+	<p>Из&nbsp;предыдущего примера видно, что&nbsp;элемент, с&nbsp;которым идет работа в&nbsp;цепочке вызовов, может изменяться. Соответственно изменяется и&nbsp;контекст вызова функций <code>this</code>, происходит это&nbsp;следующим образом:</p>
+	<pre><code class="javascript">$('container')      // this → HTMLDivElement
+.append('fieldset') // this → HTMLFieldsetElement
+.append('p')        // this → HTMLParagraphElement
+.prepend('span')    // this → HTMLSpanElement
+.text('Пример')     // this → HTMLSpanElement</code></pre>
+	<p>Получим XHTML-код:</p>
+	<pre><code class="html">&lt;div id=&quot;container&quot;&gt;
+    &lt;fieldset&gt;
+       &lt;p&gt;
+           &lt;span&gt;Пример&lt;/span&gt;
+       &lt;/p&gt;
+    &lt;/fieldset&gt;
+&lt;/div&gt;</code></pre>
+	<p>Таким&nbsp;образом, можно&nbsp;выполнить код последовательно, для&nbsp;каждого элемента, не&nbsp;запоминая ссылку на&nbsp;него в&nbsp;переменную:</p>
+	<pre><code class="javascript">$('container').exist(function() {
+ // this → HTMLDivElement
+}).append('fieldset').exist(function() {
+ // this → HTMLFieldsetElement
+}).append('p').exist(function() {
+ // this → HTMLParagraphElement
+}).prepend('span').exist(function() {
+ // this → HTMLSpanElement
+}).text('Пример') // this → HTMLSpanElement</code></pre>
+	<p>Метод <code>exist(…)</code> проверяет наличие элемента и&nbsp;запускает callback-функйцию, которая вызывается в&nbsp;контексте текущего узла.</p>
+	<h3 id="js-core-events">Обработка событий</h3>
+	<p>Кросс-браузерная обработка событий, наверное, одна&nbsp;из&nbsp;самых&nbsp;сложных частей фреймворка, как&nbsp;для&nbsp;понимания, так&nbsp;и&nbsp;в&nbsp;плане реализации.</p>
+	<h4 id="js-core-events-bind">Добавление/удаление обработчиков событий</h4>
+	<p>В&nbsp;Internet Explorer, в&nbsp;отличие от&nbsp;других браузеров, выполняемые по&nbsp;событию функции, добавленные методом <code>attachEvent(…)</code>, не&nbsp;получают в&nbsp;качестве первого аргумента объект-событие и&nbsp;не&nbsp;вызываются в&nbsp;контексте элемента, к&nbsp;событию которого «привязаны». Чтобы&nbsp;частично решить эту&nbsp;проблему в&nbsp;js-core все&nbsp;анонимные функции, добавляемые в&nbsp;обработчик события какого-либо элемента, автоматически вызываются в&nbsp;контексте этого элемента, а&nbsp;для&nbsp;получения объекта-событие предусмотрены специальные методы, о&nbsp;которых позже.</p>
+	<p>Добавим обработчик события «click» для узла с идентификатором «container»:</p>
+	<pre><code class="javascript">$('container').bind('click', function() {
+ // this → HTMLDivElement
+})</code></pre>
+	<p>Для&nbsp;анонимной функции, переданной в&nbsp;метод <code>bind(…)</code>, в&nbsp;Internet&nbsp;Explorer будет автоматически добавлена «обертка», вызывающая эту&nbsp;функцию в&nbsp;контексте узла с&nbsp;идентификатором <code>container</code>. Чтобы&nbsp;иметь&nbsp;возможность удалить функцию из&nbsp;обработчика события, т.&nbsp;е.&nbsp;выполнить метод <code>removeEventListener(…)/detachEvent(…)</code>, для&nbsp;именованных функций такая&nbsp;обертка не&nbsp;добавляется, но&nbsp;предусмотрен специальный метод <code>context(…)</code>, который можно использовать следующим образом:</p>
+	<pre><code class="javascript">function test() {
+ // this → HTMLDivElement
+}
+var obj = $('container')
+var func = $.context(test, obj.node)
+obj.bind('click', func) // добавляем обработчик события
+…
+obj.unbind('click', func) // удаляем обработчик события</code></pre>
+	<p>Немного неудобно, но&nbsp;лучшего варианта, сохраняющего возможность удаления обработчиков событий,&nbsp;нет. Для&nbsp;тех,&nbsp;кто&nbsp;хорошо разбирается в&nbsp;JavaScript, приведу более короткий вариант кода, который выполняет тоже&nbsp;самое:</p>
+	<pre><code class="javascript">var func, obj = $('container');
+obj.bind('click', (func = $.context(function() {
+ // this → HTMLDivElement
+}, obj.node))) // добавляем обработчик события
+…
+obj.unbind('click', func) // удаляем обработчик события</code></pre>
+	<h5 id="js-core-events-short-bind">Сокращенная запись добавления обработчиков событий</h5>
+	<p>Помимо функции <code>bind(…)</code> существуют вспомогательные: <code>click(…)</code>, <code>load(…)</code>, <code>mouseover(…)</code>&nbsp;и&nbsp;др. Эти&nbsp;методы позволяют немного сократить запись:</p>
+	<pre><code class="javascript">$('container').click('toggleClass', 'highlight')</code></pre>
+	<p>В&nbsp;этом случае по&nbsp;событию <code>click</code> на&nbsp;элементе с&nbsp;идентификатором <code>container</code> будет&nbsp;автоматически выполнен метод <code>toggleClass</code> с&nbsp;параметром <code>highlight</code>.</p>
+	<p>Так&nbsp;же&nbsp;остается возможность назначить в&nbsp;качестве обработчика функцию:</p>
+	<pre><code class="javascript">$('container').mouseover(function() {
+    $(this).toggleClass('highlight')
+})</code></pre>
+	<h4 id="js-core-events-object">Работа с&nbsp;объектом-событие</h4>
+	<p>Для&nbsp;работы с&nbsp;объектом-событие предусмотрен метод <code>$.event(…)</code>, который возвращает, так&nbsp;же&nbsp;как&nbsp;и&nbsp;в&nbsp;случае с&nbsp;функцией&nbsp;<code>$(…)</code>, специальную обертку, содержащую ссылку на&nbsp;этот&nbsp;объект, через&nbsp;прототип которой доступны методы для&nbsp;работы с&nbsp;событием.</p>
+	<p>Получить объект-событие можно&nbsp;несколькими способами:</p>
+	<pre><code class="javascript">$('container').bind('mousedown', function(eventObject) {
+ eventObject = eventObject || window.event
+ $.event(eventObject)
+})
+
+// или
+$('container').bind('mousedown', function(eventObject) {
+ var eventObject = arguments[0] || window.event
+ $.event(eventObject)
+})
+
+// или
+$('container').bind('mousedown', function(eventObject) {
+ $.event(eventObject)
+})
+
+// или
+$('container').bind('mousedown', function() {
+ $.event(arguments[0])
+})</code></pre>
+	<p>Все&nbsp;эти&nbsp;варианты успешно сработают. Далее&nbsp;в&nbsp;примерах будем использовать последний вариант.</p>
+	<h5 id="js-core-events-object-mouse">События мыши</h5>
+	<pre><code class="javascript">$('container').bind('mousedown', function() {
+ var eventObj = $.event(arguments[0]) // обертка для объекта-событие
+ eventObj.object // ссылка на объект-событие
+ eventObj.mouseButton() // выдаст &quot;left&quot;, &quot;middle&quot; или &quot;right&quot;
+ eventObj.mousePosition() // вернет объект {x: число, y: число}
+ eventObj.mousePosition().x // координата курсора по оси OX
+ eventObj.mousePosition().y // координата курсора по оси OY
+ eventObj.target() // текущий элемент, при всплывании события
+ this // ссылка на &lt;div&gt; c идентификатором &quot;container&quot;
+})</code></pre>
+	<h5 id="js-core-events-object-keyboard">События клавиатуры</h5>
+	<pre><code class="javascript">$(document).bind('keydown', function() {
+ $.event(arguments[0]).key() // код нажатой клавиши
+})</code></pre>
+	<h5 id="js-core-events-object-default-and-bubbling">Стандартное действие браузера и&nbsp;всплывание событий</h5>
+	<pre><code class="javascript">$(document.forms[0]).bind('submit', function() {
+ var eventObj = $.event(arguments[0])
+ eventObj.preventDefault() // предотвращает стандартное действие
+ eventObj.stopPropagation() // останавливает &quot;всплывание&quot; события
+ eventObj.stop() // выполняет 2 предыдущих метода
+})</code></pre>
+	<p>Для&nbsp;управления предотвращением стандартного действия браузера <code>(preventDefualt/returnValue)</code>, методы <code>bind(…)</code> и&nbsp;<code>unbind(…)</code> могут принимать, в&nbsp;качестве 3-го&nbsp;параметра, значения <code>true</code> или&nbsp;<code>false</code>, а&nbsp;так&nbsp;же&nbsp;предусмотрен специальный метод <code>useDefault(…)</code>:</p>
+	<pre><code class="javascript">// выполнять автоматически preventDefault
+$(document.forms[0]).bind('submit', func, false)
+
+// отменить автоматическое срабатывание preventDefault
+$(document.forms[0]).useDefault('submit', true)</code></pre>
+	<h3 id="js-core-node-list">Работа со&nbsp;списками элементов</h3>
+	<p>Еще&nbsp;одна&nbsp;функция-конструктор <code>$.list(…)</code> создает обертку для&nbsp;списка DOM-элементов (узлов&nbsp;с&nbsp;nodeType&nbsp;==&nbsp;1) и&nbsp;предоставляет набор методов:</p>
+	<pre><code class="javascript">var list = $.list(document.getElementsByTagName('div'))
+
+// или
+var list = new $.list(document.getElementsByTagName('div'))</code></pre>
+	<p>Если&nbsp;отправить в&nbsp;функцию набор, содержащий не&nbsp;только&nbsp;элементы, но&nbsp;и&nbsp;текстовые узлы, то&nbsp;она&nbsp;автоматически оставит в&nbsp;списке только&nbsp;элементы:</p>
+	<pre><code class="javascript">var list = $.list(document.body.childNodes)</code></pre>
+	<p>Так&nbsp;же, в&nbsp;качестве второго аргумента, можно&nbsp;указать значение <code>false</code> или&nbsp;функцию-фильтр. Если&nbsp;указано значение <code>false</code>, то&nbsp;автоматическая фильтрация узлов по&nbsp;значению свойства <code>nodeType</code> не&nbsp;производится, это&nbsp;может быть&nbsp;использовано для&nbsp;увеличения производительности, если&nbsp;вы&nbsp;уверены, что&nbsp;передаваемая вами&nbsp;коллекция элементов не&nbsp;содержит текстовых узлов. Функция-фильтр вызывается в&nbsp;контексте каждого элемента списка с&nbsp;<code>nodeType&nbsp;==&nbsp;1</code>, для&nbsp;того&nbsp;чтобы&nbsp;включать элемент в&nbsp;список, функция должна вернуть значение <code>true</code>.</p>
+	<pre><code class="javascript">var list = $.list(document.getElementsByTagName('*'), false)</code></pre>
+	<p>Рассмотрим работу варианта с&nbsp;функцией-фильтром на&nbsp;конкретном примере, допустим есть&nbsp;следующий XHTML-код:</p>
+	<pre><code class="html">&lt;ul id=&quot;list-items&quot;&gt;
+ &lt;li&gt;1st list item&lt;/li&gt;
+ &lt;li&gt;2nd list item&lt;/li&gt;
+ &lt;li&gt;3rd list item&lt;/li&gt;
+ &lt;li&gt;4th list item&lt;/li&gt;
+ &lt;li&gt;5th list item&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+	<p>Добавим CSS-класс <code>highlight</code> всем&nbsp;четным элементам &lt;li&gt; в&nbsp;списке &lt;ul&gt; c&nbsp;идентификатором <code>list-items</code>:</p>
+	<pre><code class="javascript">$.list($('list-items').node.childNodes, function(i) {
+ return i % 2 == 0;
+}).each(function() {
+ $(this).addClass('highlight');
+})</code></pre>
+	<p>Существуют способы сделать это&nbsp;короче:</p>
+	<pre><code class="javascript">$.list($('list-items').node.childNodes}).each(function(i) {
+ if(i % 2 == 0) $(this).addClass('highlight')
+});
+
+// или
+$.list($('list-items').node.childNodes, function(i) {
+ return i % 2 == 0;
+}).each('addClass', 'highlight')
+
+// или
+$('list-items').child().filter(function(i) {
+ return i % 2 == 0;
+}).each('addClass', 'highlight')
+
+// или
+$('list-items').child().each(function(i) {
+ if(i % 2 == 0) $(this).addClass('highlight')
+})</code></pre>
+	<p>Как&nbsp;видим, некоторые методы (<code>child</code>, <code>filter</code>&nbsp;и&nbsp;др.) возвращают экземпляр объекта <code>$.list</code>.</p>
+	<p>Сам&nbsp;список можно&nbsp;получить следующим образом:</p>
+	<pre><code class="javascript">var items = $.list(document.body.childNodes).items</code></pre>
+	<p>Остальные методы работы со&nbsp;списками смотрите в&nbsp;таблице ниже.</p>
+	<h3 id="js-core-methods">Методы js-core</h3>
+	<p>Разобьем методы на&nbsp;группы по&nbsp;объектам, к&nbsp;которым они&nbsp;относятся.</p>
+	<h4 id="js-core-methods-core-prototype">Методы доступные через&nbsp;прототип функции core(…) или&nbsp;$(…)</h4>
+	<pre><code class="javascript">$(document.body).append('h1').text('Пример');</code></pre>
+	<table summary="">
+		<colgroup>
+		<col class="col1" />
+		<col class="col2" />
+		<col class="col3" />
+		<col class="col4" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th colspan="4" class="separate">DOM</th>
+			</tr>
+			<tr>
+				<th rowspan="2">parent</th>
+				<td>.parent()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить родительский узел</td>
+			</tr>
+			<tr>
+				<td>.parent('tagName')</td>
+				<td>Получить родительский узел с&nbsp;указанным именем тега</td>
+			</tr>
+			<tr>
+				<th rowspan="2">append</th>
+				<td>.append('tagName')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить новый узел в&nbsp;конец списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.append(HTMLElement)</td>
+				<td>Переместить существующий узел в&nbsp;конец списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr>
+				<th rowspan="2">prepend</th>
+				<td>.prepend('tagName')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить новый узел в&nbsp;начало списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.prepend(HTMLElement)</td>
+				<td>Переместить существующий узел в&nbsp;начало списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr>
+				<th rowspan="2">after</th>
+				<td>.after('tagName')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить новый узел после текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.after(HTMLElement)</td>
+				<td>Поместить существующий узел после текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="2">before</th>
+				<td>.before('tagName')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить новый узел перед текущим элементом</td>
+			</tr>
+			<tr>
+				<td>.before(HTMLElement)</td>
+				<td>Поместить существующий узел перед текущим элементом</td>
+			</tr>
+			<tr>
+				<th rowspan="2">appendTo</th>
+				<td>appendTo('id')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить текущий узел в&nbsp;конец списка дочерних элементов узла с&nbsp;указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>appendTo(HTMLElement)</td>
+				<td>Добавить текущий узел в&nbsp;конец списка дочерних элементов указанным узла</td>
+			</tr>
+			<tr>
+				<th rowspan="2">prependTo</th>
+				<td>prependTo('id')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить текущий узел в&nbsp;начало списка дочерних элементов узла с&nbsp;указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>prependTo(HTMLElement)</td>
+				<td>Добавить текущий узел в&nbsp;начало списка дочерних элементов указанным узла</td>
+			</tr>
+			<tr>
+				<th rowspan="2">insertAfter</th>
+				<td>insertAfter('id')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Поместить текущий узел после элемета с&nbsp;указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>insertAfter(HTMLElement)</td>
+				<td>Поместить текущий узел после указанного элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="2">insertBefore</th>
+				<td>insertBefore('id')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Поместить текущий узел перед элеметом с&nbsp;указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>insertBefore(HTMLElement)</td>
+				<td>Поместить текущий узел перед указанным элементом</td>
+			</tr>
+			<tr>
+				<th rowspan="2">next</th>
+				<td>.next()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить следующий элемент</td>
+			</tr>
+			<tr>
+				<td>.next('tagName')</td>
+				<td>Получить следующий элемент с&nbsp;указанным именем тега</td>
+			</tr>
+			<tr>
+				<th rowspan="2">prev</th>
+				<td>.prev()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить предыдущий элемент</td>
+			</tr>
+			<tr>
+				<td>.prev('tagName')</td>
+				<td>Получить предыдущий элемент с&nbsp;указанным именем тега</td>
+			</tr>
+			<tr>
+				<th rowspan="2">firstChild</th>
+				<td>.firstChild()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить первый дочерний элемент</td>
+			</tr>
+			<tr>
+				<td>.firstChild('tagName')</td>
+				<td>Получить первый дочерний элемент с&nbsp;указанным именем тега</td>
+			</tr>
+			<tr>
+				<th rowspan="2">lastChild</th>
+				<td>.lastChild()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить последний дочерний элемент</td>
+			</tr>
+			<tr>
+				<td>.lastChild('tagName')</td>
+				<td>Получить последний дочерний элемент с&nbsp;указанным именем тега</td>
+			</tr>
+			<tr>
+				<th rowspan="2">nthChild</th>
+				<td>.nthChild(n)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить элемент, стоящий на&nbsp;n+1&nbsp;позиции в&nbsp;списке дочерних узлов</td>
+			</tr>
+			<tr>
+				<td>.nthChild(n, 'tagName')</td>
+				<td>Получить элемент, с&nbsp;указанным именем тега, стоящий на&nbsp;n+1&nbsp;позиции в&nbsp;списке дочерних узлов</td>
+			</tr>
+			<tr>
+				<th rowspan="2">clone</th>
+				<td>.clone()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Получить копию текущего узла вместе с&nbsp;дочерними элементами</td>
+			</tr>
+			<tr>
+				<td>.clone(false)</td>
+				<td>Получить копию текущего узла без&nbsp;дочерних элементов</td>
+			</tr>
+			<tr>
+				<th rowspan="2">replace</th>
+				<td>.replace('tagName')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Заменить текущий узел новым элементом</td>
+			</tr>
+			<tr>
+				<td>.replace(HTMLElement)</td>
+				<td>Заменить текущий узел существующим элементом</td>
+			</tr>
+			<tr>
+				<th rowspan="6">wrap</th>
+				<td>.wrap('tagName')</td>
+				<td rowspan="6">{node:HTMLElement}</td>
+				<td rowspan="2">Обернуть текущий узел новым элементом</td>
+			</tr>
+			<tr>
+				<td>.wrap('tagName',&nbsp;'outside')</td>
+			</tr>
+			<tr>
+				<td>.wrap('tagName',&nbsp;'inside')</td>
+				<td>Обернуть все&nbsp;дочерние узлы текущего элемента новым узлом</td>
+			</tr>
+			<tr>
+				<td>.wrap(HTMLElement)</td>
+				<td rowspan="2">Обернуть текущий узел существующим элементом</td>
+			</tr>
+			<tr>
+				<td>.wrap(HTMLElement, 'outside')</td>
+			</tr>
+			<tr>
+				<td>.wrap(HTMLElement, 'inside')</td>
+				<td>Обернуть все&nbsp;дочерние узлы текущего элемента существующим узлом</td>
+			</tr>
+			<tr>
+				<th>empty</th>
+				<td>.empty()</td>
+				<td>{node:HTMLElement}</td>
+				<td>Удалить все&nbsp;дочерние узлы текущего элемента</td>
+			</tr>
+			<tr>
+				<th>remove</th>
+				<td>.remove()</td>
+				<td>null</td>
+				<td>Удалить текущий элемент вместе с&nbsp;дочерними узлами</td>
+			</tr>
+			<tr>
+				<th rowspan="2">text</th>
+				<td>.text()</td>
+				<td>string</td>
+				<td>Получить свойство innerText текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.text('string')</td>
+				<td>{node:HTMLElement}</td>
+				<td>Удалить все&nbsp;дочерние узлы текущего элемента и&nbsp;поместить в&nbsp;него&nbsp;новый текстовый узел</td>
+			</tr>
+			<tr>
+				<th rowspan="2">html</th>
+				<td>.html()</td>
+				<td>string</td>
+				<td>Получить свойство innerHTML текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.html('string')</td>
+				<td>{node:HTMLElement}</td>
+				<td>Изменить свойство innerText текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="4">exist</th>
+				<td>.exist()</td>
+				<td>true|false</td>
+				<td>Проверить существование узла</td>
+			</tr>
+			<tr>
+				<td>.exist(func)</td>
+				<td rowspan="3">{node:HTMLElement}</td>
+				<td>Запустить функцию func, если узел существует</td>
+			</tr>
+			<tr>
+				<td>.exist(func1, func2)</td>
+				<td>Запустить функцию func1, если узел существует, иначе&nbsp;— запустить func2</td>
+			</tr>
+			<tr>
+				<td>.exist(null, func)</td>
+				<td>Запустить функцию func, если узел отсутствует</td>
+			</tr>
+			<tr>
+				<th rowspan="3">el</th>
+				<td>.el()</td>
+				<td>HTMLElement</td>
+				<td>Получить прямую ссылку на&nbsp;текущий элемент</td>
+			</tr>
+			<tr>
+				<td>.el('id')</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Заменить текущий элемент узлом с&nbsp;указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>.el(HTMLElement)</td>
+				<td>Заменить текущий элемент существующим узлом</td>
+			</tr>
+			<tr>
+				<th rowspan="2">id</th>
+				<td>.id()</td>
+				<td>string</td>
+				<td>Получить идентификатор текущего узла</td>
+			</tr>
+			<tr>
+				<td>.id('string')</td>
+				<td>{node:HTMLElement}</td>
+				<td>Изменить идентификатор текущего узла</td>
+			</tr>
+			<tr>
+				<th rowspan="6">is</th>
+				<td>.is()</td>
+				<td rowspan="6">true|false</td>
+				<td>Проверить существование узла</td>
+			</tr>
+			<tr>
+				<td>.is({attr:&nbsp;'value'})</td>
+				<td rowspan="5">Если хотя&nbsp;бы одно из&nbsp;значений указанных атрибутов не&nbsp;совпадает со&nbsp;значениями соответствующих атрибутов текущего узла, вернуть false, иначе&nbsp;— true</td>
+			</tr>
+			<tr>
+				<td>.is({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…})</td>
+			</tr>
+			<tr>
+				<td>.is('tagName')</td>
+			</tr>
+			<tr>
+				<td>.is({attr:&nbsp;'value'}, 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.is({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…}, 'tagName')</td>
+			</tr>
+			<tr>
+				<th rowspan="2">val</th>
+				<td>.val()</td>
+				<td>string</td>
+				<td>Получить свойство value текущего элемента ввода</td>
+			</tr>
+			<tr>
+				<td>.val('string')</td>
+				<td>{node:HTMLElement}</td>
+				<td>Изменить свойство value текущего элемента ввода</td>
+			</tr>
+			<tr>
+				<th rowspan="3">enabled</th>
+				<td>.enabled()</td>
+				<td>true|false</td>
+				<td>Проверить активность текущего элемента ввода</td>
+			</tr>
+			<tr>
+				<td>.enabled(true)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Включить текущий элемент ввода</td>
+			</tr>
+			<tr>
+				<td>.enabled(false)</td>
+				<td>Выключить текущий элемент ввода</td>
+			</tr>
+			<tr>
+				<th rowspan="7">attr</th>
+				<td>.attr('attr')</td>
+				<td rowspan="2">*</td>
+				<td rowspan="2">Получить значение указанного атрибута текущего узла</td>
+			</tr>
+			<tr>
+				<td>.attr(['attr'])</td>
+			</tr>
+			<tr>
+				<td>.attr('attr1&nbsp;attr2&nbsp;…')</td>
+				<td rowspan="2">array</td>
+				<td rowspan="2">Получить массив значений указанных атрибутов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.attr(['attr1',&nbsp;'attr2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.attr('attr', 'value')</td>
+				<td rowspan="3">{node:HTMLElement}</td>
+				<td rowspan="2">Изменить значение атрибута текущего узла</td>
+			</tr>
+			<tr>
+				<td>.attr({attr:&nbsp;'value'})</td>
+			</tr>
+			<tr>
+				<td>.attr({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…})</td>
+				<td>Изменить значения указанных атрибутов текущего узла</td>
+			</tr>
+			<tr>
+				<th rowspan="4">removeAttr</th>
+				<td>.removeAttr('attr')</td>
+				<td rowspan="4">{node:HTMLElement}</td>
+				<td rowspan="4">Удалить значения указанных атрибутов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.removeAttr(['attr'])</td>
+			</tr>
+			<tr>
+				<td>.removeAttr('attr1&nbsp;attr2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.removeAttr(['attr1',&nbsp;'attr2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<th rowspan="10">child</th>
+				<td>.child()</td>
+				<td rowspan="10">{items:ElementsList}</td>
+				<td>Получить все дочерние элементы текущего узла</td>
+			</tr>
+			<tr>
+				<td>.child('tagName')</td>
+				<td rowspan="4">Получить все&nbsp;дочерние элементы  текущего узла с&nbsp;указанными именами тегов</td>
+			</tr>
+			<tr>
+				<td>.child('tagName1&nbsp;tagName2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.child(['tagName'])</td>
+			</tr>
+			<tr>
+				<td>.child(['tagName1',&nbsp;'tagName2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.child(true)</td>
+				<td>Получить все&nbsp;дочерние элементы текущего узла на&nbsp;всех&nbsp;уровнях вложенности</td>
+			</tr>
+			<tr>
+				<td>.child('tagName', true)</td>
+				<td rowspan="4">Получить все&nbsp;дочерние элементы текущего узла на&nbsp;всех&nbsp;уровнях вложенности с&nbsp;указанными именами тегов</td>
+			</tr>
+			<tr>
+				<td>.child('tagName1&nbsp;tagName2&nbsp;…', true)</td>
+			</tr>
+			<tr>
+				<td>.child(['tagName'], true)</td>
+			</tr>
+			<tr>
+				<td>.child(['tagName1',&nbsp;'tagName2',&nbsp;…], true)</td>
+			</tr>
+			<tr>
+				<th rowspan="12">find</th>
+				<td>.find('attr')</td>
+				<td rowspan="12">{items:ElementsList}</td>
+				<td rowspan="12">Получить все&nbsp;дочерние элементы текущего узла, у&nbsp;которых совпадают все&nbsp;указанные атрибуты; поиск элементов ведется на&nbsp;всех&nbsp;уровнях вложенности</td>
+			</tr>
+			<tr>
+				<td>.find(['attr'])</td>
+			</tr>
+			<tr>
+				<td>.find('attr1&nbsp;attr2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.find(['attr1',&nbsp;'attr2'])</td>
+			</tr>
+			<tr>
+				<td>.find({attr:&nbsp;'value'})</td>
+			</tr>
+			<tr>
+				<td>.find({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…})</td>
+			</tr>
+			<tr>
+				<td>.find('attr',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find(['attr'], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find('attr1&nbsp;attr2&nbsp;…',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find(['attr1',&nbsp;'attr2',&nbsp;…], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find({attr:&nbsp;'value'}, 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…}, 'tagName')</td>
+			</tr>
+			<tr>
+				<th rowspan="8">findAttr</th>
+				<td>.findAttr('attr',&nbsp;'value')</td>
+				<td rowspan="8">{items:ElementsList}</td>
+				<td rowspan="8">Получить все&nbsp;дочерние элементы текущего узла, в&nbsp;значении указанного атрибута которых встречается хотя&nbsp;бы одно из&nbsp;указанных значений; поиск значений ведется по&nbsp;границе слов (/\bValue\b/); поиск элементов ведется на&nbsp;всех&nbsp;уровнях вложенности</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value'])</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr',&nbsp;'value1&nbsp;value2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value1',&nbsp;'value2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr',&nbsp;'value',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value'], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr',&nbsp;'value1&nbsp;value2&nbsp;…',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value1',&nbsp;'value2',&nbsp;…], 'tagName')</td>
+			</tr>
+			<tr>
+				<th rowspan="8">findClass</th>
+				<td>.findClass('class')</td>
+				<td rowspan="8">{items:ElementsList}</td>
+				<td rowspan="8">Получить все&nbsp;дочерние элементы текущего узла, в&nbsp;атрибуте className которых встречается хотя&nbsp;бы один из&nbsp;указанных CSS-классов; поиск элементов ведется на&nbsp;всех&nbsp;уровнях вложенности</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class'])</td>
+			</tr>
+			<tr>
+				<td>.findClass('class1&nbsp;class2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class1',&nbsp;'class2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.findClass('class',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class'], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findClass('class1&nbsp;class2&nbsp;…',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class1',&nbsp;'class2',&nbsp;…], 'tagName')</td>
+			</tr>
+			<tr>
+				<th>serialize</th>
+				<td>.serialize()</td>
+				<td>string</td>
+				<td>Получить HTML-код текущего элемента вместе с&nbsp;кодом самого&nbsp;элемента; идентично свойству outerHTML в&nbsp;IE</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">CSS</th>
+			</tr>
+			<tr>
+				<th rowspan="7">css</th>
+				<td>.css('property')</td>
+				<td rowspan="2">string</td>
+				<td rowspan="2">Получить значение указанного CSS-свойства текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.css(['property'])</td>
+			</tr>
+			<tr>
+				<td>.css('property1&nbsp;property2&nbsp;…')</td>
+				<td rowspan="2">array</td>
+				<td rowspan="2">Получить массив значений указанных CSS-свойств текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.css(['property1',&nbsp;'property2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.css('property', 'value')</td>
+				<td rowspan="3">{node:HTMLElement}</td>
+				<td rowspan="2">Изменить CSS-свойство текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.css({property:&nbsp;'value'})</td>
+			</tr>
+			<tr>
+				<td>.css({property1:&nbsp;'value1', property2:&nbsp;'value2',&nbsp;…})</td>
+				<td>Изменить указанные CSS-свойства текущего элемента</td>
+			</tr>
+			<tr>
+				<th>position</th>
+				<td>.position()</td>
+				<td>{top:number, left:number}</td>
+				<td>Рассчитать offsetTop и offsetLeft текущего элемента в зависимости от offsetParent</td>
+			</tr>
+			<tr>
+				<th>hide</th>
+				<td>.hide()</td>
+				<td>{node:HTMLElement}</td>
+				<td>Скрыть текущий элемент</td>
+			</tr>
+			<tr>
+				<th rowspan="2">show</th>
+				<td>.show()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Сделать текущий элемент видимым</td>
+			</tr>
+			<tr>
+				<td>.show('displayType')</td>
+				<td>Сделать текущий элемент видимым и&nbsp;присвоить CSS-свойству display указанное значение (может понадобится для&nbsp;отображения списков, строчных элементов и&nbsp;др.)</td>
+			</tr>
+			<tr>
+				<th rowspan="2">toggle</th>
+				<td>.toggle()</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td rowspan="2">Скрыть текущий элемент, если он&nbsp;отображается, иначе&nbsp;— сделать его&nbsp;видимым</td>
+			</tr>
+			<tr>
+				<td>.toggle('displayType')</td>
+			</tr>
+			<tr>
+				<th>visible</th>
+				<td>.visible()</td>
+				<td>true|false</td>
+				<td>Проверить отображается ли&nbsp;текущий элемент</td>
+			</tr>
+			<tr>
+				<th rowspan="5">hasClass</th>
+				<td>.hasClass()</td>
+				<td rowspan="5">true|false</td>
+				<td rowspan="5">Проверить наличие CSS-классов текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.hasClass('className')</td>
+			</tr>
+			<tr>
+				<td>.hasClass(['className'])</td>
+			</tr>
+			<tr>
+				<td>.hasClass('className1&nbsp;className2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.hasClass(['className1',&nbsp;'className2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<th rowspan="4">addClass</th>
+				<td>.addClass('className')</td>
+				<td rowspan="4">{node:HTMLElement}</td>
+				<td rowspan="4">Добавить CSS-классы текущему элементу</td>
+			</tr>
+			<tr>
+				<td>.addClass(['className'])</td>
+			</tr>
+			<tr>
+				<td>.addClass('className1&nbsp;className2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.addClass(['className1',&nbsp;'className2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<th rowspan="5">removeClass</th>
+				<td>.removeClass('className')</td>
+				<td rowspan="5">{node:HTMLElement}</td>
+				<td rowspan="5">Удалить CSS-классы текущему элементу</td>
+			</tr>
+			<tr>
+				<td>.removeClass('className')</td>
+			</tr>
+			<tr>
+				<td>.removeClass(['className'])</td>
+			</tr>
+			<tr>
+				<td>.removeClass('className1&nbsp;className2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.removeClass(['className1',&nbsp;'className2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<th rowspan="8">toggleClass</th>
+				<td>.toggleClass('className')</td>
+				<td rowspan="8">{node:HTMLElement}</td>
+				<td rowspan="4">Удалить имеющиеся CSS-классы и&nbsp;добавить недостающие</td>
+			</tr>
+			<tr>
+				<td>.toggleClass(['className'])</td>
+			</tr>
+			<tr>
+				<td>.toggleClass('className1&nbsp;className2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.toggleClass(['className1',&nbsp;'className2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.toggleClass('className1',&nbsp;'className2')</td>
+				<td rowspan="2">Заменить CSS-класс с именем className1 на className2</td>
+			</tr>
+			<tr>
+				<td>.toggleClass(['className1'], ['className2'])</td>
+			</tr>
+			<tr>
+				<td>.toggleClass('className1&nbsp;className2&nbsp;…', 'className3&nbsp;className4&nbsp;…')</td>
+				<td rowspan="2">Последовательно заменить className1 на&nbsp;className3, className2 на&nbsp;className4</td>
+			</tr>
+			<tr>
+				<td>.toggleClass(['className1',&nbsp;'className2',&nbsp;…], ['className3',&nbsp;'className4',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">Events (события)</th>
+			</tr>
+			<tr>
+				<th rowspan="2">useDefault</th>
+				<td>.useDefault('eventType', false)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Добавить в&nbsp;обработчик указанного события для&nbsp;текущего элемента функцию, предотвращающую стандартное действие браузера</td>
+			</tr>
+			<tr>
+				<td>.useDefault('eventType', true)</td>
+				<td>Удалить из&nbsp;обработчика указанного события для&nbsp;текущего элемента функцию, предотвращающую стандартное действие браузера</td>
+			</tr>
+			<tr>
+				<th rowspan="3">bind</th>
+				<td>.bind('eventType', function)</td>
+				<td rowspan="3">{node:HTMLElement}</td>
+				<td>Добавить в&nbsp;обработчик указанного события для&nbsp;текущего элемента функцию</td>
+			</tr>
+			<tr>
+				<td>.bind('eventType', function, false)</td>
+				<td>Добавить в&nbsp;обработчик указанного события для&nbsp;текущего элемента функцию и&nbsp;автоматически выполнить .useDefault('eventType', false)</td>
+			</tr>
+			<tr>
+				<td>.bind('eventType', function, true)</td>
+				<td>Добавить в&nbsp;обработчик указанного события для&nbsp;текущего элемента функцию и&nbsp;автоматически выполнить .useDefault('eventType', true)</td>
+			</tr>
+			<tr>
+				<th rowspan="3">unbind</th>
+				<td>.unbind('eventType', function)</td>
+				<td rowspan="3">{node:HTMLElement}</td>
+				<td>Удалить из обработчика указанного события для текущего элемента функцию</td>
+			</tr>
+			<tr>
+				<td>.unbind('eventType', function, false)</td>
+				<td>Удалить из&nbsp;обработчика указанного события для&nbsp;текущего элемента функцию и&nbsp;автоматически выполнить .useDefault('eventType', false)</td>
+			</tr>
+			<tr>
+				<td>.unbind('eventType', function, true)</td>
+				<td>Удалить из&nbsp;обработчика указанного события для&nbsp;текущего элемента функцию и&nbsp;автоматически выполнить .useDefault('eventType', true)</td>
+			</tr>
+			<tr>
+				<th rowspan="3">resize</th>
+				<td>.resize(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию resize на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.resize(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию resize на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.resize()</td>
+				<td>undefined</td>
+				<td>Выполнить метод resize текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">scroll</th>
+				<td>.scroll(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию scroll на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.scroll(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию scroll на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.scroll()</td>
+				<td>undefined</td>
+				<td>Выполнить метод scroll текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">click</th>
+				<td>.blur(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию blur на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.blur(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию blur на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.blur()</td>
+				<td>undefined</td>
+				<td>Выполнить метод blur текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">focus</th>
+				<td>.focus(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию focus на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.focus(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию focus на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.focus()</td>
+				<td>undefined</td>
+				<td>Выполнить метод focus текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">error</th>
+				<td>.error(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию error на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.error(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию error на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.error()</td>
+				<td>undefined</td>
+				<td>Выполнить метод error текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">load</th>
+				<td>.load(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию load на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.load(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию load на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.load()</td>
+				<td>undefined</td>
+				<td>Выполнить метод load текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">unload</th>
+				<td>.unload(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию unload на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.unload(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию unload на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.unload()</td>
+				<td>undefined</td>
+				<td>Выполнить метод unload текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">click</th>
+				<td>.click(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию click на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.click(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию click на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.click()</td>
+				<td>undefined</td>
+				<td>Выполнить метод click текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">dblclick</th>
+				<td>.dblclick(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию dblclick на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.dblclick(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию dblclick на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.dblclick()</td>
+				<td>undefined</td>
+				<td>Выполнить метод dblclick текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">mousedown</th>
+				<td>.mousedown(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию mousedown на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mousedown(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию mousedown на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mousedown()</td>
+				<td>undefined</td>
+				<td>Выполнить метод mousedown текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">mouseup</th>
+				<td>.mouseup(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию mouseup на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mouseup(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию mouseup на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mouseup()</td>
+				<td>undefined</td>
+				<td>Выполнить метод mouseup текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">mousemove</th>
+				<td>.mousemove(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию mousemove на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mousemove(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию mousemove на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mousemove()</td>
+				<td>undefined</td>
+				<td>Выполнить метод mousemove текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">mouseover</th>
+				<td>.mouseover(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию mouseover на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mouseover(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию mouseover на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.mouseover()</td>
+				<td>undefined</td>
+				<td>Выполнить метод mouseover текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">keydown</th>
+				<td>.keydown(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию keydown на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.keydown(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию keydown на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.keydown()</td>
+				<td>undefined</td>
+				<td>Выполнить метод keydown текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">keypress</th>
+				<td>.keypress(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию keypress на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.keypress(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию keypress на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.keypress()</td>
+				<td>undefined</td>
+				<td>Выполнить метод keypress текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">keyup</th>
+				<td>.keyup(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию keyup на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.keyup(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию keyup на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.keyup()</td>
+				<td>undefined</td>
+				<td>Выполнить метод keyup текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">change</th>
+				<td>.change(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию change на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.change(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию change на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.change()</td>
+				<td>undefined</td>
+				<td>Выполнить метод change текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">select</th>
+				<td>.select(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию select на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.select(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию select на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.select()</td>
+				<td>undefined</td>
+				<td>Выполнить метод select текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">submit</th>
+				<td>.submit(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию submit на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.submit(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию submit на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.submit()</td>
+				<td>undefined</td>
+				<td>Выполнить метод submit текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="3">reset</th>
+				<td>.reset(func)</td>
+				<td rowspan="2">{node:HTMLElement}</td>
+				<td>Выполнить функцию func по&nbsp;событию reset на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.reset(method [, arguments])</td>
+				<td>Выполнить указанный метод по&nbsp;событию reset на текущем элементе</td>
+			</tr>
+			<tr>
+				<td>.reset()</td>
+				<td>undefined</td>
+				<td>Выполнить метод reset текущего элемента</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">AJAX (Необходимо подключить AJAX-модуль)</th>
+			</tr>
+			<tr>
+				<th>load</th>
+				<td><a href="#js-core-methods-ajax">Смотрите в&nbsp;соответствующем разделе</a></td>
+				<td>{node:HTMLElement}</td>
+				<td>Заменить содержимое текущего узла на&nbsp;данные, полученные с&nbsp;помощью AJAX-запроса</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">Дополнительно</th>
+			</tr>
+			<tr>
+				<th>store</th>
+				<td>.store()</td>
+				<td>{node:HTMLElement}</td>
+				<td>Сохранить текущее состояние цепочки вызовов</td>
+			</tr>
+			<tr>
+				<th>restore</th>
+				<td>.restore()</td>
+				<td>{node:HTMLElement}</td>
+				<td>Восстановить сохраненную цепочку вызовов</td>
+			</tr>
+		</tbody>
+	</table>
+	<h4 id="js-core-methods-core">Методы и&nbsp;атрибуты объекта core или&nbsp;$</h4>
+	<p>Как&nbsp;бы&nbsp;странно это&nbsp;не&nbsp;звучало, но&nbsp;в&nbsp;JavaScript такое&nbsp;возможно, любая&nbsp;функция одновременно является объектом и&nbsp;может изменть свои&nbsp;атрибуты и&nbsp;методы. Использовать их&nbsp;можно следующим образом:</p>
+	<pre><code class="javascript">$.ready(func) // выполнить функцию по событию &quot;DOMContentLoaded&quot;
+$.t('h1 h2 h3 h4 h5 h6') // получить все заголовки в документе
+$.c('selected') // получить все элементы с классом &quot;selected&quot;</code></pre>
+	<p>Подробнее обо&nbsp;всех&nbsp;методах объекта <code>core</code> или&nbsp;<code>$</code> далее&nbsp;в&nbsp;таблице.</p>
+	<table summary="">
+		<colgroup>
+		<col class="col1" />
+		<col class="col2" />
+		<col class="col3" />
+		<col class="col4" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th colspan="4" class="separate">Основные</th>
+			</tr>
+			<tr>
+				<th>ready</th>
+				<td>.ready(func)</td>
+				<td>undefined</td>
+				<td>Выполнить функцию func по&nbsp;событию DOMContentLoaded</td>
+			</tr>
+			<tr>
+				<th>context</th>
+				<td>.context(func, obj)</td>
+				<td>function</td>
+				<td>Добавить специальную обертку для&nbsp;функции func, чтобы она&nbsp;всегда выполнялась в&nbsp;контексте объекта obj</td>
+			</tr>
+			<tr>
+				<th>n</th>
+				<td>.n('tagName')</td>
+				<td>{node:HTMLElement}</td>
+				<td>Создать новый элемент</td>
+			</tr>
+			<tr>
+				<th>parse</th>
+				<td>.parse('&lt;html/&gt;')</td>
+				<td>{node:HTMLElement}</td>
+				<td>Создать новый элемент</td>
+			</tr>
+			<tr>
+				<th rowspan="5">tags</th>
+				<td>.tags()</td>
+				<td rowspan="5">{items:ElementsList}</td>
+				<td>Получить список всех&nbsp;тегов</td>
+			</tr>
+			<tr>
+				<td>.tags('tagName')</td>
+				<td rowspan="4">Получить список указанных тегов</td>
+			</tr>
+			<tr>
+				<td>.tags(['tagName'])</td>
+			</tr>
+			<tr>
+				<td>.tags('tagName1&nbsp;tagName2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.tags(['tagName1', 'tagName2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<th rowspan="8">findClass</th>
+				<td>.findClass('class')</td>
+				<td rowspan="8">{items:ElementsList}</td>
+				<td rowspan="8">Получить все&nbsp;элементы, в&nbsp;атрибуте className которых встречается хотя&nbsp;бы один из&nbsp;указанных CSS-классов; поиск элементов ведется во&nbsp;всем&nbsp;документе</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class'])</td>
+			</tr>
+			<tr>
+				<td>.findClass('class1&nbsp;class2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class1',&nbsp;'class2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.findClass('class',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class'], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findClass('class1&nbsp;class2&nbsp;…',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findClass(['class1',&nbsp;'class2',&nbsp;…], 'tagName')</td>
+			</tr>
+			<tr>
+				<th rowspan="12">find</th>
+				<td>.find('attr')</td>
+				<td rowspan="12">{items:ElementsList}</td>
+				<td rowspan="12">Получить все&nbsp;элементы, у&nbsp;которых совпадают все&nbsp;указанные атрибуты; поиск элементов ведется во&nbsp;всем&nbsp;документе</td>
+			</tr>
+			<tr>
+				<td>.find(['attr'])</td>
+			</tr>
+			<tr>
+				<td>.find('attr1&nbsp;attr2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.find(['attr1',&nbsp;'attr2'])</td>
+			</tr>
+			<tr>
+				<td>.find({attr:&nbsp;'value'})</td>
+			</tr>
+			<tr>
+				<td>.find({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…})</td>
+			</tr>
+			<tr>
+				<td>.find('attr',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find(['attr'], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find('attr1&nbsp;attr2&nbsp;…',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find(['attr1',&nbsp;'attr2',&nbsp;…], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find({attr:&nbsp;'value'}, 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.find({attr1:&nbsp;'value1', attr2:&nbsp;'value2',&nbsp;…}, 'tagName')</td>
+			</tr>
+			<tr>
+				<th rowspan="8">findAttr</th>
+				<td>.findAttr('attr',&nbsp;'value')</td>
+				<td rowspan="8">{items:ElementsList}</td>
+				<td rowspan="8">Получить все&nbsp;элементы, в&nbsp;значении указанного атрибута которых встречается хотя&nbsp;бы одно из&nbsp;указанных значений; поиск значений ведется по&nbsp;границе слов (/\bValue\b/); поиск элементов ведется во&nbsp;всем документе</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value'])</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr',&nbsp;'value1&nbsp;value2&nbsp;…')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value1',&nbsp;'value2',&nbsp;…])</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr',&nbsp;'value',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value'], 'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr',&nbsp;'value1&nbsp;value2&nbsp;…',&nbsp;'tagName')</td>
+			</tr>
+			<tr>
+				<td>.findAttr('attr', ['value1',&nbsp;'value2',&nbsp;…], 'tagName')</td>
+			</tr>
+			<tr>
+				<th>makeArray</th>
+				<td>.makeArray(list)</td>
+				<td>array</td>
+				<td>Преобразовать список в&nbsp;массив</td>
+			</tr>
+			<tr>
+				<th rowspan="4">forEach</th>
+				<td>.forEach(array, function(element,&nbsp;index,&nbsp;array)&nbsp;{…})</td>
+				<td rowspan="2">array</td>
+				<td rowspan="4">Последовательно выполнить функцию для&nbsp;каждого элемента массива или&nbsp;объекта; чтобы&nbsp;прервать цикл, функция должна вернуть false</td>
+			</tr>
+			<tr>
+				<td>.forEach(array, function(element,&nbsp;index,&nbsp;array)&nbsp;{…}, context)</td>
+			</tr>
+			<tr>
+				<td>.forEach(object, function(element,&nbsp;index,&nbsp;array)&nbsp;{…})</td>
+				<td rowspan="2">object</td>
+			</tr>
+			<tr>
+				<td>.forEach(object, function(key,&nbsp;value,&nbsp;object)&nbsp;{…}, context)</td>
+			</tr>
+			<tr>
+				<th>extend</th>
+				<td>.extend(object, hash)</td>
+				<td>object</td>
+				<td>Расширить объект object методами и&nbsp;атрибутами объекта hash; имеющиеся атрибуты и&nbsp;методы перезаписываются</td>
+			</tr>
+			<tr>
+				<th rowspan="6">trim</th>
+				<td>.trim('string')</td>
+				<td rowspan="6">string</td>
+				<td rowspan="2">Удалить все&nbsp;пробельные символы в&nbsp;начале и&nbsp;конце строки</td>
+			</tr>
+			<tr>
+				<td>.trim.both('string')</td>
+			</tr>
+			<tr>
+				<td>.trim.left('string')</td>
+				<td>Удалить все&nbsp;пробельные символы в&nbsp;начале строки</td>
+			</tr>
+			<tr>
+				<td>.trim.right('string')</td>
+				<td>Удалить все&nbsp;пробельные символы в&nbsp;конце строки</td>
+			</tr>
+			<tr>
+				<td>.trim.spaces('string')</td>
+				<td>Удалить все&nbsp;повторяющиеся пробельные символы</td>
+			</tr>
+			<tr>
+				<td>.trim.all('string')</td>
+				<td>Выполнить все&nbsp;виды преобразований</td>
+			</tr>
+			<tr>
+				<th rowspan="6">list</th>
+				<td>.list(NodeList)</td>
+				<td rowspan="6">{items:ElementsList}</td>
+				<td rowspan="2">Получить список элементов с&nbsp;nodeType==1</td>
+			</tr>
+			<tr>
+				<td>new $.list(NodeList)</td>
+			</tr>
+			<tr>
+				<td>.list(NodeList, false)</td>
+				<td rowspan="2">Получить список элементов; используйте этот&nbsp;вариант для&nbsp;увеличения производительности в&nbsp;случае, если&nbsp;уверены, что&nbsp;в&nbsp;коллекции нет&nbsp;текстовых и&nbsp;других узлов, кроме элементов</td>
+			</tr>
+			<tr>
+				<td>new $.list(NodeList, false)</td>
+			</tr>
+			<tr>
+				<td>.list(NodeList, function(index){…})</td>
+				<td rowspan="2">Получить список элементов используя функцию-фильтр; если&nbsp;функция возвращает true, элемент включается в&nbsp;коллекцию</td>
+			</tr>
+			<tr>
+				<td>new $.list(NodeList, function(index){…})</td>
+			</tr>
+			<tr>
+				<th rowspan="4">timer</th>
+				<td>.timer(timeout, func)</td>
+				<td rowspan="4">object</td>
+				<td rowspan="4">Получить объект "timer"; методы этого&nbsp;объекта приведены в&nbsp;отдельной таблице</td>
+			</tr>
+			<tr>
+				<td>new $.timer(timeout, func)</td>
+			</tr>
+			<tr>
+				<td>.timer(timeout, func, context)</td>
+			</tr>
+			<tr>
+				<td>new $.timer(timeout, func, context)</td>
+			</tr>
+			<tr>
+				<th rowspan="2">event</th>
+				<td>.event(eventObject)</td>
+				<td rowspan="2">{object:eventObject}</td>
+				<td rowspan="2">Получить объект-событие; методы этого&nbsp;объекта приведены в&nbsp;отдельной таблице</td>
+			</tr>
+			<tr>
+				<td>new $.event(eventObject)</td>
+			</tr>
+			<tr>
+				<th rowspan="2">ajax</th>
+				<td>.ajax()</td>
+				<td rowspan="2">{xhr:XMLHttpRequest}</td>
+				<td rowspan="2">Получить объект для&nbsp;работы с&nbsp;AJAX; методы этого&nbsp;объекта приведены в&nbsp;отдельной таблице;</td>
+			</tr>
+			<tr>
+				<td>new $.ajax()</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">Вспомогательные</th>
+			</tr>
+			<tr>
+				<th>ie</th>
+				<td>.ie</td>
+				<td>number|undefined</td>
+				<td>Номер версии Internet&nbsp;Explorer</td>
+			</tr>
+			<tr>
+				<th>storage</th>
+				<td>.storage</td>
+				<td>{node:HTMLElement} или {items:ElementsList}</td>
+				<td>Сохраненное функцией store состояние цепочки</td>
+			</tr>
+			<tr>
+				<th>attrs</th>
+				<td>.attrs</td>
+				<td>object</td>
+				<td>Список названий свойств, которые преобразуются в&nbsp;имена атрибутов и&nbsp;используются методами find и&nbsp;findAttr, когда доступен Selectors&nbsp;API</td>
+			</tr>
+			<tr>
+				<th>cache</th>
+				<td>.cache</td>
+				<td>object</td>
+				<td>Кэш элементов по&nbsp;идентификаторам</td>
+			</tr>
+			<tr>
+				<th>clear</th>
+				<td>.clear(HTMLElement)</td>
+				<td>HTMLElement</td>
+				<td>Очищает кэш</td>
+			</tr>
+			<tr>
+				<th rowspan="2">id</th>
+				<td>.id('string')</td>
+				<td rowspan="2">HTMLElement</td>
+				<td rowspan="2">Получить элемент по&nbsp;идентификатору используя кэш</td>
+			</tr>
+			<tr>
+				<td>.id(HTMLElement)</td>
+			</tr>
+			<tr>
+				<th rowspan="2">create</th>
+				<td>.create('tagName')</td>
+				<td rowspan="2">HTMLElement</td>
+				<td rowspan="2">Создать новый элемент</td>
+			</tr>
+			<tr>
+				<td>.create(HTMLElement)</td>
+			</tr>
+			<tr>
+				<th rowspan="2">insert</th>
+				<td>.insert(parentNode, thisNode, beforeNode)</td>
+				<td rowspan="2">thisNode (HTMLElement)</td>
+				<td>Вставить элемент thisNode в&nbsp;список дочерних элементов узла parentNode перед&nbsp;элементом beforeNode</td>
+			</tr>
+			<tr>
+				<td>.insert(parentNode, 'tagName', beforeNode)</td>
+				<td>Вставить новый узел в&nbsp;список дочерних элементов узла parentNode перед&nbsp;элементом beforeNode</td>
+			</tr>
+			<tr>
+				<th>bind</th>
+				<td>.bind(HTMLElement, 'eventType', func)</td>
+				<td>undefined</td>
+				<td>Добавить обработчик события</td>
+			</tr>
+			<tr>
+				<th>unbind</th>
+				<td>.unbind(HTMLElement, 'eventType', func)</td>
+				<td>undefined</td>
+				<td>Удалить обработчик события</td>
+			</tr>
+			<tr>
+				<th rowspan="2">toArray</th>
+				<td>.toArray('string')</td>
+				<td rowspan="2">array</td>
+				<td rowspan="2">Разбить строку на&nbsp;элементы по&nbsp;шаблону /\s+/</td>
+			</tr>
+			<tr>
+				<td>.toArray(array)</td>
+			</tr>
+		</tbody>
+	</table>
+	<h4 id="js-core-methods-timer">Методы работы с таймером</h4>
+	<p>В&nbsp;js-core вводит специальный объект для&nbsp;более удобного использования встроенных методов <code>setTimeout</code> и&nbsp;<code>setInterval</code>. Получить этот&nbsp;объект можно при&nbsp;помощи функции конструктора&nbsp;<code>$.timer(…)</code> или&nbsp;<code>core.timer(…)</code>:</p>
+	<pre><code class="javascript">// повторить выполнение функции 5 раз с задержкой 100 мс
+$.timer(100, function() {…}).repeat(5)
+
+// выполнять функцию с задержкой 50 мс
+core.timer(50, function(timer) {
+    if(…) timer.stop()
+}).start()</code></pre>
+	<p>Подробнее, об&nbsp;остальных методах, в&nbsp;таблице&nbsp;ниже:</p>
+	<table summary="">
+		<colgroup>
+		<col class="col1" />
+		<col class="col2" />
+		<col class="col3" />
+		<col class="col4" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th>start</th>
+				<td>.start()</td>
+				<td>object</td>
+				<td>Запустить таймер</td>
+			</tr>
+			<tr>
+				<th>stop</th>
+				<td>.stop()</td>
+				<td>object</td>
+				<td>Остановить таймер</td>
+			</tr>
+			<tr>
+				<th rowspan="3">repeat</th>
+				<td>.repeat(amount)</td>
+				<td rowspan="3">object</td>
+				<td>Запустить таймер и&nbsp;выполнить указанное количество раз</td>
+			</tr>
+			<tr>
+				<td>.repeat(amount, callback)</td>
+				<td rowspan="2">Запустить таймер и&nbsp;выполнить указанное количество раз; по&nbsp;окончании запустить callback-функцию</td>
+			</tr>
+			<tr>
+				<td>.repeat(amount, callback, context)</td>
+			</tr>
+		</tbody>
+	</table>
+	<h4 id="js-core-methods-list">Методы работы со&nbsp;списками узлов</h4>
+	<p>Все&nbsp;методы фреймворка для&nbsp;работы со&nbsp;списками узлов доступны через&nbsp;прототип функции <code>$.list(…)</code>, которая&nbsp;может&nbsp;быть использована в&nbsp;качестве конструктора любым из&nbsp;представленных ниже&nbsp;способов:</p>
+	<pre><code class="javascript">var list = $.list(document.getElementsByTagName('div'))
+
+// или
+var list = new $.list(document.getElementsByTagName('div'))
+
+// или
+var list = core.list(document.getElementsByTagName('div'))
+
+// или
+var list = new core.list(document.getElementsByTagName('div'))</code></pre>
+	<p>Некоторые функции фреймворка автоматически создают подобные списки, например:</p>
+	<pre><code class="javascript">var list = $.t('div');</code></pre>
+	<p>В&nbsp;результате в&nbsp;переменной <code>list</code> будет ссылка на&nbsp;объект, содержащий список узлов, над&nbsp;которым можно&nbsp;произвонить действия, например, добавим всем&nbsp;найденным элементам CSS-класс <code>highlight</code>:</p>
+	<pre><code class="javascript">list.each('addClass', 'highlight');</code></pre>
+	<p>Подробнее обо&nbsp;всех&nbsp;методах функции-конструктора <code>$.list(…)</code> далее&nbsp;в&nbsp;таблице:</p>
+	<table summary="">
+		<colgroup>
+		<col class="col1" />
+		<col class="col2" />
+		<col class="col3" />
+		<col class="col4" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th>items</th>
+				<td>.items</td>
+				<td>ElementsList</td>
+				<td>Получить прямую ссылку на&nbsp;список или&nbsp;массив узлов</td>
+			</tr>
+			<tr>
+				<th>item</th>
+				<td>.item(number)</td>
+				<td>{node:HTMLElement}</td>
+				<td>Получить элемент списка с&nbsp;указанным номером</td>
+			</tr>
+			<tr>
+				<th>last</th>
+				<td>.last()</td>
+				<td>{node:HTMLElement}</td>
+				<td>Получить последний элемент списка</td>
+			</tr>
+			<tr>
+				<th>size</th>
+				<td>.size()</td>
+				<td>number</td>
+				<td>Получить количество элементов в&nbsp;списке</td>
+			</tr>
+			<tr>
+				<th rowspan="2">each</th>
+				<td>.each(function(HTMLElement, index, ElementsList){…})</td>
+				<td rowspan="2">{items:ElementsList}</td>
+				<td>Последовательно выполнить функцию для&nbsp;каждого элемента списка; чтобы прервать цикл, функция должна вернуть false</td>
+			</tr>
+			<tr>
+				<td>.each('method', arguments)</td>
+				<td>Последовательно выполнить указанный метод для&nbsp;каждого элемента списка</td>
+			</tr>
+			<tr>
+				<th rowspan="2">filter</th>
+				<td>.filter('method', arguments)</td>
+				<td rowspan="2">{items:ElementsList}</td>
+				<td>Получить новый список элементов из&nbsp;текущего используя метод-фильтр; если&nbsp;метод возвращает true, элемент включается в&nbsp;новую коллекцию</td>
+			</tr>
+			<tr>
+				<td>.filter(NodeList, function(index){…})</td>
+				<td>Получить новый список элементов из&nbsp;текущего используя функцию-фильтр; если&nbsp;функция возвращает true, элемент включается в&nbsp;новую коллекцию</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">Дополнительно</th>
+			</tr>
+			<tr>
+				<th>store</th>
+				<td>.store()</td>
+				<td>{items:ElementsList}</td>
+				<td>Сохранить текущее состояние цепочки вызовов</td>
+			</tr>
+			<tr>
+				<th>restore</th>
+				<td>.restore()</td>
+				<td>{items:ElementsList}</td>
+				<td>Восстановить сохраненную цепочку вызовов</td>
+			</tr>
+		</tbody>
+	</table>
+	<h4 id="js-core-methods-event">Методы работы с&nbsp;объектом-событие</h4>
+	<p>Обработка событий, как&nbsp;говорилось ранее, один из&nbsp;самых трудных моментов, но&nbsp;используя js-core, вы&nbsp;избавить себя от&nbsp;ряда проблем.</p>
+	<pre><code class="javascript">function(e) {
+ $.event(e).preventDefault();
+}</code></pre>
+	<p>Подробнее, об&nbsp;остальных методах, в&nbsp;таблице ниже:</p>
+	<table summary="">
+		<colgroup>
+		<col style="width:120px;background:#f5f5f5;" />
+		<col style="width:220" />
+		<col style="width:128px;" />
+		<col style="width:200px;" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th>preventDefault</th>
+				<td>.preventDefault()</td>
+				<td>{object:eventObject}</td>
+				<td>Предотвратить стандартное действие браузера</td>
+			</tr>
+			<tr>
+				<th>stopPropagation</th>
+				<td>.stopPropagation()</td>
+				<td>{object:eventObject}</td>
+				<td>Остановить всплывание события</td>
+			</tr>
+			<tr>
+				<th>stop</th>
+				<td>.stop()</td>
+				<td>{object:eventObject}</td>
+				<td>Выполнить два предыдущих метода</td>
+			</tr>
+			<tr>
+				<th>target</th>
+				<td>.target()</td>
+				<td>HTMLElement</td>
+				<td>Получить текущий элемент, на&nbsp;котором сработало событие</td>
+			</tr>
+			<tr>
+				<th>mouseButton</th>
+				<td>.mouseButton()</td>
+				<td>left|middle|right</td>
+				<td>Узнать, какая кнопка мыши была&nbsp;нажата</td>
+			</tr>
+			<tr>
+				<th>mousePosition</th>
+				<td>.mousePosition()</td>
+				<td>{x:number,y:number}</td>
+				<td>Получить координаты курсоры мыши</td>
+			</tr>
+			<tr>
+				<th>key</th>
+				<td>.key()</td>
+				<td>number</td>
+				<td>Получить код&nbsp;нажатой клавиши</td>
+			</tr>
+		</tbody>
+	</table>
+	<h4 id="js-core-methods-ajax">Методы работы с&nbsp;AJAX</h4>
+	<p>Для&nbsp;того чтобы&nbsp;получить доступ к&nbsp;методам для&nbsp;работы с&nbsp;AJAX в&nbsp;js-core, вам&nbsp;нужно&nbsp;подключить соответствующий модуль, который находится в&nbsp;отдельном файле. Такое разделение было&nbsp;сделано по&nbsp;причине&nbsp;того, что&nbsp;в&nbsp;дальнейшем планируется значительно увеличить функционал этого&nbsp;модуля, что&nbsp;неминуемо приведет к&nbsp;увеличению его&nbsp;размеров, но&nbsp;не&nbsp;каждое JavaScript-приложение использует AJAX для&nbsp;передачи данных.</p>
+	<p>На&nbsp;данный момент (версия модуля&nbsp;0.2.5) доступно 4&nbsp;метода, которые могут&nbsp;принимать следующие аргументы:</p>
+	<pre><code class="javascript">// объект с параметрами
+var parametrs = {
+ method: 'GET'|'POST',      // по умолчанию GET
+ url: 'url-encoded-string', // по умолчанию location.href
+ async: true|false,         // по умолчанию true
+ user: 'string',            // по умолчанию null
+ password: 'string',        // по умолчанию null
+ params: {param: 'value'},  // по умолчанию null
+ processData: true|false,   // по умолчанию false
+ timeout: number,           // по умолчанию 0
+ contentType: 'string',// по умолчанию application/x-www-form-urlencoded
+ dataType: 'string',        // по умолчанию */*
+ requestHeaders: {'name': 'content'}, // по умолчанию null
+ protocol: 'string'         // по умолчанию http:
+}
+// callback-функции
+function success(responseText [, xhr]) {...}
+function error(responseText [, xhr]) {...}</code></pre>
+	<p>Ни&nbsp;один из&nbsp;аргументов объекта <code>parametrs</code> не&nbsp;обязателен, как&nbsp;и&nbsp;callback-функции. Метод <code>$(…).load(…)</code> выполняет callback-функции в&nbsp;контексте текущего элемента, остальные&nbsp;— AJAX-объекта.</p>
+	<pre><code class="javascript">$('container').text('loading…').load(parametrs, success, error)</code></pre>
+	<p><strong>Не забывайте, что в JavaScript действует «правило одного источника», поэтому передачу данных можно производить только в переделах одного домена.</strong></p>
+	<table summary="">
+		<colgroup>
+		<col style="width:120px;background:#f5f5f5;" />
+		<col style="width:220" />
+		<col style="width:128px;" />
+		<col style="width:200px;" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th rowspan="4">load</th>
+				<td>$(…).load(parametrs)</td>
+				<td rowspan="4">{node:HTMLElement}</td>
+				<td rowspan="4">Заменить содержимое текущего узла на&nbsp;данные, полученные с&nbsp;помощью AJAX-запроса</td>
+			</tr>
+			<tr>
+				<td>$(…).load(parametrs, success)</td>
+			</tr>
+			<tr>
+				<td>$(…).load(parametrs, success, error)</td>
+			</tr>
+			<tr>
+				<td>$(…).load(parametrs, null, error)</td>
+			</tr>
+			<tr>
+				<th rowspan="4">$.get</th>
+				<td>$.get(parametrs)</td>
+				<td rowspan="4">object</td>
+				<td rowspan="4">Выполнить GET-запрос средствами AJAX</td>
+			</tr>
+			<tr>
+				<td>$.get(parametrs, success)</td>
+			</tr>
+			<tr>
+				<td>$.get(parametrs, success, error)</td>
+			</tr>
+			<tr>
+				<td>$.get(parametrs, null, error)</td>
+			</tr>
+			<tr>
+				<th rowspan="4">$.post</th>
+				<td>$.post(parametrs)</td>
+				<td rowspan="4">object</td>
+				<td rowspan="4">Выполнить POST-запрос средствами AJAX</td>
+			</tr>
+			<tr>
+				<td>$.post(parametrs, success)</td>
+			</tr>
+			<tr>
+				<td>$.post(parametrs, success, error)</td>
+			</tr>
+			<tr>
+				<td>$.post(parametrs, null, error)</td>
+			</tr>
+			<tr>
+				<th rowspan="4">$.getJSON</th>
+				<td>$.getJSON(parametrs)</td>
+				<td rowspan="4">object</td>
+				<td rowspan="4">Выполнить запрос средствами AJAX и&nbsp;автоматически преобразовать пришедшие от&nbsp;сервера данные в&nbsp;JavaScript-объект</td>
+			</tr>
+			<tr>
+				<td>$.getJSON(parametrs, success)</td>
+			</tr>
+			<tr>
+				<td>$.getJSON(parametrs, success, error)</td>
+			</tr>
+			<tr>
+				<td>$.getJSON(parametrs, null, error)</td>
+			</tr>
+		</tbody>
+	</table>
+	<h3 id="js-core-writing-extensions">Создание расширений для js-core</h3>
+	<p>Фреймворк имеет удобный и&nbsp;простой механизм расширения стандартного функционала пользовательскими методами:</p>
+	<pre><code class="javascript">core.prototype.newMethod = function() {
+ // что-то делаем с this.node
+ return this; // для обарзования цепочек
+}</code></pre>
+	<p>Добавим метод <code>defaultValue(…)</code>, который&nbsp;служит, чтобы&nbsp;установить значение по&nbsp;умолчанию для&nbsp;элемента ввода:</p>
+	<pre><code class="javascript">core.prototype.defaultValue = function(str) {
+ if(!this.node.value) this.node.value = str;
+ return this.bind('focus', function() {
+	  if(this.value == str) this.value = '';
+ }).bind('blur', function() {
+	  if(!core.trim(this.value)) this.value = str;
+ });
+};
+
+// используем
+$(HTMLInputElement).defaultValue('Найти');</code></pre>
+	<p>Как&nbsp;видим, механизм расширения предельно прост, достаточно добавить свой&nbsp;метод в&nbsp;прототип объекта&nbsp;<code>core</code>, а&nbsp;для&nbsp;того, чтобы&nbsp;организовать возможность построения цепочек вызовов, можно&nbsp;вернуть в&nbsp;своем&nbsp;методе контекст вызова&nbsp;<code>this</code>.</p>
+	<h3 id="js-core-examples">Демонстрация</h3>
+	<p>Несколько простых и&nbsp;наглядных примеров вы&nbsp;можете&nbsp;увидеть перейдя по&nbsp;следующей ссылке: «<a href="http://js-core.googlecode.com/svn/trunk/index.html">Примеры использования js-core</a>».</p>
+	<h3 id="js-core-features">Что дальше?</h3>
+	<p>Дальнейшие планы по&nbsp;наращиванию функционала:</p>
+	<ul>
+		<li><strong>Анимация</strong> (fadeIn, fadeOut, slideToggle), которую&nbsp;вы&nbsp;можете реализовать и&nbsp;сейчас, для&nbsp;этого есть&nbsp;набор необходимых методов (opacity, timer, hide, show и&nbsp;др.);</li>
+		<li>Обработка форм, маскированный ввод;</li>
+		<li>Расширение функциональности AJAX-модуля, внедрение глобальных AJAX-событий и&nbsp;очередей перезапускающихся запросов;</li>
+		<li>Создание набора готовых элементов интерфейса.</li>
+	</ul>
+	<h3 id="js-core-download">Скачать</h3>
+	<p>Скачать можно на&nbsp;<a href="http://code.google.com/p/js-core/downloads/list">странице проекта</a> в&nbsp;сервисе Google&nbsp;Code или&nbsp;с&nbsp;сайта <a href="http://www.js-core.ru/downloads/">www.js-core.ru</a>.</p>
+	<p>В&nbsp;архиве <a href="http://js-core.googlecode.com/files/js-core-2.7.8-release.zip">js-core-2.7.8-release.zip</a> вы&nbsp;сможете найти специальную версию <code>js-core-2.7.8-compact.js</code>, подготовленную для&nbsp;интеграции с&nbsp;движком выборки элементов по&nbsp;<abbr title="Cascading Style Sheets">CSS</abbr>-селекторам. В&nbsp;этой&nbsp;версии удалены все&nbsp;методы, связанные с&nbsp;поиском элементов (<code>findClass</code>, <code>find</code>, <code>findAttr</code> и&nbsp;<code>child</code>).</p>
+</div>
+<p class="copyright">&copy;&nbsp;<a href="http://www.designwizard.ru/">Дмитрий&nbsp;Коробкин</a>,&nbsp;2009</p>
+<script type="text/javascript" src="highlight.pack.js"></script>
+<script type="text/javascript">hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
