@@ -1351,8 +1351,8 @@ $('list-items').child().each(function(i) {
 	<h4 id="js-core-methods-core">Методы и&nbsp;атрибуты объекта core или&nbsp;$</h4>
 	<p>Как&nbsp;бы&nbsp;странно это&nbsp;не&nbsp;звучало, но&nbsp;в&nbsp;JavaScript такое&nbsp;возможно, любая&nbsp;функция одновременно является объектом и&nbsp;может изменть свои&nbsp;атрибуты и&nbsp;методы. Использовать их&nbsp;можно следующим образом:</p>
 	<pre><code class="javascript">$.ready(func) // выполнить функцию по событию &quot;DOMContentLoaded&quot;
-$.t('h1 h2 h3 h4 h5 h6') // получить все заголовки в документе
-$.c('selected') // получить все элементы с классом &quot;selected&quot;</code></pre>
+$.tags('h1 h2 h3 h4 h5 h6') // получить все заголовки в документе
+$.findClass('selected') // получить все элементы с классом &quot;selected&quot;</code></pre>
 	<p>Подробнее обо&nbsp;всех&nbsp;методах объекта <code>core</code> или&nbsp;<code>$</code> далее&nbsp;в&nbsp;таблице.</p>
 	<table summary="">
 		<colgroup>
@@ -1768,7 +1768,7 @@ var list = core.list(document.getElementsByTagName('div'))
 // или
 var list = new core.list(document.getElementsByTagName('div'))</code></pre>
 	<p>Некоторые функции фреймворка автоматически создают подобные списки, например:</p>
-	<pre><code class="javascript">var list = $.t('div');</code></pre>
+	<pre><code class="javascript">var list = $.tags('div');</code></pre>
 	<p>В&nbsp;результате в&nbsp;переменной <code>list</code> будет ссылка на&nbsp;объект, содержащий список узлов, над&nbsp;которым можно&nbsp;произвонить действия, например, добавим всем&nbsp;найденным элементам CSS-класс <code>highlight</code>:</p>
 	<pre><code class="javascript">list.each('addClass', 'highlight');</code></pre>
 	<p>Подробнее обо&nbsp;всех&nbsp;методах функции-конструктора <code>$.list(…)</code> далее&nbsp;в&nbsp;таблице:</p>
