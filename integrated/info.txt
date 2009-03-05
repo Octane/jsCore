@@ -1,0 +1,112 @@
+Сборка YASS + js-core
+
+------------
+ Компоненты
+------------
+
+ • js-core 2.8.0 — fast and lightweight JavaScript framework
+   Copyright (c) 2009 Dmitry Korobkin
+   Released under the MIT License.
+   More information: http://www.js-core.ru/
+
+ • js-core AJAX module, version 0.2.6
+
+ • YASS 0.3.8 — the fastest CSS selectors JavaScript library
+   Experimental branch of YASS — CSS3 selectors with cache only
+   Copyright (c) 2008 Nikolay Matsievsky aka sunnybear (webo.in, webo.name)
+   Dual licensed under the MIT and GPL licenses.
+   $Date: 2009-02-23 12:59:31 +3000 (Mon, 23 Feb 2009)
+   $Rev: 22
+
+-------
+ Файлы
+-------
+
+ • js-core.yass.js      — несжатая версия для разработчиков.
+
+ • js-core.yass.min.js  — minified-версия, рекомендуется
+                          использовать в готовых проектах.
+
+ • js-core.yass.pack.js — packed-версия, имеет меньший объем,
+                          но значительно повышает нагрузку
+                          на процессор во время старта,
+                          рекомендуется использовать только
+                          при жесткой необходимости уменьшить
+                          объем передаваемых данных.
+
+---------------------
+ Изменения в js-core
+---------------------
+
+ • Следующие методы и свойства были удалены:
+
+   - core.tag
+   - core.find
+   - core.findAttr
+   - core.findClass
+   - core.prototype.findAttr
+   - core.prototype.findClass
+   - core.prototype.children
+   - core.attrs
+
+ • Следующие методы были изменены:
+
+   - core.find — поиск элементов по CSS-селектору.
+     Синтаксис:  core.find(selector [, root] [, noCache])
+     Возвращает: new core.list(…)
+     Доступные CSS-селекторы уточняйте на сайте http://yass.webo.in/
+
+   - window.$$ — глобальная ссылка на предыдущий метод.
+     Уже существующая функция $$ не будет перезаписана.
+
+   - core.prototype.find — поиск вложенных узлов по CSS-селектору.
+     Синтаксис:  core(…).find(selector [, noCache])
+     Возвращает: new core.list(…)
+     Доступные CSS-селекторы уточняйте на сайте http://yass.webo.in/
+
+   - core.prototype.child — поиск дочерних элементов.
+     Изменениям подверглись логика и синтаксис метода,
+     теперь доступен поиск только дочерних элементов.
+     Синтаксис:  core(…).child("tagName [, tagName2]")
+     Возвращает: new core.list(…)
+
+   - core.list.prototype.add — теперь возможен поиск новых элементов,
+     добавляемых в существующую коллекцию, по CSS-селектору.
+     Синтаксис: core.list(…).add(HTMLElement|DOMNodeList|selector)
+     Изменяет и возвращает предыдущую копию new core.list(…)
+
+   - core.prototype.clone и core.prototype.empty — поиск вложенных
+     узлов производится средствами YASS.
+
+   - core.prototype.nthChild — удален 3-й аргумент, отвечающий
+     за глубину поиска элементов.
+
+ • Следующие методы были добавлены:
+
+   - core.yass — поиск элементов по CSS-селектору.
+     Синтаксис: core.yass(selector, root, noCache)
+     Возвращает: список элементов
+
+ • В сборку включен модуль для работы с AJAX.
+
+------------------
+ Изменения в YASS
+------------------
+
+ • Для исключения ошибок, возникающих при использовании CSS3-селекторов
+   в Internet Explorer 8 RC1, вызов метода querySelectorAll заключен
+   в конструкцию try {…}, и в случае ошибки происходит поиск элементов
+   по алгоритму, как для браузеров, не поддерживающих этот метод.
+
+ • Удалены некоторые кэширующие ссылки встроенных элементов (doc, win и др.),
+   уже присутствующие в js-core.
+
+ • Удалены глобальные ссылки, создаваемые YASS.
+
+ • Изменено общее форматирование кода и удалены комментарии.
+
+----------------------
+ Пример использования
+----------------------
+
+ $$("ul > li:nth-child(odd)").each("addClass", "odd");

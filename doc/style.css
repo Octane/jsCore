@@ -1,0 +1,267 @@
+@charset "utf-8";
+body {
+margin: 24px;
+color: #272727;
+font: 16px/24px Calibri, "Trebuchet MS", sans-serif;
+background: #fff;
+}
+a:link, a:visited {
+text-decoration: none;
+border-bottom-width: 1px;
+border-bottom-style: solid;
+}
+a:link {
+color: #1578bd;
+border-bottom-color: #1578bd;
+}
+a:visited {
+color: #486f8a;
+border-bottom-color: #486f8a;
+}
+a:hover, a:focus {
+color: #bd067a;
+border-bottom-color: #bd067a;
+}
+img {
+vertical-align: bottom;
+}
+.logo:link, .logo:visited, logo:link img, .logo:visited img {
+display: block;
+width: 192px;
+height: 192px;
+border: none;
+}
+.logo:link, .logo:visited {
+float: left;
+margin-right: 14px;
+}
+h1, h2, h3, h4, h5, h6, p, pre, ul, ol, li, dl, dt, dd, blockquote, address {
+margin: 0 0 14px;
+padding: 0;
+}
+h1, h2, h3, h4, h5, h6 {
+line-height: 24px;
+}
+h2, h3, h4, h5, h6 {
+color: #bd064f;
+font-variant: small-caps;
+}
+h3, h4, h5, h6 {
+font-weight: normal;
+}
+h3:target, h4:target, h5:target, h6:target {
+color: #272727;
+background: #fee890;
+}
+h1 {
+overflow: hidden;
+padding: 48px 0 0 24px;
+color: #223d6a;
+font: italic 36px/24px Cambria, Georgia, serif;
+}
+h1 span {
+display: block;
+margin-left: 24px;
+color: #8d9fbf;
+font-size: 16px;
+}
+h2 {
+padding-top: 36px;
+clear: both;
+font-size: 22px;
+font-weight: bold;
+border-top: 1px dotted #abb8ce;
+}
+h3 {
+margin-top: 36px;
+font-size: 20px;
+counter-increment: first-level;
+counter-reset: second-level third-level;
+}
+h4 {
+font-size: 18px;
+counter-increment: second-level;
+counter-reset: third-level;
+}
+h5 {
+font-size: 16px;
+counter-increment: third-level;
+}
+h6 {
+font-size: 14px;
+}
+h3:before {
+content: counter(first-level) " ";
+}
+h4:before {
+content: counter(first-level) "." counter(second-level) " ";
+}
+h5:before {
+content: counter(first-level) "." counter(second-level) "." counter(third-level) " ";
+}
+li {
+list-style-type: disc;
+margin-left: 36px;
+}
+li li {
+list-style-type: circle;
+}
+li ul {
+margin-top: 14px;
+}
+code {
+font: 14px/20px Consolas, "Courier New", Courier, monospace;
+}
+p code, li code {
+background: #f7f7f7;
+}
+pre {
+padding-left: 28px;
+border: 1px solid #f1f1f1;
+background: #f7f7f7 url(code.png) no-repeat;
+}
+abbr {
+border-bottom: 1px dotted #999;
+cursor: help;
+}
+a:link abbr, a:visited abbr {
+cursor: pointer;
+border: none;
+}
+dfn {
+font-weight: normal;
+font-style: italic;
+}
+table, th, td {
+border-width: 1px;
+border-style: solid;
+margin: 0;
+}
+table {
+table-layout: fixed;
+width: 100%;
+margin-bottom: 24px;
+padding: 0 1px 1px 0;
+border-spacing: 0;
+border-collapse: separate;
+border-color: #abb8ce;
+background: #f8f8f8;
+}
+th {
+padding: 0;
+font-weight: bold;
+border-color: #f8f8f8 #abb8ce #abb8ce #f8f8f8;
+text-align: center;
+text-shadow: 1px 1px 0 #e4edfb;
+vertical-align: middle;
+background: #d0dbee;
+}
+thead th {
+font-size: 11px;
+}
+tbody th {
+font-size: 12px;
+}
+th.separate {
+border-color: #fbe3e3 #dca6a6 #dca6a6 #f8f8f8;
+background: #eed0d0;
+}
+td {
+padding: 4px;
+font: 12px/18px Consolas, "Courier New", Courier, monospace;
+text-align: left;
+vertical-align: top;
+}
+td {
+border-color: #f8f8f8 #abb8ce #abb8ce #f8f8f8;
+background: #e0e8f5;
+}
+tr.odd th {
+background: #dbe4f4;
+}
+tr.odd td {
+background: #e6eef9;
+}
+.col1 {
+width: 10%;
+}
+.col2 {
+width: 35%;
+}
+.col3 {
+width: 15%;
+}
+.col4 {
+width: 40%;
+}
+.container {
+min-width: 900px;
+max-width: 1200px;
+margin: 0 auto;
+}
+.contents {
+padding: 14px 0;
+background: #f8f8f8;
+}
+.contents h3 {
+color: #778896;
+margin: 0 36px 14px;
+counter-increment: none;
+counter-reset: none;
+}
+.contents h3:before {
+content: "";
+}
+.contents li {
+display: block;
+list-style: none;
+counter-increment: level1;
+counter-reset: level2 level3;
+}
+.contents li li {
+counter-increment: level2;
+counter-reset: level3;
+}
+.contents li li li {
+counter-increment: level3;
+counter-reset: none;
+}
+.contents li:before {
+content: counter(level1) " ";
+}
+.contents li li:before {
+content: counter(level1) "." counter(level2) " ";
+}
+.contents li li li:before {
+content: counter(level1) "." counter(level2) "." counter(level3) " ";
+}
+.comment, .annotation, .template_comment, .diff .header, .chunk, .apache .cbracket {
+color: #7889a6;
+}
+.keyword, .id, .title, .vbscript .built_in, .rsl .built_in, .cpp .built_in, .aggregate, .smalltalk .class, .winutils, .bash .variable {
+color: rgb(0, 0, 255);
+}
+.string, .title, .parent, .tag .attribute .value, .rules .value, .rules .value .number, .ruby .symbol, .instancevar, .aggregate, .template_tag, .django .variable, .addition, .flow, .stream, .apache .tag {
+color: rgb(0, 128, 0);
+}
+.ruby .string, .decorator, .filter .argument, .localvars, .array, .attr_selector, .pi, .doctype, .deletion, .envvar, .shebang, .preprocessor, .userType, .apache .sqbracket {
+color: rgb(43, 145, 175);
+}
+.phpdoc, .javadoc, .xmlDocTag {
+color: rgb(128, 128, 128);
+}
+.copyright {
+margin: 24px 0 0;
+padding: 24px;
+font: 11px/16px Verdana, sans-serif;
+text-align: center;
+border-top: 1px dotted #abb8ce;
+}
+::selection {
+color: #000;
+background: #faedb1;
+}
+::-moz-selection {
+color: #000;
+background: #faedb1;
+}
