@@ -3,70 +3,53 @@ $.ready(function() {
 
 	// nav menu tooltip
 	$('header').exist(function() {
-
 		// create tooltip container
-		var tooltip = $(document.body).append('div').hide().addClass('tooltip'),
-		// cache tooltip style object
-		style = tooltip.node.style,
-		// flags
-		hide, change = false,
-		// decrease operations onmousemove
-		timer = $.timer(30, function() {
-			// calculate/don't calculate position left
-			change = !change;
-		});
-		// show tooltip
+		var tooltip = $(document.body).append('div').hide().addClass('tooltip'), visible = false, move = false;
 		function show() {
-			// visible
-			hide = false;
-			// change text and show
-			tooltip.node.innerHTML = this.tooltip;
-			setTimeout(function() {
-				tooltip.show();
-			}, 150);
-			// start decreasing operations onmousemove
-			timer.start();
-		};
-		// hide tooltip
+			visible = true;
+			var link = $(this), position = tooltip.position().left;
+			if(move && position > 0) {
+				var destination = link.position().left, step = position < destination ? 5 : -5;
+				$.timer(10, function(timer) {
+					if(move && Math.abs(position - destination) > 5) {
+						position += step;
+						tooltip.css('left', position + 'px');
+					} else {
+						timer.stop();
+						tooltip.text(link.attr('tooltip'));
+					}
+				}).start();
+			}
+			else {
+				move = true;
+				setTimeout(function() {
+					tooltip.css('left', link.position().left + 'px').text(link.attr('tooltip')).show();
+				}, 150);
+			}
+		}
 		function hide() {
-			// to hide
-			hide = true;
+			visible = false;
 			setTimeout(function() {
-				if(hide) {
-					// stop decreasing operations onmousemove
-					timer.stop();
-					// hide tooltip
+				if(!visible) {
 					tooltip.hide();
+					move = false;
 				}
 			}, 300);
 		}
-		$(this).firstChild('ul').children('a').each(function() {
-			$(this).mouseover(show).mouseout(hide).mousemove(function(e) {
-				// calculate position left
-				if(change) style.left = $.event(e).mousePosition().x - 26 + 'px';
-			}).focus(function() {
-				// calculate position left
-				style.left = $(this).position().left - 26 + Math.round(this.offsetWidth / 2) + 'px';
-				// show tooltip
-				show.call(this);
-			}).blur(hide);
-			// save original title
-			this.tooltip = this.title;
-			// remove native tooltip for title attribute
-			this.title = '';
+		$(this).first('ul').children('a').each(function() {
+			$(this).focus(show).blur(hide).mouseover(show).mouseout(hide).attr('tooltip', this.title).node.removeAttribute('title');
 		});
-
 	});
 	
 	// get elements by class name
 	var examples = $.findClass('example');
 
 	function args(example) {
-		var	button = example.firstChild('button'),
-				temp = example.firstChild('div'),
+		var	button = example.first('button'),
+				temp = example.first('div'),
 				dom = temp.children('span'),
 				javascript = temp.next('div').children('code'),
-				actions = example.firstChild('ol').child('li');
+				actions = example.first('ol').child('li');
 		return [button, dom, javascript, actions];
 	}
 
@@ -77,10 +60,10 @@ $.ready(function() {
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				dom.item(state).addClass('active');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
-				if(state == 2) dom.item(2).text('Пример');
+				dom.get(state).addClass('active');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
+				if(state == 2) dom.get(2).text('Пример');
 				state++;
 			}
 			if(state == 3) {
@@ -91,7 +74,7 @@ $.ready(function() {
 			if(state == 4) {
 				button.text('Старт');
 				dom.each('removeClass', 'active');
-				dom.item(2).text('Текст');
+				dom.get(2).text('Текст');
 				javascript.each('removeClass', 'active');
 				actions.each('hide');
 				state = 0;
@@ -99,7 +82,7 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(0)));
+	}).apply(this, args(examples.get(0)));
 
 	(function(button, dom, javascript, actions) {
 
@@ -108,9 +91,9 @@ $.ready(function() {
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				dom.item(state).addClass('active');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
+				dom.get(state).addClass('active');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
 				if(state == 1) li.each('addClass', 'active');
 				if(state == 2) li.each('html', '&lt;li class=&quot;some&quot;&gt;');
 				state++;
@@ -131,7 +114,7 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(1)));
+	}).apply(this, args(examples.get(1)));
 
 	(function(button, dom, javascript, actions) {
 
@@ -140,11 +123,11 @@ $.ready(function() {
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				dom.item(state).addClass('active');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
+				dom.get(state).addClass('active');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
 				if(state == 1) span.each('addClass', 'active');
-				if(state == 2) span.item(0).removeClass('active');
+				if(state == 2) span.get(0).removeClass('active');
 				state++;
 			}
 			if(state == 3) {
@@ -162,7 +145,7 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(2)));
+	}).apply(this, args(examples.get(2)));
 
 	(function(button, dom, javascript, actions) {
 
@@ -171,11 +154,11 @@ $.ready(function() {
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
-				dom.item(0).addClass('active');
-				if(state == 1) dom.item(3).addClass('active');
-				if(state == 2) dom.item(3).html('&lt;span title=&quot;Подсказка&quot;&gt;');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
+				dom.get(0).addClass('active');
+				if(state == 1) dom.get(3).addClass('active');
+				if(state == 2) dom.get(3).html('&lt;span title=&quot;Подсказка&quot;&gt;');
 				state++;
 			}
 			if(state == 3) {
@@ -186,7 +169,7 @@ $.ready(function() {
 			if(state == 4) {
 				button.text('Старт');
 				dom.each('removeClass', 'active');
-				dom.item(3).html('&lt;span&gt;');
+				dom.get(3).html('&lt;span&gt;');
 				javascript.each('removeClass', 'active');
 				actions.each('hide');
 				state = 0;
@@ -194,7 +177,7 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(3)));
+	}).apply(this, args(examples.get(3)));
 
 	(function(button, dom, javascript, actions) {
 
@@ -203,11 +186,11 @@ $.ready(function() {
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
-				if(state == 0) dom.item(3).addClass('active');
-				if(state == 1) dom.item(1).addClass('active');
-				if(state == 2) dom.item(1).html('&lt;div style=&quot;color:#f00&quot;&gt;');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
+				if(state == 0) dom.get(3).addClass('active');
+				if(state == 1) dom.get(1).addClass('active');
+				if(state == 2) dom.get(1).html('&lt;div style=&quot;color:#f00&quot;&gt;');
 				state++;
 			}
 			if(state == 3) {
@@ -218,7 +201,7 @@ $.ready(function() {
 			if(state == 4) {
 				button.text('Старт');
 				dom.each('removeClass', 'active');
-				dom.item(1).html('&lt;div&gt;');
+				dom.get(1).html('&lt;div&gt;');
 				javascript.each('removeClass', 'active');
 				actions.each('hide');
 				state = 0;
@@ -226,7 +209,7 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(4)));
+	}).apply(this, args(examples.get(4)));
 
 	(function(button, dom, javascript, actions) {
 
@@ -235,10 +218,10 @@ $.ready(function() {
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
-				if(state == 0) dom.item(0).addClass('active');
-				if(state == 1) h1 = dom.item(1).parent().before('code').addClass('tag').append('span').addClass('active').html('&lt;h1&gt;');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
+				if(state == 0) dom.get(0).addClass('active');
+				if(state == 1) h1 = dom.get(1).parent().before('code').addClass('tag').append('span').addClass('active').html('&lt;h1&gt;');
 				if(state == 2) h1.append('code').addClass('text').append('span').addClass('active').text('Пример');
 				state++;
 			}
@@ -258,25 +241,25 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(5)));
+	}).apply(this, args(examples.get(5)));
 
 	(function(button, dom, javascript, actions) {
 
-		var	state = 0, pre = button.parent().lastChild('div').firstChild('pre');
+		var state = 0, pre = button.parent().last('div').first('pre');
 		
 		function show(response) {
 			button.show();
-			dom.item(1).text(response.substring(0, 18) + '…');
+			dom.get(1).text(response.substring(0, 18) + '…');
 		};
 
 		button.click(function() {
 			if(state < 3) {
 				button.text('Далее');
-				javascript.item(state).addClass('active');
-				actions.item(state).show('list-item');
-				if(state == 0) dom.item(0).addClass('active');
+				javascript.get(state).addClass('active');
+				actions.get(state).show('list-item');
+				if(state == 0) dom.get(0).addClass('active');
 				if(state == 1) {
-					dom.item(1).text('Загрузка…').addClass('active');
+					dom.get(1).text('Загрузка…').addClass('active');
 					pre.text('Загрузка…');
 				}
 				if(state == 2) {
@@ -293,7 +276,7 @@ $.ready(function() {
 			if(state == 4) {
 				button.text('Старт');
 				dom.each('removeClass', 'active');
-				dom.item(1).text('Текст');
+				dom.get(1).text('Текст');
 				pre.text('Текст');
 				javascript.each('removeClass', 'active');
 				actions.each('hide');
@@ -302,7 +285,7 @@ $.ready(function() {
 			}
 		});
 
-	}).apply(this, args(examples.item(6)));
+	}).apply(this, args(examples.get(6)));
 
 	// fix :hover and :active for IE6,7
 	if($.ie < 8) $.tag('button').each(function() {

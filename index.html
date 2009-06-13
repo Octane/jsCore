@@ -2,17 +2,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>js-core JavaScript framework • примеры использования</title>
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 <link rel="stylesheet" type="text/css" href="preview/style.css" />
 <script type="text/javascript">
 (function() {
 	if(window.opera && window.opera.version() > 9.5) {
-		var link = document.createElement('link');
-		link.rel = 'stylesheet';
-		link.type = 'text/css';
-		link.href = 'preview/opera.css';
-		document.getElementsByTagName('head')[0].appendChild(link);
+		var link = document.createElement("link");
+		link.rel = "stylesheet";
+		link.type = "text/css";
+		link.href = "preview/opera.css";
+		document.getElementsByTagName("head")[0].appendChild(link);
 	}
 })();
 </script>
@@ -22,7 +23,7 @@
 <div id="container">
 	<div id="header">
 		<h1><a href="http://www.js-core.ru/">js-core JavaScript framework</a></h1>
-		<span>Версия 2.8.0</span>
+		<span>Версия 2.8.1</span>
 		<ul>
 			<li class="web-site"><a href="http://www.js-core.ru/" title="Веб-сайт проекта js-core.ru" tabindex="1">Веб-сайт</a></li>
 			<li class="downloads"><a href="http://code.google.com/p/js-core/downloads/list" title="Различные версии и сборки js-core, расширения и модули, документация"  tabindex="2">Скачать</a></li>
@@ -39,7 +40,7 @@
 				<code class="tag"><span>&lt;div id=&quot;test&quot;&gt;</span><code class="tag"><span>&lt;span&gt;</span><code class="text"><span>Текст</span></code></code><code class="tag"><span>&lt;span&gt;</span><code class="text"><span>Текст</span></code></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$('test')</code>.<code>firstChild('span')</code>.<code>text('Пример')</code>;</pre>
+				<pre><code>$(&quot;test&quot;)</code>.<code>first(&quot;span&quot;)</code>.<code>text(&quot;Пример&quot;)</code>;</pre>
 			</div>
 			<ol>
 				<li>Поиск элемента с&nbsp;идентификатором «test»</li>
@@ -55,7 +56,7 @@
 				<code class="tag"><span>&lt;ul id=&quot;list&quot;&gt;</span><code class="tag"><span>&lt;li&gt;</span><code class="text">Текст</code></code><code class="tag"><span>&lt;li&gt;</span><code class="text">Текст</code></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$('list')</code>.<code>child()</code>.<code>each('addClass', 'some')</code>;</pre>
+				<pre><code>$(&quot;list&quot;)</code>.<code>child()</code>.<code>each(&quot;addClass&quot;, &quot;some&quot;)</code>;</pre>
 			</div>
 			<ol>
 				<li>Поиск элемента с&nbsp;идентификатором «list»</li>
@@ -71,7 +72,7 @@
 				<code class="tag"><span>&lt;fieldset id=&quot;some&quot;&gt;</span><code class="tag">&lt;form&gt;<code class="tag">&lt;div&gt;<code class="tag"><span>&lt;span&gt;</span><code class="text">Текст</code></code></code><code class="tag">&lt;div&gt;<code class="tag"><span>&lt;span&gt;</span><code class="text">Текст</code></code></code></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$('some')</code>.<code>child('span', true)</code>.<code>item(1)</code>;</pre>
+				<pre><code>$(&quot;some&quot;)</code>.<code>children(&quot;span&quot;)</code>.<code>get(1)</code>;</pre>
 			</div>
 			<ol>
 				<li>Поиск элемента с&nbsp;идентификатором «some»</li>
@@ -87,7 +88,7 @@
 				<code class="tag"><span>&lt;p id=&quot;addr&quot;&gt;</span><code class="tag"><span>&lt;span&gt;</span><code class="text"><span>Текст</span></code></code><code class="tag"><span>&lt;span&gt;</span><code class="text"><span>Текст</span></code></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$('addr')</code>.<code>lastChild()</code>.<code>attr('title', 'Подсказка')</code>;</pre>
+				<pre><code>$(&quot;addr&quot;)</code>.<code>last()</code>.<code>attr(&quot;title&quot;, &quot;Подсказка&quot;)</code>;</pre>
 			</div>
 			<ol>
 				<li>Поиск элемента с&nbsp;идентификатором «addr»</li>
@@ -103,7 +104,7 @@
 				<code class="tag"><span>&lt;fieldset&gt;</span><code class="tag"><span>&lt;div&gt;</span><code class="text"><span>Текст</span></code></code><code class="tag"><span>&lt;div id=&quot;tooltip&quot;&gt;</span><code class="text"><span>Текст</span></code></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$('tooltip')</code>.<code>prev('div')</code>.<code>css('color', '#f00')</code>;</pre>
+				<pre><code>$(&quot;tooltip&quot;)</code>.<code>prev(&quot;div&quot;)</code>.<code>css(&quot;color&quot;, &quot;#f00&quot;)</code>;</pre>
 			</div>
 			<ol>
 				<li>Поиск элемента с&nbsp;идентификатором «tooltip»</li>
@@ -119,7 +120,7 @@
 				<code class="tag"><span>&lt;body&gt;</span><code class="tag"><span>&lt;div&gt;</span><code class="text"><span>Текст</span></code></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$(document.body)</code>.<code>prepend('h1')</code>.<code>text('Пример')</code>;</pre>
+				<pre><code>$(document.body)</code>.<code>prepend(&quot;h1&quot;)</code>.<code>text(&quot;Пример&quot;)</code>;</pre>
 			</div>
 			<ol>
 				<li>Создание обёртки для&nbsp;«document.body»</li>
@@ -135,9 +136,9 @@
 				<code class="tag"><span>&lt;pre id=&quot;license&quot;&gt;</span><code class="text"><span>Текст</span></code></code> </div>
 			<div class="code">
 				<label>JavaScript</label>
-				<pre><code>$('license')</code>
-    .<code>text('Загрузка…')</code>
-        .<code>load({url: 'MIT-LICENSE.txt'})</code>;</pre>
+				<pre><code>$(&quot;license&quot;)</code>
+    .<code>text(&quot;Загрузка…&quot;)</code>
+        .<code>load({url: &quot;MIT-LICENSE.txt&quot;})</code>;</pre>
 			</div>
 			<ol>
 				<li>Поиск элемента с&nbsp;идентификатором «license»</li>

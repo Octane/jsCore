@@ -1,4 +1,4 @@
-/* js-core AJAX module, version 0.2.6
+/* js-core AJAX module, version 0.2.7
    Copyright (c) 2009 Dmitry Korobkin
    Released under the MIT License.
    More information: http://www.js-core.ru/
@@ -80,7 +80,8 @@ core.post = function(params, success, error) {
 core.getJSON = function(params, callback, error) {
 	new core.ajax().open(core.extend(params, {dataType: 'json', success: function(response) {
 		try {
-			callback(eval('(' + response + ')'));
+			// todo remove eval
+			callback(window.JSON && JSON.parse ? JSON.parse(response) : eval('(' + response + ')'));
 		}
 		catch(error) {
 			if(this.error) this.error(error);
@@ -91,10 +92,12 @@ core.getJSON = function(params, callback, error) {
 core.prototype.load = function(params, success, error) {
 	var _this = this;
 	new core.ajax().open(core.extend(params, {success: function(response) {
-		_this.html(response);
+		var control = /^INPUT|BUTTON|TEXTAREA$/;
+		_this[control.test(_this.node.tagName) ? 'val' : 'html'](response);
 		if(success) success.call(_this.node, response, this.xhr);
 	}, error: function(response) {
 		if(error) error.call(_this.node, response, this.xhr);
 	}}));
 	return this;
 };
+

@@ -257,6 +257,7 @@ height: 66px;
 width: 180px;
 padding: 10px 10px 40px;
 color: #fff;
+font-size: 12px;
 background: url(tooltip.png) no-repeat;
 }
 /* -----[clearfix]----- */

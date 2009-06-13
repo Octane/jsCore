@@ -3,27 +3,25 @@
  *
  * Components:
  *
- * • js-core JavaScript framework, version 2.8.0
+ * • js-core JavaScript framework, version 2.8.1
  *   Copyright (c) 2009 Dmitry Korobkin
  *   Released under the MIT License.
  *   More information: http://www.js-core.ru/
  *
- * • js-core AJAX module, version 0.2.6
+ * • js-core AJAX module, version 0.2.7
  *
  * • YASS 0.3.8 — the fastest CSS selectors JavaScript library
  *   Experimental branch of YASS — CSS3 selectors with cache only
  *   Copyright (c) 2008 Nikolay Matsievsky aka sunnybear (webo.in, webo.name)
  *   Dual licensed under the MIT and GPL licenses.
- *   $Date: 2009-02-23 12:59:31 +3000 (Mon, 23 Feb 2009)
- *   $Rev: 22
  *
  * For details, see: info.txt
  */
-(function(win, doc, core, ie, undefined) {
+(function(win, doc, element, core, ie, undefined) {
 core.forEach = function(obj, func, context) {
 	var length = obj.length, i = -1;
 	if(length !== undefined) {
-		while(++i < length) if(func.call(context, obj[i], i, obj) === false) break;
+		while(++i < length) if(func.call(context, obj[i], i, obj, length) === false) break;
 	}
 	else for(var key in obj) if(obj.hasOwnProperty(key)) if(func.call(context, key, obj[key], obj) === false) break;
 	return obj;
@@ -38,10 +36,10 @@ core.extend(core, {
 	ie: ie,
 	cache: {},
 	id: function(arg) {
-		return typeof arg === 'string' ? this.cache[arg] || (this.cache[arg] = doc.getElementById(arg)) : arg;
+		return typeof arg == 'string' ? this.cache[arg] || (this.cache[arg] = doc.getElementById(arg)) : arg;
 	},
 	create: function(arg) {
-		return typeof arg === 'string' ? doc.createElement(arg) : arg;
+		return typeof arg == 'string' ? doc.createElement(arg) : arg;
 	},
 	insert: function(node, arg, before) {
 		return node.insertBefore(this.create(arg), before);
@@ -63,25 +61,22 @@ core.extend(core, {
 		});
 		return empty;
 	},
+	isNumber: function(arg) {
+		return !isNaN(arg * 1);
+	},
 	handlers: {
 		guid: 1,
 		fid: 1,
-		createListener: function(preventDefault) {
-			return function(guid) {
-				return function(event) {
-					core.forEach(core.handlers[guid].events[(event = event || win.event).type], function(fid, func) {
-						if(func.call(this, event) === false) preventDefault(event);
-					}, core.handlers[guid].link);
-				};
+		createListener: function(guid) {
+			return function(event) {
+				core.forEach(core.handlers[guid].events[(event || (event = win.event)).type], function(fid, func) {
+					if(func.call(this, event) === false) core.preventDefault(event);
+				}, core.handlers[guid].link);
 			};
-		}(ie ? function(event) {
-			event.returnValue = false;
-		} : function(event) {
-			event.preventDefault();
-		})
+		}
 	},
 	toArray: function(arg) {
-		if(typeof arg === 'string') {
+		if(typeof arg == 'string') {
 			var i = -1, j = 0, array = arg.split(' '), length = array.length;
 			arg = [];
 			while(++i < length) if(array[i]) arg[j++] = array[i];
@@ -106,7 +101,7 @@ core.extend(core, {
 		};
 	},
 	parse: function(html) {
-		var div = document.createElement('div');
+		var div = doc.createElement('div');
 		div.innerHTML = html;
 		return new this(div.firstChild);
 	},
@@ -136,174 +131,216 @@ core.extend(core, {
 		if(this.timer) return new this.timer(time, func, context);
 		core.extend(this, {time: time, func: func, context: context, enabled: false});
 	},
-	event: function(event) {
-		if(this.event) return new this.event(event);
-		event = event || win.event;
-		this.object = event;
+	preventDefault: ie ? function(event) {
+		event.returnValue = false;
+	} : function(event) {
+		event.preventDefault();
 	},
-	trim: function(str) {
-		return this.trim.both(str);
+	stopPropagation: ie ? function(event) {
+		event.cancelBubble = true;
+	} : function(event) {
+		event.stopPropagation();
+	},
+	stop: function(event) {
+		core.preventDefault(event);
+		core.stopPropagation(event);
+	},
+	target: function(target) {
+		return function(event) {
+			return event[target];
+		};
+	}(ie ? 'srcElement' : 'target'),
+	relatedTarget: ie ? function(event) {
+		return event.fromElement === event.srcElement ? event.toElement : event.fromElement;
+	} : function(event) {
+		return event.relatedTarget;
+	},
+	mouseButton: function(property, middle) {
+		return function(event) {
+			return event[property] < 2 ? 1 : event[property] == middle ? 3 : 2;
+		};
+	}(ie ? 'button' : 'which', ie ? 4 : 2),
+	trim: String.prototype.trim ? function(str) {
+		return str.trim();
+	} : function(str) {
+		return str.replace(/^\s+|\s+$/g, '');
+	},
+	trimLeft: String.prototype.trimLeft ? function(str) {
+		return str.trimLeft();
+	} : function(str) {
+		return str.replace(/^\s+/, '');
+	},
+	trimRight: String.prototype.trimRight ? function(str) {
+		return str.trimRight();
+	} : function(str) {
+		return str.replace(/\s+$/, '');
+	},
+	computedStyle: ie ? function(node) {
+		return node.currentStyle;
+	} : function(node) {
+		return doc.defaultView.getComputedStyle(node, null);
 	},
 	yass: function(selector, root, noCache) {
-		if(core.yass.c[selector] && !noCache && !root) return core.yass.c[selector];
+		if (core.yass.c[selector] && !noCache && !root) {
+			return core.yass.c[selector]
+		}
 		noCache = noCache || !!root;
 		root = root || doc;
 		var sets = [];
-		if(/^[\w[:#.][\w\]*^|=!]*$/.test(selector)) {
+		if (/^[\w[:#.][\w\]*^|=!]*$/.test(selector)) {
 			var idx = 0;
 			switch (selector.charAt(0)) {
-			case "#":
+			case '#':
 				idx = selector.slice(1);
 				sets = doc.getElementById(idx);
-				if(ie && sets.id !== idx) {
-					sets = doc.all[idx];
+				if (ie && sets.id !== idx) {
+					sets = doc.all[idx]
 				}
 				sets = sets ? [sets] : [];
 				break;
-			case ".":
+			case '.':
 				var klass = selector.slice(1);
-				if(core.yass.k) {
-					sets = (idx = (sets = root.getElementsByClassName(klass)).length) ? sets: [];
+				if (core.yass.k) {
+					sets = (idx = (sets = root.getElementsByClassName(klass)).length) ? sets: []
 				} else {
-					klass = " " + klass + " ";
-					var nodes = root.getElementsByTagName("*"), i = 0, node;
+					klass = ' ' + klass + ' ';
+					var nodes = root.getElementsByTagName('*'), i = 0, node;
 					while (node = nodes[i++]) {
-						if((" " + node.className + " ").indexOf(klass) != -1) {
-							sets[idx++] = node;
+						if ((' ' + node.className + ' ').indexOf(klass) != -1) {
+							sets[idx++] = node
 						}
 					}
-					sets = idx ? sets: [];
+					sets = idx ? sets: []
 				}
 				break;
-			case ":":
-				var node, nodes = root.getElementsByTagName("*"), i = 0, ind = selector.replace(/[^(]*\(([^)]*)\)/, "$1"), mod = selector.replace(/\(.*/, "");
+			case ':':
+				var node, nodes = root.getElementsByTagName('*'), i = 0, ind = selector.replace(/[^(]*\(([^)]*)\)/, "$1"), mod = selector.replace(/\(.*/, '');
 				while (node = nodes[i++]) {
-					if(core.yass.mods[mod] && !core.yass.mods[mod](node, ind)) {
-						sets[idx++] = node;
+					if (core.yass.mods[mod] && !core.yass.mods[mod](node, ind)) {
+						sets[idx++] = node
 					}
 				}
 				sets = idx ? sets: [];
 				break;
-			case "[":
-				var nodes = root.getElementsByTagName("*"), node, i = 0, attrs = /\[([^!~^*|$ [:=]+)([$^*|]?=)?([^ :\]]+)?\]/.exec(selector), attr = attrs[1], eql = attrs[2] || "", value = attrs[3];
+			case '[':
+				var nodes = root.getElementsByTagName('*'), node, i = 0, attrs = /\[([^!~^*|$ [:=]+)([$^*|]?=)?([^ :\]]+)?\]/.exec(selector), attr = attrs[1], eql = attrs[2] || '', value = attrs[3]; 
 				while (node = nodes[i++]) {
-					if(core.yass.attr[eql] && (core.yass.attr[eql](node, attr, value) || (attr === "class" && core.yass.attr[eql](node, "className", value)))) {
-						sets[idx++] = node;
+					if (core.yass.attr[eql] && (core.yass.attr[eql](node, attr, value) || (attr === 'class' && core.yass.attr[eql](node, 'className', value)))) {
+						sets[idx++] = node
 					}
 				}
 				sets = idx ? sets: [];
 				break;
 			default:
 				sets = (idx = (sets = root.getElementsByTagName(selector)).length) ? sets: [];
-				break;
+				break
 			}
 		} else {
 			if(core.yass.q && selector.indexOf("!=") == -1) {
 				try {
 					sets = root.querySelectorAll(selector);
-					return noCache ? sets: core.yass.c[selector] = sets;
+					return noCache ? sets : core.yass.c[selector] = sets;
 				}
 				catch(error) {}
 			}
 			var groups = selector.split(/ *, */), gl = groups.length - 1, concat = !!gl, group, singles, singles_length, single, i, ancestor, nodes, tag, id, klass, attr, eql, mod, ind, newNodes, idx, J, child, last, childs, item, h;
 			while (group = groups[gl--]) {
-				if(! (nodes = core.yass.c[group]) || noCache) {
+				if (! (nodes = core.yass.c[group]) || noCache) {
 					singles_length = (singles = group.replace(/(\([^)]*)\+/, "$1%").replace(/(\[[^\]]+)~/, "$1&").replace(/(~|>|\+)/, " $1 ").split(/ +/)).length;
 					i = 0;
-					ancestor = " ";
+					ancestor = ' ';
 					nodes = [root];
 					while (single = singles[i++]) {
-						if(single !== " " && single !== ">" && single !== "~" && single !== "+" && nodes) {
+						if (single !== ' ' && single !== '>' && single !== '~' && single !== '+' && nodes) {
 							single = single.match(/([^[:.#]+)?(?:#([^[:.#]+))?(?:\.([^[:.]+))?(?:\[([^!&^*|$[:=]+)([!$^*|&]?=)?([^:\]]+)?\])?(?:\:([^(]+)(?:\(([^)]+)\))?)?/);
-							tag = single[1] || "*";
+							tag = single[1] || '*';
 							id = single[2];
-							klass = single[3] ? " " + single[3] + " ": "";
+							klass = single[3] ? ' ' + single[3] + ' ': '';
 							attr = single[4];
-							eql = single[5] || "";
+							eql = single[5] || '';
 							mod = single[7];
-							ind = mod === "nth-child" || mod === "nth-last-child" ? /(?:(-?\d*)n)?(?:(%|-)(\d*))?/.exec(single[8] === "even" && "2n" || single[8] === "odd" && "2n%1" || !/\D/.test(single[8]) && "0n%" + single[8] || single[8]) : single[8];
+							ind = mod === 'nth-child' || mod === 'nth-last-child' ? /(?:(-?\d*)n)?(?:(%|-)(\d*))?/.exec(single[8] === 'even' && '2n' || single[8] === 'odd' && '2n%1' || !/\D/.test(single[8]) && '0n%' + single[8] || single[8]) : single[8];
 							newNodes = [];
 							idx = J = 0;
 							last = i == singles_length;
 							while (child = nodes[J++]) {
 								switch (ancestor) {
-								case " ":
+								case ' ':
 									childs = child.getElementsByTagName(tag);
 									h = 0;
 									while (item = childs[h++]) {
-										if((!id || item.id === id) && (!klass || (" " + item.className + " ").indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === "class" && core.yass.attr[eql](item, "className", single[6]))))) && !item.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](item, ind) : mod)) {
-											if(last) {
-												item.yeasss = 1;
+										if ((!id || item.id === id) && (!klass || (' ' + item.className + ' ').indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === 'class' && core.yass.attr[eql](item, 'className', single[6]))))) && !item.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](item, ind) : mod)) {
+											if (last) {
+												item.yeasss = 1
 											}
-											newNodes[idx++] = item;
+											newNodes[idx++] = item
 										}
 									}
 									break;
-								case "~":
+								case '~':
 									tag = tag.toLowerCase();
 									while ((child = child.nextSibling) && !child.yeasss) {
-	
-										if(child.nodeType == 1 && (tag === "*" || child.nodeName.toLowerCase() === tag) && (!id || child.id === id) && (!klass || (" " + child.className + " ").indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === "class" && core.yass.attr[eql](item, "className", single[6]))))) && !child.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](child, ind) : mod)) {
-											if(last) {
-												child.yeasss = 1;
+										if (child.nodeType == 1 && (tag === '*' || child.nodeName.toLowerCase() === tag) && (!id || child.id === id) && (!klass || (' ' + child.className + ' ').indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === 'class' && core.yass.attr[eql](item, 'className', single[6]))))) && !child.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](child, ind) : mod)) {
+											if (last) {
+												child.yeasss = 1
 											}
-											newNodes[idx++] = child;
+											newNodes[idx++] = child
 										}
 									}
 									break;
-								case "+":
+								case '+':
 									while ((child = child.nextSibling) && child.nodeType != 1) {}
-									if(child && (child.nodeName.toLowerCase() === tag.toLowerCase() || tag === "*") && (!id || child.id === id) && (!klass || (" " + item.className + " ").indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === "class" && core.yass.attr[eql](item, "className", single[6]))))) && !child.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](child, ind) : mod)) {
-										if(last) {
-											child.yeasss = 1;
+									if (child && (child.nodeName.toLowerCase() === tag.toLowerCase() || tag === '*') && (!id || child.id === id) && (!klass || (' ' + item.className + ' ').indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === 'class' && core.yass.attr[eql](item, 'className', single[6]))))) && !child.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](child, ind) : mod)) {
+										if (last) {
+											child.yeasss = 1
 										}
-										newNodes[idx++] = child;
+										newNodes[idx++] = child
 									}
 									break;
-								case ">":
+								case '>':
 									childs = child.getElementsByTagName(tag);
 									i = 0;
 									while (item = childs[i++]) {
-										if(item.parentNode === child && (!id || item.id === id) && (!klass || (" " + item.className + " ").indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === "class" && core.yass.attr[eql](item, "className", single[6]))))) && !item.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](item, ind) : mod)) {
-											if(last) {
-												item.yeasss = 1;
+										if (item.parentNode === child && (!id || item.id === id) && (!klass || (' ' + item.className + ' ').indexOf(klass) != -1) && (!attr || (core.yass.attr[eql] && (core.yass.attr[eql](item, attr, single[6]) || (attr === 'class' && core.yass.attr[eql](item, 'className', single[6]))))) && !item.yeasss && !(core.yass.mods[mod] ? core.yass.mods[mod](item, ind) : mod)) {
+											if (last) {
+												item.yeasss = 1
 											}
-											newNodes[idx++] = item;
+											newNodes[idx++] = item
 										}
 									}
-									break;
+									break
 								}
 							}
-							nodes = newNodes;
+							nodes = newNodes
 						} else {
-							ancestor = single;
+							ancestor = single
 						}
 					}
 				}
-				if(concat) {
-					if(!nodes.concat) {
+				if (concat) {
+					if (!nodes.concat) {
 						newNodes = [];
 						h = 0;
 						while (item = nodes[h]) {
-							newNodes[h++] = item;
+							newNodes[h++] = item
 						}
-						nodes = newNodes;
+						nodes = newNodes
 					}
-					sets = nodes.concat(sets.length == 1 ? sets[0] : sets);
+					sets = nodes.concat(sets.length == 1 ? sets[0] : sets)
 				} else {
-					sets = nodes;
+					sets = nodes
 				}
 			}
 			idx = sets.length;
 			while (idx--) {
-				sets[idx].yeasss = sets[idx].nodeIndex = sets[idx].nodeIndexLast = null;
+				sets[idx].yeasss = sets[idx].nodeIndex = sets[idx].nodeIndexLast = null
 			}
 		}
 		return noCache ? sets: core.yass.c[selector] = sets;
 	},
 	ajax: function() {
 		if(this.ajax) return new this.ajax();
-		this.xhr = window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+		this.xhr = win.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
 	},
 	get: function(params, success, error) {
 		new core.ajax().open(core.extend(params, {success: success, error: error}));
@@ -316,7 +353,7 @@ core.extend(core, {
 	getJSON: function(params, callback, error) {
 		new core.ajax().open(core.extend(params, {dataType: 'json', success: function(response) {
 			try {
-				callback(eval('(' + response + ')'));
+				callback(win.JSON && JSON.parse ? JSON.parse(response) : eval('(' + response + ')'));
 			}
 			catch(error) {
 				if(this.error) this.error(error);
@@ -325,12 +362,192 @@ core.extend(core, {
 		return this;
 	}
 });
+core.extend(core.yass, {
+	c: [],
+	q: !!doc.querySelectorAll,
+	k: !!doc.getElementsByClassName,
+	attr: {
+		'': function(child, attr) {
+			return !! child.getAttribute(attr)
+		},
+		'=': function(child, attr, value) {
+			return (attr = child.getAttribute(attr)) && attr === value
+		},
+		'&=': function(child, attr, value) {
+			return (attr = child.getAttribute(attr)) && (new RegExp('(^| +)' + value + '($| +)').test(attr))
+		},
+		'^=': function(child, attr, value) {
+			return (attr = child.getAttribute(attr) + '') && !attr.indexOf(value)
+		},
+		'$=': function(child, attr, value) {
+			return (attr = child.getAttribute(attr) + '') && attr.indexOf(value) == attr.length - value.length
+		},
+		'*=': function(child, attr, value) {
+			return (attr = child.getAttribute(attr) + '') && attr.indexOf(value) != -1
+		},
+		'|=': function(child, attr, value) {
+			return (attr = child.getAttribute(attr) + '') && (attr === value || !!attr.indexOf(value + '-'))
+		},
+		'!=': function(child, attr, value) {
+			return ! (attr = child.getAttribute(attr)) || !(new RegExp('(^| +)' + value + '($| +)').test(attr))
+		}
+	},
+	mods: {
+		'first-child': function(child) {
+			return child.parentNode.getElementsByTagName('*')[0] !== child
+		},
+		'last-child': function(child) {
+			var brother = child;
+			while ((brother = brother.nextSibling) && brother.nodeType != 1) {}
+			return !! brother
+		},
+		root: function(child) {
+			return child.nodeName.toLowerCase() !== 'html'
+		},
+		'nth-child': function(child, ind) {
+			var i = child.nodeIndex || 0, a = ind[3] = ind[3] ? (ind[2] === '%' ? -1 : 1) * ind[3] : 0, b = ind[1];
+			if (i) {
+				return ! ((i + a) % b)
+			} else {
+				var brother = child.parentNode.firstChild;
+				i++;
+				do {
+					if (brother.nodeType == 1 && (brother.nodeIndex = ++i) && child === brother && ((i + a) % b)) {
+						return 0
+					}
+				} while (brother = brother.nextSibling);
+				return 1
+			}
+		},
+		'nth-last-child': function(child, ind) {
+			var i = child.nodeIndexLast || 0, a = ind[3] ? (ind[2] === '%' ? -1 : 1) * ind[3] : 0, b = ind[1];
+			if (i) {
+				return ! ((i + a) % b)
+			} else {
+				var brother = child.parentNode.lastChild;
+				i++;
+				do {
+					if (brother.nodeType == 1 && (brother.nodeLastIndex = i++) && child === brother && ((i + a) % b)) {
+						return 0
+					}
+				} while (brother = brother.previousSibling);
+				return 1
+			}
+		},
+		empty: function(child) {
+			return !! child.firstChild
+		},
+		parent: function(child) {
+			return ! child.firstChild
+		},
+		'only-child': function(child) {
+			return child.parentNode.getElementsByTagName('*').length != 1
+		},
+		checked: function(child) {
+			return ! child.checked
+		},
+		lang: function(child, ind) {
+			return child.lang !== ind && doc.documentElement.lang !== ind
+		},
+		enabled: function(child) {
+			return child.disabled || child.type === 'hidden'
+		},
+		disabled: function(child) {
+			return ! child.disabled
+		},
+		selected: function(elem) {
+			child.parentNode.selectedIndex;
+			return ! child.selected
+		}
+	}
+});
+core.ajax.type = {
+	html: 'text/html',
+	text: 'text/plain',
+	xml: 'application/xml, text/xml',
+	json: 'application/json, text/javascript',
+	script: 'text/javascript, application/javascript',
+	'default': 'application/x-www-form-urlencoded'
+};
+core.ajax.accept = '*\/*';
+core.ajax.prototype.open = function(params) {
+	core.extend(this, {
+		method: params.method || 'GET',
+		url: params.url || location.href,
+		async: params.async !== false,
+		user: params.user || null,
+		password: params.password || null,
+		params: params.params || null,
+		processData: params.processData === true,
+		timeout: params.timeout || 0,
+		contentType: core.ajax.type[params.contentType] || core.ajax.type['default'],
+		dataType: core.ajax.type[params.dataType] ? core.ajax.type[params.dataType] + ', *\/*' : core.ajax.accept,
+		requestHeaders: params.requestHeaders || null,
+		success: params.success,
+		error: params.error
+	});
+	if(this.params) {
+		var params = [], process = this.process;
+		core.forEach(this.params, function(key, value) {
+			params.push([key, '=', process ? encodeURIComponent(value) : value].join(''));
+		});
+		this.params = params.join('&');
+	}
+	try {
+		this.xhr.open(this.method, this.method == 'GET' && this.params ? this.url + '?' + this.params : this.url, this.async, this.user, this.password);
+		this.xhr.setRequestHeader('Accept', this.dataType);
+		this.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		this.xhr.setRequestHeader('Content-Type', this.contentType);
+		var ajax = this;
+		if(this.requestHeaders) core.forEach(this.requestHeaders, function(key, value) {
+			ajax.xhr.setRequestHeader(key, value);
+		});
+		this.xhr.send(this.params);
+		(function() {
+			if(ajax.xhr.readyState == 4) {
+				if(ajax.xhr.status == 200 || ajax.xhr.status == 0 && ajax.success) ajax.success(ajax.xhr.responseText);
+				else if(ajax.error && !ajax.aborted) ajax.error(ajax.xhr.statusText);
+			}
+			else if(!ajax.aborted) setTimeout(arguments.callee, 20);
+		})();
+		if(this.async && this.timeout) setTimeout(function() {
+			if(ajax.xhr.readyState != 4) {
+				ajax.xhr.abort();
+				ajax.aborted = true;
+				if(ajax.error) ajax.error('Time is out');
+			}
+		}, this.timeout);
+	}
+	catch(error) {
+		if(this.error) this.error(error);
+	}
+};
+(function(calc) {
+	if (ie) {
+		core.pageX = function(event) {
+			return event.clientX + calc('Left');
+		};
+		core.pageY = function(event) {
+			return event.clientY + calc('Top');
+		};
+	}
+	else {
+		core.pageX = function(event) {
+			return event.pageX;
+		};
+		core.pageY = function(event) {
+			return event.pageY;
+		};
+	}
+})(function (side) {
+	return (element['scroll' + side] || 0) - (element['client' + side] || 0);
+});
 core.prototype = {
 	parent: function(tag) {
 		var node = this.node.parentNode;
 		if(tag) {
 			tag = tag.toUpperCase();
-			do if(node.tagName === tag) break;
+			do if(node.tagName == tag) break;
 			while(node = node.parentNode);
 		}
 		return new core(node);
@@ -384,18 +601,14 @@ core.prototype = {
 			core.forEach(handler.events, function(type) {
 				core.bind(this.link, type, this.listener);
 			}, handler);
-			if(cloneHandlers) list.item(index).copyHandlers(handler.link);
+			if(cloneHandlers) list.get(index).copyHandlers(handler.link);
 		});
 		return clone;
 	},
 	replace: function(arg) {
-		try {
-			return this.before(core.create(arg));
-		}
-		catch(e) {}
-		finally {
-			this.remove();
-		}
+		arg = this.before(arg);
+		this.remove();
+		return arg;
 	},
 	wrap: ie ? function(arg, side) {
 		return new core(this.node.applyElement(core.create(arg), side));
@@ -577,11 +790,12 @@ core.prototype = {
 		return this;
 	},
 	val: function(str) {
-		return str !== undefined ? this.attr({value: str}): this.node.value;
+		var value = 'value' in this.node;
+		return str !== undefined ? (value ? this.attr({value: str}) : this.text(str)) : (value ? this.node.value : ((value = this.node.firstChild) ? value.nodeValue : ''));
 	},
 	is: function(arg, tag) {
 		if(arg) {
-			if(typeof arg == 'string') return this.node.tagName === arg.toUpperCase();
+			if(typeof arg == 'string') return this.node.tagName == arg.toUpperCase();
 			var key = true;
 			if(tag) arg.tagName = tag.toUpperCase();
 			core.forEach(arg, function(attr, value) {
@@ -650,20 +864,11 @@ core.prototype = {
 		return this.node.offsetWidth > 0 || this.node.offsetHeight > 0;
 	},
 	toggle: function(type) {
-		this.node.style.display = this.css(['display']) === 'none' ? type || 'block' : 'none';
+		this.node.style.display = this.css(['display']) == 'none' ? type || 'block' : 'none';
 		return this;
 	},
-	position: function() {
-		var node = this.node, top = 0, left = 0;
-		do {
-			top += node.offsetTop;
-			left += node.offsetLeft;
-		}
-		while(node = node.offsetParent);
-		return {top: top, left: left};
-	},
 	enabled: function(bool) {
-		return typeof bool === 'boolean' ? (bool ? this.removeAttr(['disabled']) : this.attr({disabled: 'disabled'})) : !this.attr(['disabled']);
+		return typeof bool == 'boolean' ? (bool ? this.removeAttr(['disabled']) : this.attr({disabled: 'disabled'})) : !this.attr(['disabled']);
 	},
 	id: function(str) {
 		if(str !== undefined) {
@@ -675,6 +880,18 @@ core.prototype = {
 	},
 	serialize: function() {
 		return this.node.outerHTML || new XMLSerializer().serializeToString(this.node);
+	},
+	position: element.getBoundingClientRect ? function() {
+		var rect = this.node.getBoundingClientRect();
+		return {top: Math.round(rect.top +  (win.pageYOffset || element.scrollTop) - (element.clientTop || 0)), left: Math.round(rect.left + (win.pageXOffset || element.scrollLeft) - (element.clientLeft || 0))};
+	} : function() {
+		var top = 0, left = 0, node = this.node;
+		while(node) {
+			top += parseInt(node.offsetTop) || 0;
+			left += parseInt(node.offsetLeft) || 0;
+			node = node.offsetParent        
+		}
+		return {top: top, left: left};
 	},
 	child: function(children, filter) {
 		if(doc.createElement('div').children !== undefined) {
@@ -698,7 +915,8 @@ core.prototype = {
 	load: function(params, success, error) {
 		var _this = this;
 		new core.ajax().open(core.extend(params, {success: function(response) {
-			_this.html(response);
+			var control = /^INPUT|BUTTON|TEXTAREA$/;
+			_this[control.test(_this.node.tagName) ? 'val' : 'html'](response);
 			if(success) success.call(_this.node, response, this.xhr);
 		}, error: function(response) {
 			if(error) error.call(_this.node, response, this.xhr);
@@ -707,21 +925,21 @@ core.prototype = {
 	}
 };
 core.extend(core.prototype, function(traversal, sibling, child) {
-	if(doc.createElement('div').childElementCount === 0) {
+	if('childElementCount' in element) {
 		traversal = {next: 'nextElementSibling', prev: 'previousElementSibling', first: 'firstElementChild', last: 'lastElementChild'};
 		sibling = function(node, dir, tag) {
 			if(tag) {
 				tag = tag.toUpperCase();
-				while(node = node[dir]) if(node.tagName === tag) break;
+				while(node = node[dir]) if(node.nodeName == tag) break;
 				return node;
 			}
-			else return node[dir];
+			return node[dir];
 		};
 		child = function(node, dir, tag) {
-			return node ? (tag && node.tagName !== tag.toUpperCase() ? sibling(node, traversal[dir], tag) : node) : null;
+			return node ? (tag && node.tagName != tag.toUpperCase() ? sibling(node, traversal[dir], tag) : node) : null;
 		};
 		core.clear = function(node) {
-			node.childElementCount > 0 ? this.cache = {} : delete this.cache[node.id];
+			node.childElementCount ? this.cache = {} : delete this.cache[node.id];
 			return node;
 		};
 	}
@@ -729,11 +947,11 @@ core.extend(core.prototype, function(traversal, sibling, child) {
 		traversal = {next: 'nextSibling', prev: 'previousSibling', first: 'firstChild', last: 'lastChild'};
 		sibling = function(node, dir, tag) {
 			if(tag) tag = tag.toUpperCase();
-			while(node = node[dir]) if(node.nodeType == 1 && (tag ? node.tagName === tag : true)) break;
+			while(node = node[dir]) if(node.nodeType == 1 && (tag ? node.tagName == tag : true)) break;
 			return node;
 		};
 		child = function(node, dir, tag) {
-			return node && node.nodeType != 1 || (tag ? tag.toUpperCase() !== node.tagName : true) ? sibling(node, traversal[dir], tag) : node;
+			return node ? (node.nodeType == 1 && (tag ? tag.toUpperCase() == node.tagName : true) ? node : sibling(node, traversal[dir], tag)) : null;
 		};
 		core.clear = function(node) {
 			node.hasChildNodes() ? this.cache = {} : delete this.cache[node.id];
@@ -747,22 +965,22 @@ core.extend(core.prototype, function(traversal, sibling, child) {
 		prev: function(tag) {
 			return new core(sibling(this.node, traversal.prev, tag));
 		},
-		firstChild: function(tag) {
+		first: function(tag) {
 			return new core(child(this.node[traversal.first], 'next', tag));
 		},
-		lastChild: function(tag) {
+		last: function(tag) {
 			return new core(child(this.node[traversal.last], 'prev', tag));
 		},
-		nthChild: function(index, tags) {
-			return this.child(tags).item(index);
+		nth: function(index, tags) {
+			return this.child(tags).get(index);
 		}
 	};
 }());
 core.list.prototype = {
-	item: function(i) {
-		return new core(this.items[i]);
+	get: function(index) {
+		return index === undefined ? this.items : new core(this.items[index]);
 	},
-	last: function() {
+	getLast: function() {
 		return new core(this.items[this.items.length - 1]);
 	},
 	size: function() {
@@ -798,7 +1016,7 @@ core.extend(core.list.prototype, function(slice) {
 			if(arg.call) return new core.list(this.items, arg);
 			else {
 				var obj = new core(this.items[0]), exec = check(arguments);
-				return new core.list(this.items, exec.method === 'call' ? function() {
+				return new core.list(this.items, exec.method == 'call' ? function() {
 					obj.node = this;
 					return obj[arg](exec.args);
 				} : function() {
@@ -814,7 +1032,7 @@ core.extend(core.list.prototype, function(slice) {
 			}
 			else {
 				var obj = new core(this.items[0]), exec = check(arguments);
-				if(exec.method === 'call') while(i--) {
+				if(exec.method == 'call') while(i--) {
 					obj.node = this.items[i];
 					obj[arg](exec.args);
 				}
@@ -836,9 +1054,10 @@ core.restore = core.prototype.restore = core.list.prototype.restore = function()
 	return storage;
 };
 core.timer.prototype = {
-	start: function(timer) {
+	start: function() {
 		if(!this.enabled) {
-			(timer = this).enabled = true;
+			var timer = this;
+			timer.enabled = true;
 			(function() {
 				timer.func.call(timer.context, timer);
 				if(timer.enabled) setTimeout(arguments.callee, timer.time);
@@ -850,256 +1069,39 @@ core.timer.prototype = {
 		this.enabled = false;
 		return this;
 	},
-	repeat: function(amount, callback, context, timer) {
+	repeat: function(amount, callback, context) {
 		if(!this.enabled) {
-			(timer = this).enabled = true;
+			var timer = this;
+			timer.enabled = true;
 			(function() {
 				timer.func.call(timer.context, timer);
 				if(timer.enabled && --amount) setTimeout(arguments.callee, timer.time);
 				else {
 					timer.enabled = false;
-					if(callback) callback.call(context, timer);
+					if(callback) callback.call(context || timer.context, timer);
 				}
 			})();
 		}
 		return this;
 	}
 };
-core.event.prototype = {
-	preventDefault: ie ? function() {
-		this.object.returnValue = false;
-		return this;
-	} : function() {
-		this.object.preventDefault();
-		return this;
-	},
-	stopPropagation: ie ? function() {
-		this.object.cancelBubble = true;
-		return this;
-	} : function() {
-		this.object.stopPropagation();
-		return this;
-	},
-	stop: function() {
-		return this.preventDefault().stopPropagation();
-	},
-	target: function(target) {
-		return function() {
-			return this.object[target];
-		};
-	}(ie ? 'srcElement' : 'target'),
-	mouseButton: function(attr, middle) {
-		return function() {
-			return this.object[attr] < 2 ? 'left' : this.object[attr] == middle ? 'middle' : 'right';
-		};
-	}(ie ? 'button' : 'which', ie ? 4 : 2),
-	mousePosition: ie ? function(doc, body) {
-		return function() {
-			return {x: this.object.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc.clientLeft || 0), y: this.object.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc.clientTop || 0)};
-		};
-	}(doc.documentElement, doc.body) : function() {
-		return {x: this.object.pageX, y: this.object.pageY};
-	},
-	key: ie ? function() {
-		return this.object.keyCode;
-	} : function() {
-		return this.object.keyCode || this.object.which;
-	}
-};
-core.extend(core.trim, {
-	left: function(str) {
-		return str.replace(/^\s+/, '');
-	},
-	right: function(str) {
-		return str.replace(/\s+$/, '');
-	},
-	spaces: function(str) {
-		return str.replace(/\s{2,}/g, ' ');
-	},
-	both: function(str) {
-		return this.right(this.left(str));
-	},
-	all: function(str) {
-		return this.both(this.spaces(str));
-	}
-});
-core.extend(core.yass, {
-	c: [],
-	q: !!doc.querySelectorAll,
-	k: !!doc.getElementsByClassName,
-	attr: {
-		"": function(child, attr) {
-			return !! child.getAttribute(attr);
-		},
-		"=": function(child, attr, value) {
-			return (attr = child.getAttribute(attr)) && attr === value;
-		},
-		"&=": function(child, attr, value) {
-			return (attr = child.getAttribute(attr)) && (new RegExp("(^| +)" + value + "($| +)").test(attr));
-		},
-		"^=": function(child, attr, value) {
-			return (attr = child.getAttribute(attr) + "") && !attr.indexOf(value);
-		},
-		"$=": function(child, attr, value) {
-			return (attr = child.getAttribute(attr) + "") && attr.indexOf(value) == attr.length - value.length;
-		},
-		"*=": function(child, attr, value) {
-			return (attr = child.getAttribute(attr) + "") && attr.indexOf(value) != -1;
-		},
-		"|=": function(child, attr, value) {
-			return (attr = child.getAttribute(attr) + "") && (attr === value || !!attr.indexOf(value + "-"));
-		},
-		"!=": function(child, attr, value) {
-			return ! (attr = child.getAttribute(attr)) || !(new RegExp("(^| +)" + value + "($| +)").test(attr));
-		}
-	},
-	mods: {
-		"first-child": function(child) {
-			return child.parentNode.getElementsByTagName("*")[0] !== child;
-		},
-		"last-child": function(child) {
-			var brother = child;
-			while ((brother = brother.nextSibling) && brother.nodeType != 1) {}
-			return !! brother;
-		},
-		root: function(child) {
-			return child.nodeName.toLowerCase() !== "html";
-		},
-		"nth-child": function(child, ind) {
-			var i = child.nodeIndex || 0,
-			a = ind[3] = ind[3] ? (ind[2] === "%" ? -1 : 1) * ind[3] : 0,
-			b = ind[1];
-			if(i) {
-				return ! ((i + a) % b);
-			} else {
-				var brother = child.parentNode.firstChild;
-				i++;
-				do {
-					if(brother.nodeType == 1 && (brother.nodeIndex = ++i) && child === brother && ((i + a) % b)) {
-						return 0;
-					}
-				} while ( brother = brother . nextSibling );
-				return 1;
-			}
-		},
-		"nth-last-child": function(child, ind) {
-			var i = child.nodeIndexLast || 0,
-			a = ind[3] ? (ind[2] === "%" ? -1 : 1) * ind[3] : 0,
-			b = ind[1];
-			if(i) {
-				return ! ((i + a) % b);
-			} else {
-				var brother = child.parentNode.lastChild;
-				i++;
-				do {
-					if(brother.nodeType == 1 && (brother.nodeLastIndex = i++) && child === brother && ((i + a) % b)) {
-						return 0;
-					}
-				} while ( brother = brother . previousSibling );
-				return 1;
-			}
-		},
-		empty: function(child) {
-			return !! child.firstChild;
-		},
-		parent: function(child) {
-			return ! child.firstChild;
-		},
-		"only-child": function(child) {
-			return child.parentNode.getElementsByTagName("*").length != 1;
-		},
-		checked: function(child) {
-			return ! child.checked;
-		},
-		lang: function(child, ind) {
-			return child.lang !== ind && doc.documentElement.lang !== ind;
-		},
-		enabled: function(child) {
-			return child.disabled || child.type === "hidden";
-		},
-		disabled: function(child) {
-			return ! child.disabled;
-		},
-		selected: function(elem) {
-			child.parentNode.selectedIndex;
-			return ! child.selected;
-		}
-	}
-});
-core.ajax.type = {
-	html: 'text/html',
-	text: 'text/plain',
-	xml: 'application/xml, text/xml',
-	json: 'application/json, text/javascript',
-	script: 'text/javascript, application/javascript',
-	'default': 'application/x-www-form-urlencoded'
-};
-core.ajax.accept = '*\/*';
-core.ajax.prototype.open = function(params) {
-	core.extend(this, {
-		method: params.method || 'GET',
-		url: params.url || location.href,
-		async: params.async !== false,
-		user: params.user || null,
-		password: params.password || null,
-		params: params.params || null,
-		processData: params.processData === true,
-		timeout: params.timeout || 0,
-		contentType: core.ajax.type[params.contentType] || core.ajax.type['default'],
-		dataType: core.ajax.type[params.dataType] ? core.ajax.type[params.dataType] + ', *\/*' : core.ajax.accept,
-		requestHeaders: params.requestHeaders || null,
-		success: params.success,
-		error: params.error
-	});
-	if(this.params) {
-		var params = [], process = this.process;
-		core.forEach(this.params, function(key, value) {
-			params.push([key, '=', process ? encodeURIComponent(value) : value].join(''));
-		});
-		this.params = params.join('&');
-	}
-	try {
-		this.xhr.open(this.method, this.method == 'GET' && this.params ? this.url + '?' + this.params : this.url, this.async, this.user, this.password);
-		this.xhr.setRequestHeader('Accept', this.dataType);
-		this.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-		this.xhr.setRequestHeader('Content-Type', this.contentType);
-		var ajax = this;
-		if(this.requestHeaders) core.forEach(this.requestHeaders, function(key, value) {
-			ajax.xhr.setRequestHeader(key, value);
-		});
-		this.xhr.send(this.params);
-		(function() {
-			if(ajax.xhr.readyState == 4) {
-				if(ajax.xhr.status == 200 || ajax.xhr.status == 0 && ajax.success) ajax.success(ajax.xhr.responseText);
-				else if(ajax.error && !ajax.aborted) ajax.error(ajax.xhr.statusText);
-			}
-			else if(!ajax.aborted) setTimeout(arguments.callee, 20);
-		})();
-		if(this.async && this.timeout) setTimeout(function() {
-			if(ajax.xhr.readyState != 4) {
-				ajax.aborted = true;
-				ajax.xhr.abort();
-				if(ajax.error) ajax.error('Time is out');
-			}
-		}, this.timeout);
-	}
-	catch(error) {
-		if(this.error) this.error(error);
-	}
-};
 win.core = win.$ ? core : (win.$ = core);
 if(!win.$$) win.$$ = core.find;
 (function(listener) {
-	ie ? doc.write(unescape('%3CSCRIPT onreadystatechange="if(this.readyState==\'complete\') core.ready()" defer="defer" src="\/\/:"%3E%3C/SCRIPT%3E')) : doc.addEventListener('DOMContentLoaded', listener, false);
-	if(/KHTML|WebKit/i.test(navigator.userAgent)) (function() {
-		/loaded|complete/.test(doc.readyState) ? core.ready() : setTimeout(arguments.callee, 10);
-	})();
 	core.bind(win, 'load', listener);
+	if(!ie) return doc.addEventListener('DOMContentLoaded', listener, false);
+	try {
+		element.doScroll('left');
+	}
+	catch(error) {
+		doc.write(unescape('%3CSCRIPT onreadystatechange="if(this.readyState==\'complete\') core.ready()" defer="defer" src="\/\/:"%3E%3C/SCRIPT%3E'));
+	}
 })(function() {
 	core.unbind(doc, 'DOMContentLoaded', arguments.callee);
 	core.unbind(win, 'load', arguments.callee);
 	core.ready();
 });
+
 core.bind(win, 'unload', function() {
 	delete core.yass.c;
 	delete core.cache;
@@ -1115,7 +1117,7 @@ core.bind(win, 'unload', function() {
 	delete core.handlers;
 	core.unbind(win, 'unload', arguments.callee);
 });
-})(window, document, function(arg) {
+})(window, document, document.documentElement || document.body, function(arg) {
 	if(this.core) return new core(arg);
 	this.node = core.id(arg);
 } /*@cc_on , ScriptEngineMinorVersion() @*/);

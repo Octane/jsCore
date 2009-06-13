@@ -23,6 +23,7 @@ color: #bd067a;
 border-bottom-color: #bd067a;
 }
 img {
+border: none;
 vertical-align: bottom;
 }
 .logo:link, .logo:visited, logo:link img, .logo:visited img {
