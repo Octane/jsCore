@@ -53,6 +53,11 @@ font-weight: normal;
 h3:target, h4:target, h5:target, h6:target {
 color: #272727;
 background: #fee890;
+cursor: pointer;
+}
+h3:target:after, h4:target:after, h5:target:after, h6:target:after {
+float: right;
+content: "↑";
 }
 h1 {
 overflow: hidden;

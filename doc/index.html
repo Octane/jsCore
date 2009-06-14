@@ -7,7 +7,6 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-<p style="text-align: center; color: #900; background: #fec;">Документация еще не полностью приведена в соответствие с версией фреймворка 2.8.1 RC1. Все, что перечеркнуто, подверглось изменениям и будет отредактировано. Перед использованием, посмотрите <a href="#js-core-changes">список изменений</a>. Готовая документация будет выпущена вместе с релизом версии 2.8.1 уже скоро.</p>
 <div class="container">
 	<a class="logo" href="http://www.js-core.ru/"><img src="logo.png" alt="logo" width="192" height="192" /></a>
 	<h1>js-core <span>JavaScript framework</span></h1>
@@ -30,8 +29,8 @@
 					<li><a href="#js-core-events-object">Работа с&nbsp;объектом-событие</a>
 						<ul>
 							<li><a href="#js-core-events-object-mouse">События мыши</a></li>
-							<li><a href="#js-core-events-object-keyboard">События клавиатуры</a></li>
 							<li><a href="#js-core-events-object-default-and-bubbling">Стандартное действие браузера и&nbsp;всплывание событий</a></li>
+							<li><a href="#js-core-events-object-target">Цели события</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -43,7 +42,6 @@
 					<li><a href="#js-core-methods-core">Методы и&nbsp;атрибуты объекта core или&nbsp;$</a></li>
 					<li><a href="#js-core-methods-timer">Методы работы с&nbsp;таймером</a></li>
 					<li><a href="#js-core-methods-list">Методы работы со&nbsp;списками узлов</a></li>
-					<li><a href="#js-core-methods-event">Методы работы с&nbsp;объектом-событие</a></li>
 					<li><a href="#js-core-methods-ajax">Методы работы c&nbsp;<abbr title="Asynchronous JavaScript and XML">AJAX</abbr></a></li>
 				</ul>
 			</li>
@@ -161,9 +159,8 @@ alert(text) // выдаст сообщение &quot;Пример&quot;</code></
 }).text(&quot;Пример&quot;) // this → HTMLSpanElement</code></pre>
 	<p>Метод <code>exist(…)</code> проверяет наличие элемента и&nbsp;запускает callback-функйцию, которая вызывается в&nbsp;контексте текущего узла.</p>
 	<h3 id="js-core-events">Обработка событий</h3>
-	<p>Кросс-браузерная обработка событий, наверное, одна&nbsp;из&nbsp;самых&nbsp;сложных частей фреймворка, как&nbsp;для&nbsp;понимания, так&nbsp;и&nbsp;в&nbsp;плане реализации.</p>
+	<p>Фреймворк js-core позволяет максимально избавиться от&nbsp;проблем кросс-браузерной обработки событий. Все&nbsp;функции-обработчики во&nbsp;всех&nbsp;браузерах будут&nbsp;получать в&nbsp;качестве 1-го&nbsp;аргумента объект-событие и&nbsp;будут вызываться в&nbsp;контексте элемента, к&nbsp;событию которого «привязаны». Кроме&nbsp;того, система обработки событий спроектирована таким&nbsp;образом, чтобы&nbsp;исключить известные причины утечек памяти (Memory&nbsp;Leaks) в&nbsp;Internet&nbsp;Explorer&nbsp;6.</p>
 	<h4 id="js-core-events-bind">Добавление/удаление обработчиков событий</h4>
-	<p>В&nbsp;Internet Explorer, в&nbsp;отличие от&nbsp;других браузеров, выполняемые по&nbsp;событию функции, добавленные методом <code>attachEvent(…)</code>, не&nbsp;получают в&nbsp;качестве первого аргумента объект-событие и&nbsp;не&nbsp;вызываются в&nbsp;контексте элемента, к&nbsp;событию которого «привязаны». js-core решает эту&nbsp;проблему, все&nbsp;функции, добавляемые в&nbsp;обработчик события какого-либо элемента, автоматически вызываются в&nbsp;контексте этого элемента, и&nbsp;получают объекта-событие первым аргументом.</p>
 	<p>Добавим обработчик события «click» для узла с идентификатором «container»:</p>
 	<pre><code class="javascript">$(&quot;container&quot;).bind(&quot;click&quot;, function(eventObject) {
     this // → HTMLDivElement#container
@@ -185,55 +182,30 @@ $(&quot;container&quot;).unbind(&quot;click&quot;, listener) // удалить �
 	<pre><code class="javascript">$(&quot;container&quot;).mouseover(function() {
     $(this).toggleClass(&quot;highlight&quot;)
 })</code></pre>
-<div style="text-decoration: line-through;">
 	<h4 id="js-core-events-object">Работа с&nbsp;объектом-событие</h4>
-	<p>Для&nbsp;работы с&nbsp;объектом-событие предусмотрен метод <code>$.event(…)</code>, который возвращает, так&nbsp;же&nbsp;как&nbsp;и&nbsp;в&nbsp;случае с&nbsp;функцией&nbsp;<code>$(…)</code>, специальную обертку, содержащую ссылку на&nbsp;этот&nbsp;объект, через&nbsp;прототип которой доступны методы для&nbsp;работы с&nbsp;событием.</p>
-	<p>Получить объект-событие можно&nbsp;несколькими способами:</p>
-	<pre><code class="javascript">$(&quot;container&quot;).bind(&quot;mousedown&quot;, function(eventObject) {
-    eventObject = eventObject || window.event
-    $.event(eventObject)
-})
-// или
-$(&quot;container&quot;).bind(&quot;mousedown&quot;, function(eventObject) {
-    var eventObject = arguments[0] || window.event
-    $.event(eventObject)
-})
-// или
-$(&quot;container&quot;).bind(&quot;mousedown&quot;, function(eventObject) {
-    $.event(eventObject)
-})
-// или
-$(&quot;container&quot;).bind(&quot;mousedown&quot;, function() {
-    $.event(arguments[0])
-})</code></pre>
-	<p>Все&nbsp;эти&nbsp;варианты успешно сработают. Далее&nbsp;в&nbsp;примерах будем использовать 3-й&nbsp;вариант.</p>
+	<p>Для&nbsp;работы с&nbsp;объектом-событие предусмотрен набор методов, позволяющих кросс-браузерно извлечь всю&nbsp;необходимую информацию.</p>
 	<h5 id="js-core-events-object-mouse">События мыши</h5>
 	<pre><code class="javascript">$(&quot;container&quot;).bind(&quot;mousedown&quot;, function(eventObj) {
-    eventObj = $.event(eventObj) // обертка для объекта-событие
-    eventObj.object              // ссылка на объект-событие
-    eventObj.mouseButton()       // выдаст &quot;left&quot;, &quot;middle&quot; или &quot;right&quot;
-    eventObj.mousePosition()     // вернет объект {x: число, y: число}
-    eventObj.mousePosition().x   // координата курсора по оси OX
-    eventObj.mousePosition().y   // координата курсора по оси OY
-    eventObj.target()            // текущий элемент, при всплывании события
-    this // ссылка на &lt;div&gt; c идентификатором &quot;container&quot;
-})</code></pre>
-	<h5 id="js-core-events-object-keyboard">События клавиатуры</h5>
-	<pre><code class="javascript">$(document).bind(&quot;keydown&quot;, function(eventObj) {
-    $.event(eventObj).key() // код нажатой клавиши
+    $.mouseButton(eventObj) // номер нажатой кнопки мыши
+    $.pageX(eventObj)       // координата курсора по оси X относительно начала страницы
+    $.pageY(eventObj)       // координата курсора по оси Y относительно начала страницы
 })</code></pre>
 	<h5 id="js-core-events-object-default-and-bubbling">Стандартное действие браузера и&nbsp;всплывание событий</h5>
 	<pre><code class="javascript">$(document.forms[0]).bind(&quot;submit&quot;, function(eventObj) {
-    eventObj = $.event(eventObj)
-    eventObj.preventDefault()  // предотвращает стандартное действие
-    eventObj.stopPropagation() // останавливает &quot;всплывание&quot; события
-    eventObj.stop()            // выполняет 2 предыдущих метода
+    $.preventDefault(eventObj)  // предотвращает стандартное действие
+    $.stopPropagation(eventObj) // останавливает &quot;всплывание&quot; события
+    $.stop(eventObj)            // выполняет 2 предыдущих метода
 })</code></pre>
 	<p>Для&nbsp;предотвращением стандартного действия браузера <code>(preventDefualt/returnValue)</code>, в&nbsp;обработчике события достаточно выполнить <code>return&nbsp;false</code>:</p>
 	<pre><code class="javascript">$(document.forms[0]).submit(function() {
     return false; // выполнить preventDefault для события &quot;submit&quot;
 })</code></pre>
-</div>
+	<h5 id="js-core-events-object-target">Цели события</h5>
+	<pre><code class="javascript">$(document).bind(&quot;keydown&quot;, function(eventObj) {
+    $.target(eventObj)        // элемент, с которым произошло событие
+    $.relatedTarget(eventObj) // элемент, с которого &quot;пришло&quot; событие
+    this // элемент, к которму &quot;привязан&quot; обработчик события (document)
+})</code></pre>
 	<h3 id="js-core-node-list">Работа со&nbsp;списками элементов</h3>
 	<p>Еще&nbsp;одна&nbsp;функция-конструктор <code>$.list(…)</code> создает обертку для&nbsp;списка <abbr title="Document Object Model">DOM</abbr>-элементов (узлов&nbsp;с&nbsp;<code>nodeType&nbsp;==&nbsp;1</code>) и&nbsp;предоставляет набор методов:</p>
 	<pre><code class="javascript">var list = $.list(document.getElementsByTagName(&quot;div&quot;))
@@ -1442,15 +1414,15 @@ $.findClass(&quot;selected&quot;) // получить все элементы с
 			</tr>
 			<tr>
 				<th rowspan="4">forEach</th>
-				<td>.forEach(array, function(element,&nbsp;index,&nbsp;array)&nbsp;{…})</td>
+				<td>.forEach(array, function(element,&nbsp;index,&nbsp;array,&nbsp;length)&nbsp;{…})</td>
 				<td rowspan="2">array</td>
 				<td rowspan="4">Последовательно выполнить функцию для&nbsp;каждого элемента массива или&nbsp;объекта; чтобы&nbsp;прервать цикл, функция должна вернуть false</td>
 			</tr>
 			<tr>
-				<td>.forEach(array, function(element,&nbsp;index,&nbsp;array)&nbsp;{…}, context)</td>
+				<td>.forEach(array, function(element,&nbsp;index,&nbsp;array,&nbsp;length)&nbsp;{…}, context)</td>
 			</tr>
 			<tr>
-				<td>.forEach(object, function(element,&nbsp;index,&nbsp;array)&nbsp;{…})</td>
+				<td>.forEach(object, function(key,&nbsp;value,&nbsp;object)&nbsp;{…})</td>
 				<td rowspan="2">object</td>
 			</tr>
 			<tr>
@@ -1463,29 +1435,22 @@ $.findClass(&quot;selected&quot;) // получить все элементы с
 				<td>Расширить объект object методами и&nbsp;атрибутами объекта hash; имеющиеся атрибуты и&nbsp;методы перезаписываются</td>
 			</tr>
 			<tr>
-				<th rowspan="6">trim</th>
+				<th>trim</th>
 				<td>.trim(&quot;string&quot;)</td>
-				<td rowspan="6">string</td>
-				<td rowspan="2">Удалить все&nbsp;пробельные символы в&nbsp;начале и&nbsp;конце строки</td>
+				<td>string</td>
+				<td>Удалить все&nbsp;пробельные символы с&nbsp;начала и&nbsp;с&nbsp;конца строки</td>
 			</tr>
 			<tr>
-				<td>.trim.both(&quot;string&quot;)</td>
+				<th>trimLeft</th>
+				<td>.trimLeft(&quot;string&quot;)</td>
+				<td>string</td>
+				<td>Удалить все&nbsp;пробельные символы с&nbsp;начала строки</td>
 			</tr>
 			<tr>
-				<td>.trim.left(&quot;string&quot;)</td>
-				<td>Удалить все&nbsp;пробельные символы в&nbsp;начале строки</td>
-			</tr>
-			<tr>
-				<td>.trim.right(&quot;string&quot;)</td>
-				<td>Удалить все&nbsp;пробельные символы в&nbsp;конце строки</td>
-			</tr>
-			<tr>
-				<td>.trim.spaces(&quot;string&quot;)</td>
-				<td>Удалить все&nbsp;повторяющиеся пробельные символы</td>
-			</tr>
-			<tr>
-				<td>.trim.all(&quot;string&quot;)</td>
-				<td>Выполнить все&nbsp;виды преобразований</td>
+				<th>trimRight</th>
+				<td>.trimRight(&quot;string&quot;)</td>
+				<td>string</td>
+				<td>Удалить все&nbsp;пробельные символы с&nbsp;конца строки</td>
 			</tr>
 			<tr>
 				<th rowspan="6">list</th>
@@ -1526,13 +1491,52 @@ $.findClass(&quot;selected&quot;) // получить все элементы с
 				<td>new $.timer(timeout, func, context)</td>
 			</tr>
 			<tr>
-				<th rowspan="2">event</th>
-				<td>.event(eventObject)</td>
-				<td rowspan="2">{object:eventObject}</td>
-				<td rowspan="2">Получить объект-событие; методы этого&nbsp;объекта приведены в&nbsp;отдельной таблице</td>
+				<th>preventDefault</th>
+				<td>.preventDefault(eventObject)</td>
+				<td>undefined</td>
+				<td>Предотвратить стандартное действие браузера</td>
 			</tr>
 			<tr>
-				<td>new $.event(eventObject)</td>
+				<th>stopPropagation</th>
+				<td>.stopPropagation(eventObject)</td>
+				<td>undefined</td>
+				<td>Остановить всплывание события</td>
+			</tr>
+			<tr>
+				<th>stop</th>
+				<td>.stop(eventObject)</td>
+				<td>undefined</td>
+				<td>Выполнить два предыдущих метода</td>
+			</tr>
+			<tr>
+				<th>target</th>
+				<td>.target(eventObject)</td>
+				<td>HTMLElement</td>
+				<td>Получить элемент, на&nbsp;котором сработало событие</td>
+			</tr>
+			<tr>
+				<th>relatedTarget</th>
+				<td>.relatedTarget(eventObject)</td>
+				<td>HTMLElement</td>
+				<td>Получить элемент, с&nbsp;которого &quot;пришло&quot; событие</td>
+			</tr>
+			<tr>
+				<th>mouseButton</th>
+				<td>.mouseButton(eventObject)</td>
+				<td>1|2|3</td>
+				<td>Узнать, какая кнопка мыши была&nbsp;нажата</td>
+			</tr>
+			<tr>
+				<th>pageX</th>
+				<td>.pageX(eventObject)</td>
+				<td>number</td>
+				<td>Получить координату курсора мыши по&nbsp;оси&nbsp;X относительно начала страницы</td>
+			</tr>
+			<tr>
+				<th>pageY</th>
+				<td>.pageY(eventObject)</td>
+				<td>number</td>
+				<td>Получить координату курсора мыши по&nbsp;оси&nbsp;Y относительно начала страницы</td>
 			</tr>
 			<tr>
 				<th rowspan="2">ajax</th>
@@ -1623,6 +1627,12 @@ $.findClass(&quot;selected&quot;) // получить все элементы с
 				<td>Проверить существования в&nbsp;объекте хотя&nbsp;бы&nbsp;одной пары&nbsp;ключ:значение</td>
 			</tr>
 			<tr>
+				<th>isNumber</th>
+				<td>.isNumber(something)</td>
+				<td>true|false</td>
+				<td>Проверить является ли&nbsp;переданный объект числом</td>
+			</tr>
+			<tr>
 				<th rowspan="2">toArray</th>
 				<td>.toArray(&quot;string&quot;)</td>
 				<td rowspan="2">array</td>
@@ -1630,6 +1640,12 @@ $.findClass(&quot;selected&quot;) // получить все элементы с
 			</tr>
 			<tr>
 				<td>.toArray(array)</td>
+			</tr>
+			<tr>
+				<th>computedStyle</th>
+				<td>.computedStyle(HTMLElement)</td>
+				<td>StylesObject</td>
+				<td>Получить объект, содержащий информацию о&nbsp;стилях элемента на&nbsp;странице</td>
 			</tr>
 		</tbody>
 	</table>
@@ -1786,79 +1802,6 @@ var list = new core.list(document.getElementsByTagName(&quot;div&quot;))</code><
 			</tr>
 		</tbody>
 	</table>
-<div style="text-decoration: line-through;">
-	<h4 id="js-core-methods-event">Методы работы с&nbsp;объектом-событие</h4>
-	<p>Обработка событий, как&nbsp;говорилось ранее, один из&nbsp;самых трудных моментов, но&nbsp;используя js-core, вы&nbsp;избавить себя от&nbsp;ряда проблем.</p>
-	<pre><code class="javascript">function(eventObject) {
-    $.event(eventObject).stop();
-}</code></pre>
-	<p>Подробнее, об&nbsp;остальных методах, в&nbsp;таблице ниже:</p>
-	<style type="text/css">
-		#abc th, #abc td {
-			text-decoration: line-through;
-		}
-	</style>
-	<table id="abc" summary="">
-		<colgroup>
-		<col class="col1" />
-		<col class="col2" />
-		<col class="col3" />
-		<col class="col4" />
-		</colgroup>
-		<thead>
-			<tr>
-				<th>Метод</th>
-				<th>Варианты вызова</th>
-				<th>Возвращаемое значение</th>
-				<th>Действие</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<th>preventDefault</th>
-				<td>.preventDefault()</td>
-				<td>{object:eventObject}</td>
-				<td>Предотвратить стандартное действие браузера</td>
-			</tr>
-			<tr>
-				<th>stopPropagation</th>
-				<td>.stopPropagation()</td>
-				<td>{object:eventObject}</td>
-				<td>Остановить всплывание события</td>
-			</tr>
-			<tr>
-				<th>stop</th>
-				<td>.stop()</td>
-				<td>{object:eventObject}</td>
-				<td>Выполнить два предыдущих метода</td>
-			</tr>
-			<tr>
-				<th>target</th>
-				<td>.target()</td>
-				<td>HTMLElement</td>
-				<td>Получить текущий элемент, на&nbsp;котором сработало событие</td>
-			</tr>
-			<tr>
-				<th>mouseButton</th>
-				<td>.mouseButton()</td>
-				<td>left|middle|right</td>
-				<td>Узнать, какая кнопка мыши была&nbsp;нажата</td>
-			</tr>
-			<tr>
-				<th>mousePosition</th>
-				<td>.mousePosition()</td>
-				<td>{x:number,y:number}</td>
-				<td>Получить координаты курсоры мыши</td>
-			</tr>
-			<tr>
-				<th>key</th>
-				<td>.key()</td>
-				<td>number</td>
-				<td>Получить код&nbsp;нажатой клавиши</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
 	<h4 id="js-core-methods-ajax">Методы работы с&nbsp;<abbr title="Asynchronous JavaScript and XML">AJAX</abbr></h4>
 	<p>Для&nbsp;того чтобы&nbsp;получить доступ к&nbsp;методам для&nbsp;работы с&nbsp;<abbr title="Asynchronous JavaScript and XML">AJAX</abbr> в&nbsp;js-core, вам&nbsp;нужно&nbsp;подключить соответствующий модуль, который находится в&nbsp;отдельном файле. Такое разделение было&nbsp;сделано по&nbsp;причине&nbsp;того, что&nbsp;в&nbsp;дальнейшем планируется значительно увеличить функционал этого&nbsp;модуля, что&nbsp;неминуемо приведет к&nbsp;увеличению его&nbsp;размеров, но&nbsp;не&nbsp;каждое JavaScript-приложение использует <abbr title="Asynchronous JavaScript and XML">AJAX</abbr> для&nbsp;передачи данных.</p>
 	<p>На&nbsp;данный момент (версия модуля&nbsp;0.2.6) доступно 4&nbsp;метода, которые могут&nbsp;принимать следующие аргументы:</p>
@@ -2156,6 +2099,30 @@ hljs.initHighlightingOnLoad();
 			}
 			else j++;
 		}
+	}
+})();
+(function() {
+	var list = document.getElementsByTagName("div"), i = list.length, contents;
+	while(i--) {
+		if((" " + list[i].className + " ").indexOf(" contents ") != -1) {
+			contents = list[i];
+			break;
+		}
+	}
+	list = contents.getElementsByTagName("a");
+	i = list.length;
+	while(i--) {
+		(function(id) {
+			document.getElementById(id).onclick = function() {
+				i = list.length;
+				while(i--) {
+					if(list[i].href.indexOf("#" + id) != -1) {
+						list[i].focus();
+						break;
+					}
+				}
+			};
+		})(list[i].href.replace(/^(.*?)#/, ""));
 	}
 })();
 </script>
