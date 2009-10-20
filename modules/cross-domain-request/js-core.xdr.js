@@ -17,6 +17,12 @@
 		@license GPL v3 and X11/MIT License
 				 http://eligrey.com/about/license/
 		@author Elijah Grey, http://eligrey.com
+		* 
+	Using: 				$.xdr.open("GET", "http://code.eligrey.com/pmxdr/libxdr/example.php");
+						$.xdr.onload = function() {
+    						alert(this.responseText);
+						}
+						$.xdr.send();
 */
 
 core.xdr = function(){
