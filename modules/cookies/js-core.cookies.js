@@ -13,12 +13,14 @@ core.cookies = function(cookie_name, cookie_value, cookie_expire) {
 };
 core.extend(core.cookies, {
 	isEnabled : function() {
-	    var enabled = (navigator.cookieEnabled)? true : false;
-		if (typeof navigator.cookieEnabled == "undefined" && !enabled) { 
-			document.cookie = "js-core-test-cookie";
-			enabled = (document.cookie.indexOf("js-core-test-cookie")!=-1) ? true : false;
+		var c = "js-core-test-cookie";
+	    var e = (navigator.cookieEnabled)? true : false;
+		if (typeof navigator.cookieEnabled == "undefined" && !e) { 
+			core.cookies.set = c;
+			e = (core.cookies.get(c) != null) ? true : false;
+			core.cookies.set(c, "", -1);
 		}
-		return enabled;
+		return e;
 	},
 	set: function(cookie_name, cookie_value, cookie_expire) {
 		var expire_date = new Date;
