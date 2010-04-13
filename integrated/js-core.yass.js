@@ -41,6 +41,11 @@ core.extend(core, {
 	create: function(arg) {
 		return typeof arg == 'string' ? doc.createElement(arg) : arg;
 	},
+	addScript: function(path) {
+		var e = core.create('script');
+		$(e).attr({'src' : path,'type':'text/javascript'});
+		document.getElementsByTagName('head')[0].appendChild(e);
+	},	
 	insert: function(node, arg, before) {
 		return node.insertBefore(this.create(arg), before);
 	},
@@ -505,7 +510,7 @@ core.ajax.prototype.open = function(params) {
 		this.xhr.send(this.params);
 		(function() {
 			if(ajax.xhr.readyState == 4) {
-				if(ajax.xhr.status == 200 || ajax.xhr.status == 0 && ajax.success) ajax.success(ajax.xhr.responseText);
+				if(ajax.xhr.status == 200 || !ajax.xhr.status && ajax.success) ajax.success(ajax.xhr.responseText);
 				else if(ajax.error && !ajax.aborted) ajax.error(ajax.xhr.statusText);
 			}
 			else if(!ajax.aborted) setTimeout(arguments.callee, 20);
@@ -635,10 +640,23 @@ core.prototype = {
 		core.clear(this.unbind().node).parentNode.removeChild(this.node);
 		return this;
 	},
+	/*
+		ѕо заверению создателей ф-ии replaceHTML, она намного быстрее innerHTML (кроме IE и некоторых версий оперы)
+		—сылка: http://blog.stevenlevithan.com/archives/faster-than-innerhtml
+	*/
 	html: function(str) {
 		if(str !== undefined) {
-			this.empty().node.innerHTML = str;
-			return this;
+			if(core.ie) {
+				this.empty().node.innerHTML = str;
+				return this;
+			} else {
+				var oE = this.empty().node;   // An old element
+				var nE = oE.cloneNode(false); // A new element
+				nE.innerHTML = str;
+				oE.parentNode.replaceChild(nE, oE);
+				return core(nE);
+			}
+
 		}
 		else return this.node.innerHTML;
 	},
@@ -779,7 +797,7 @@ core.prototype = {
 		else if(arg.join || arg.split) {
 			var attributes = core.toArray(arg), length = attributes.length, i = -1, j = 0, result = [];
 			while(++i < length) result[j++] = this.node[attributes[i]];
-			return result.length == 1 ? result[0] : result;
+			return result.length ? result[0] : result;
 		}
 		core.extend(this.node, arg);
 		return this;
@@ -815,7 +833,7 @@ core.prototype = {
 			else if(arg.split || arg.join) {
 				var properties = core.toArray(arg), length = properties.length, i = -1, j = 0, result = [];
 				while(++i < length) result[j++] = get(this.node, properties[i]);
-				return result.length == 1 ? result[0] : result;
+				return result.length ? result[0] : result;
 			}
 			change(this.node, arg);
 			return this;
