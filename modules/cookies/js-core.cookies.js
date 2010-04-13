@@ -3,6 +3,7 @@
 	Copyright (c) 2009 Vlad Zaritovsky
 	Released under the MIT License.
 	More information: http://www.js-core.ru/
+	Todo: add ;domain= and ;path= as optional variables;
 	Using:
 		- Set a cookie: $.cookies('Name','Value',Expire time in milliseconds); 
 		- Get stored cookie: $.cookies('Name'), returns null, if cookie does not exist;

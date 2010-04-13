@@ -652,8 +652,10 @@ core.prototype = {
 			} else {
 				var oE = this.empty().node;   // An old element
 				var nE = oE.cloneNode(false); // A new element
+				core(nE).copyHandlers(core(this));
 				nE.innerHTML = str;
 				oE.parentNode.replaceChild(nE, oE);
+				
 				return core(nE);
 			}
 
@@ -797,7 +799,7 @@ core.prototype = {
 		else if(arg.join || arg.split) {
 			var attributes = core.toArray(arg), length = attributes.length, i = -1, j = 0, result = [];
 			while(++i < length) result[j++] = this.node[attributes[i]];
-			return result.length ? result[0] : result;
+			return result.length == 1 ? result[0] : result;
 		}
 		core.extend(this.node, arg);
 		return this;
@@ -833,7 +835,7 @@ core.prototype = {
 			else if(arg.split || arg.join) {
 				var properties = core.toArray(arg), length = properties.length, i = -1, j = 0, result = [];
 				while(++i < length) result[j++] = get(this.node, properties[i]);
-				return result.length ? result[0] : result;
+				return result.length == 1 ? result[0] : result;
 			}
 			change(this.node, arg);
 			return this;
