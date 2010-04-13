@@ -12,6 +12,14 @@ core.cookies = function(cookie_name, cookie_value, cookie_expire) {
 	return cookie_value === undefined ? core.cookies.get(cookie_name) : core.cookies.set(cookie_name, cookie_value, cookie_expire);
 };
 core.extend(core.cookies, {
+	isEnabled : function() {
+	    var enabled = (navigator.cookieEnabled)? true : false;
+		if (typeof navigator.cookieEnabled == "undefined" && !enabled) { 
+			document.cookie = "js-core-test-cookie";
+			enabled = (document.cookie.indexOf("js-core-test-cookie")!=-1) ? true : false;
+		}
+		return enabled;
+	},
 	set: function(cookie_name, cookie_value, cookie_expire) {
 		var expire_date = new Date;
 		expire_date.setDate(expire_date.getDate() + cookie_expire);
