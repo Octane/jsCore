@@ -5,18 +5,19 @@
 	More information: http://www.js-core.ru/
 	Todo: add ;domain= and ;path= as optional variables;
 	Using:
-		- Set a cookie: $.cookies('Name','Value',Expire time in milliseconds); 
+		- Set a cookie: $.cookies('Name','Value',Expire time in milliseconds);
 		- Get stored cookie: $.cookies('Name'), returns null, if cookie does not exist;
 		- Remove sored cookie: $.cookies.erase('Name');
 */
 core.cookies = function(cookie_name, cookie_value, cookie_expire) {
 	return cookie_value === undefined ? core.cookies.get(cookie_name) : core.cookies.set(cookie_name, cookie_value, cookie_expire);
 };
+
 core.extend(core.cookies, {
 	isEnabled : function() {
 		var c = "js-core-test-cookie";
 	    var e = (navigator.cookieEnabled)? true : false;
-		if (typeof navigator.cookieEnabled == "undefined" && !e) { 
+		if (typeof navigator.cookieEnabled == "undefined" && !e) {
 			core.cookies.set = c;
 			e = (core.cookies.get(c) != null) ? true : false;
 			core.cookies.set(c, "", -1);
