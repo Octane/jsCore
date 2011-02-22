@@ -31,7 +31,7 @@ core.forEach = function(obj, func, context) {
 core.extend = function(obj, hash) {
 	this.forEach(hash, function(key, value) {
 		obj[key] = value;
-	});
+	},undefined);
 	return obj;
 };
 core.extend(core, {
@@ -65,7 +65,7 @@ core.extend(core, {
 		var empty = true;
 		core.forEach(obj, function() {
 			return empty = false;
-		});
+		},undefined);
 		return empty;
 	},
 	isNumber: function(arg) {
@@ -199,11 +199,14 @@ core.extend(core, {
 			switch (selector.charAt(0)) {
 			case '#':
 				idx = selector.slice(1);
-				sets = doc.getElementById(idx);
+				sets = root.getElementById(idx);
+				sets = sets && sets.parentNode ? [sets] : new Array;
+				/*sets = doc.getElementById(idx);
 				if (ie && sets.id !== idx) {
 					sets = doc.all[idx]
 				}
-				sets = sets ? [sets] : new Array;
+				sets = sets ? [sets] : new Array;*/
+
 				break;
 			case '.':
 				var klass = selector.slice(1);
@@ -239,7 +242,8 @@ core.extend(core, {
 				sets = idx ? sets: new Array;
 				break;
 			default:
-				sets = (idx = (sets = root.getElementsByTagName(selector)).length) ? sets: new Array;
+				if('body' === selector) sets = [ root.body ];
+				else sets = (idx = (sets = root.getElementsByTagName(selector)).length) ? sets: new Array;
 				break
 			}
 		} else {
@@ -499,7 +503,7 @@ core.ajax.prototype.open = function(params) {
 		var params = new Array, process = this.process;
 		core.forEach(this.params, function(key, value) {
 			params.push([key, '=', process ? encodeURIComponent(value) : value].join(''));
-		});
+		},undefined);
 		this.params = params.join('&');
 	}
 	try {
@@ -510,7 +514,7 @@ core.ajax.prototype.open = function(params) {
 		var ajax = this;
 		if(this.requestHeaders) core.forEach(this.requestHeaders, function(key, value) {
 			ajax.xhr.setRequestHeader(key, value);
-		});
+		},undefined);
 		this.xhr.send(this.params);
 		(function() {
 			if(ajax.xhr.readyState == 4) {
@@ -626,7 +630,7 @@ core.prototype = {
 			var nodes = doc.createDocumentFragment();
 			core.forEach(core.makeArray(this.node.childNodes), function(node) {
 				nodes.appendChild(node);
-			});
+			},undefined);
 			return new core(nodes).appendTo(this.append(arg).node);
 		}
 		else return this.appendTo(this.before(arg).node);
@@ -728,7 +732,7 @@ core.prototype = {
 			var className = ' ' + this.node.className + ' ', exist = true;
 			core.forEach(core.toArray(arg), function(str) {
 				if(className.indexOf(' ' + str + ' ') == -1) return exist = false;
-			});
+			},undefined);
 			return exist;
 		}
 		else return !!this.node.className;
@@ -742,7 +746,7 @@ core.prototype = {
 					className += str + ' ';
 					modified = true;
 				}
-			});
+			},undefined);
 			if(modified) this.node.className = core.toArray(className).join(' ');
 		}
 		else this.node.className = classes;
@@ -754,7 +758,7 @@ core.prototype = {
 			core.forEach(core.toArray(this.node.className), function(str) {
 				if(classes.indexOf(' ' + str + ' ') == -1) className[i++] = str;
 				else modified = true;
-			});
+			},undefined);
 			if(modified) this.node.className = className.join(' ');
 		}
 		else this.node.className = '';
@@ -769,7 +773,7 @@ core.prototype = {
 				className = ' ' + className + ' ';
 				core.forEach(core.toArray(classes1), function(str) {
 					className = className.replace(' ' + str + ' ', ' ' + classes2[i++] + ' ');
-				});
+				},undefined);
 				this.node.className = core.toArray(className).join(' ');
 			}
 		}
@@ -1012,7 +1016,8 @@ core.extend(core.list.prototype, function(slice) {
 		var length = (args = slice.call(args, 1)).length < 2;
 		return length ? {method: 'call', args: args[0]} : {method: 'apply', args: args};
 	}
-	core.forEach('resize,scroll,blur,focus,error,abort,onload,unload,click,dblclick,mousedown,mouseup,mousemove,mouseover,mouseout,keydown,keypress,keyup,change,select,submit,reset'.split(','), function(listener) {
+	core.forEach('resize,scroll,blur,focus,error,abort,onload,unload,click,dblclick,mousedown,mouseup,mousemove,mouseover,mouseout,keydown,keypress,keyup,change,select,submit,reset'.split(','), function(listener)
+	{
 		return function(type) {
 			core.prototype[type] = function(arg) {
 				return arg ? this.bind(type, arg.call ? arg : listener(arg, arguments)) : this.node[type]();
@@ -1023,7 +1028,7 @@ core.extend(core.list.prototype, function(slice) {
 			var obj, exec = check(args);
 			(obj = $(this))[method][exec.method](obj, exec.args);
 		};
-	}));
+	}),undefined);
 	return {
 		filter: function(arg) {
 			if(arg.call) return new core.list(this.items, arg);
@@ -1126,7 +1131,7 @@ core.bind(win, 'unload', function() {
 		core.forEach(handler.events, function(type) {
 			core.unbind(handler.link, type, handler.listener);
 		}, handler);
-	});
+	},undefined);
 	delete core.handlers;
 	core.unbind(win, 'unload', arguments.callee);
 });
