@@ -22,7 +22,6 @@
 (function(win, doc, element, core, ie, undefined) {
 core.forEach = function(obj, func, context) {
 	var length = obj.length, i = -1;
-	var j = 0;
 	if(length !== undefined) {
 		while(++i < length) if(func.call(context, obj[i], i, obj, length) === false) break;
 	}
@@ -413,7 +412,6 @@ core.extend(core.yass, {
 			return child.nodeName.toLowerCase() !== 'html'
 		},
 		'nth-child': function(child, ind) {
-			console.dir(ind);
 			var i = child.nodeIndex || 0, a = ind[3] = ind[3] ? (ind[2] === '%' ? -1 : 1) * ind[3] : 0, b = ind[1];
 			if (i) {
 				return ! ((i + a) % b)
