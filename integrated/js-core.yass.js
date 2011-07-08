@@ -3,8 +3,8 @@
  *
  * Components:
  *
- * Х js-core JavaScript framework, version 2.8.1
- *   Copyright (c) 2009 Dmitry Korobkin
+ * Х js-core JavaScript framework, version 2.8.2
+ *   Copyright (c) 2009-2011 Dmitry Korobkin
  *   Released under the MIT License.
  *   More information: http://www.js-core.ru/
  *
@@ -17,9 +17,13 @@
  *
  * For details, see: info.txt
  *
- * TODO: Add :contains() to yass selectors engine
  */
-(function(win, doc, element, core, ie, undefined) {
+(function(win, doc, element, core, ie) {
+	
+core._Array_prototype  = Array.prototype;
+core._Object_prototype = Object.prototype;
+core._String_prototype = String.prototype;
+
 core.forEach = function(obj, func, context) {
 	var length = obj.length, i = -1;
 	if(length !== undefined) {
@@ -35,13 +39,78 @@ core.extend = function(obj, hash) {
 	return obj;
 };
 core.extend(core, {
+	support : {
+		Touch: (typeof Touch === "object"),
+		contentEditable : (typeof document.documentElement.contentEditable === 'string'),
+		WebKitAnimationEvent: (typeof WebKitTransitionEvent === "object"),
+		WebKitCSSMatrix : (typeof WebKitCSSMatrix === "object"),
+		Canvas : (function(){ 
+			var element = document.createElement( 'canvas' );
+			return !!(element.getContext && element.getContext('2d'));
+		})(),
+		WebGL : !!window.WebGLRenderingContext,
+		geolocation: !!navigator.geolocation,
+		postMessage: !!window.postMessage,
+		WebsqlDB: !!window.openDatabase,
+		IndexedDB: (function(){
+			var pfx = 'Webkit Moz O ms Khtml'.split(' ');
+			for (var i = -1, len = pfx.length; ++i < len; ){ 
+				var prefix = pfx[i].toLowerCase();
+				if (window[prefix + '_indexedDB'] || window[prefix + 'IndexedDB']){
+				  return true;
+				} 
+			  }
+			  return false;
+		})(),
+		localStorage: !!window.localStorage,
+		history: !!(window.history && history.pushState),
+		WebSocket: !!('WebSocket' in window),
+		Worker: !!window.localStorage
+	},
+	error : function(str) {
+		return function() { throw new Error(str) }
+	},
+	/* Arrays, Strings, Objects functions: */
+	typeOf : function(value) {
+		if(value === null && typeof value !== 'undefined') return 'null';
+			if (!!(typeof value === 'object') && !!(value) && typeof value.length === 'number' &&  !(value.propertyIsEnumerable('length')) && typeof value.splice === 'function')
+				return 'array';
+			return typeof value;
+	},
+	isString : function(val) {
+	  return typeof val === 'string';
+	},
+	map: function(thing,fn,sc) {
+		
+		if(this.typeOf(thing) === 'array') {
+			if(core._Array_prototype.map) { return core._Array_prototype.map.call(thing,fn,sc)}
+			var l = thing.length;
+			var res = [](l);
+			var array = this.isString(thing) ? arr.split('') : thing;
+			for (var i = 0; i < l; i++) {
+				if (i in array) {
+					res[i] = fn.call(sc, array[i], i, thing);
+				}
+			}
+			return res;
+		} else if (this.typeOf(thing) === 'object') {
+			if(core._Object_prototype.map) { return core._Object_prototype.map.call(thing,fn,sc)}
+			var res = {};
+			for (var key in thing) {
+				res[key] = f.call(sc, thing[key], key, thing);
+			}
+			return res;
+		} else {
+			this.error('Not an object or array');
+		}
+	},
 	ie: ie,
-	cache: new Object,
+	cache: {}(),
 	id: function(arg) {
-		return typeof arg == 'string' ? this.cache[arg] || (this.cache[arg] = doc.getElementById(arg)) : arg;
+		return typeof arg === 'string' ? this.cache[arg] || (this.cache[arg] = doc.getElementById(arg)) : arg;
 	},
 	create: function(arg) {
-		return typeof arg == 'string' ? doc.createElement(arg) : arg;
+		return typeof arg === 'string' ? doc.createElement(arg) : arg;
 	},
 	addScript: function(path) {
 		var e = core.create('script');
@@ -83,15 +152,15 @@ core.extend(core, {
 		}
 	},
 	toArray: function(arg) {
-		if(typeof arg == 'string') {
+		if(typeof arg === 'string') {
 			var i = -1, j = 0, array = arg.split(' '), length = array.length;
-			arg = new Array;
+			arg = [];
 			while(++i < length) if(array[i]) arg[j++] = array[i];
 		}
 		return arg;
 	},
 	ready: function() {
-		var ready, list = new Array, i = -1;
+		var ready, list = [], i = -1;
 		return function(func) {
 			if(func) ready ? func() : list.push(func);
 			else if(!ready) {
@@ -119,18 +188,18 @@ core.extend(core, {
 		return new core.list(core.yass(selector, root, noCache), false);
 	},
 	makeArray: ie ? function(list) {
-		var i = -1, length = list.length, array = new Array;
+		var i = -1, length = list.length, array = [];
 		while(++i < length) array[i] = list[i];
 		return array;
 	} : function(list) {
-		return Array.prototype.slice.call(list);
+		return core._Array_prototype.slice.call(list);
 	},
 	list: function(items, filter) {
 		if(this.list) return new this.list(items, filter);
-		if(filter === false) this.items = items || new Array;
+		if(filter === false) this.items = items || [];
 		else {
 			var i = -1, j = 0, k = 0, length = items.length;
-			this.items = new Array;
+			this.items = [];
 			while(++i < length) if(items[i].nodeType == 1 && (filter ? filter.call(items[i], j++) : true)) this.items[k++] = items[i];
 		}
 	},
@@ -167,20 +236,24 @@ core.extend(core, {
 			return event[property] < 2 ? 1 : event[property] == middle ? 3 : 2;
 		};
 	}(ie ? 'button' : 'which', ie ? 4 : 2),
-	trim: String.prototype.trim ? function(str) {
+	trim: core._String_prototype.trim ? function(str) {
 		return str.trim();
 	} : function(str) {
 		return str.replace(/^\s+|\s+$/g, '');
 	},
-	trimLeft: String.prototype.trimLeft ? function(str) {
+	trimLeft: core._String_prototype.trimLeft ? function(str) {
 		return str.trimLeft();
 	} : function(str) {
 		return str.replace(/^\s+/, '');
 	},
-	trimRight: String.prototype.trimRight ? function(str) {
+	trimRight: core._String_prototype.trimRight ? function(str) {
 		return str.trimRight();
 	} : function(str) {
 		return str.replace(/\s+$/, '');
+	},
+	camelCase: function(text) {
+		if (typeof text !== 'string') return;
+		return text.replace(/-([a-z])/ig, function(all, letter) { return letter.toUpperCase(); });
 	},
 	computedStyle: ie ? function(node) {
 		return node.currentStyle;
@@ -190,28 +263,22 @@ core.extend(core, {
 	yass: function(selector, root, noCache) {
 		if (core.yass.c[selector] && !noCache && !root) {
 			return core.yass.c[selector]
-		}
+		}																																							
 		noCache = noCache || !!root;
 		root = root || doc;
-		var sets = new Array;
+		var sets = [];
 		if (/^[\w[:#.][\w\]*^|=!]*$/.test(selector)) {
 			var idx = 0;
 			switch (selector.charAt(0)) {
 			case '#':
 				idx = selector.slice(1);
 				sets = root.getElementById(idx);
-				sets = sets && sets.parentNode ? [sets] : new Array;
-				/*sets = doc.getElementById(idx);
-				if (ie && sets.id !== idx) {
-					sets = doc.all[idx]
-				}
-				sets = sets ? [sets] : new Array;*/
-
+				sets = sets && sets.parentNode ? [sets] : [];
 				break;
 			case '.':
 				var klass = selector.slice(1);
 				if (core.yass.k) {
-					sets = (idx = (sets = root.getElementsByClassName(klass)).length) ? sets: new Array
+					sets = (idx = (sets = root.getElementsByClassName(klass)).length) ? sets: []
 				} else {
 					klass = ' ' + klass + ' ';
 					var nodes = root.getElementsByTagName('*'), i = 0, node;
@@ -220,7 +287,7 @@ core.extend(core, {
 							sets[idx++] = node
 						}
 					}
-					sets = idx ? sets: new Array
+					sets = idx ? sets: []
 				}
 				break;
 			case ':':
@@ -230,7 +297,7 @@ core.extend(core, {
 						sets[idx++] = node
 					}
 				}
-				sets = idx ? sets: new Array;
+				sets = idx ? sets: [];
 				break;
 			case '[':
 				var nodes = root.getElementsByTagName('*'), node, i = 0, attrs = /\[([^!~^*|$ [:=]+)([$^*|]?=)?([^ :\]]+)?\]/.exec(selector), attr = attrs[1], eql = attrs[2] || '', value = attrs[3];
@@ -239,11 +306,11 @@ core.extend(core, {
 						sets[idx++] = node
 					}
 				}
-				sets = idx ? sets: new Array;
+				sets = idx ? sets: [];
 				break;
 			default:
 				if('body' === selector) sets = [ root.body ];
-				else sets = (idx = (sets = root.getElementsByTagName(selector)).length) ? sets: new Array;
+				else sets = (idx = (sets = root.getElementsByTagName(selector)).length) ? sets: [];
 				break
 			}
 		} else {
@@ -271,7 +338,7 @@ core.extend(core, {
 							eql = single[5] || '';
 							mod = single[7];
 							ind = mod === 'nth-child' || mod === 'nth-last-child' ? /(?:(-?\d*)n)?(?:(%|-)(\d*))?/.exec(single[8] === 'even' && '2n' || single[8] === 'odd' && '2n%1' || !/\D/.test(single[8]) && '0n%' + single[8] || single[8]) : single[8];
-							newNodes = new Array;
+							newNodes = [];
 							idx = J = 0;
 							last = i == singles_length;
 							while (child = nodes[J++]) {
@@ -330,7 +397,7 @@ core.extend(core, {
 				}
 				if (concat) {
 					if (!nodes.concat) {
-						newNodes = new Array;
+						newNodes = [];
 						h = 0;
 						while (item = nodes[h]) {
 							newNodes[h++] = item
@@ -374,7 +441,7 @@ core.extend(core, {
 	}
 });
 core.extend(core.yass, {
-	c: new Array,
+	c: [],
 	q: !!doc.querySelectorAll,
 	k: !!doc.getElementsByClassName,
 	attr: {
@@ -469,7 +536,7 @@ core.extend(core.yass, {
 			return ! child.disabled
 		},
 		selected: function(child) {
-			child.parentNode.selectedIndex;
+			//child.parentNode.selectedIndex;
 			return ! child.selected
 		}
 	}
@@ -500,11 +567,11 @@ core.ajax.prototype.open = function(params) {
 		error: params.error
 	});
 	if(this.params) {
-		var params = new Array, process = this.process;
+		var parms = [], process = this.process;
 		core.forEach(this.params, function(key, value) {
-			params.push([key, '=', process ? encodeURIComponent(value) : value].join(''));
+			parms.push([key, '=', process ? encodeURIComponent(value) : value].join(''));
 		},undefined);
-		this.params = params.join('&');
+		this.params = parms.join('&');
 	}
 	try {
 		this.xhr.open(this.method, this.method == 'GET' && this.params ? this.url + '?' + this.params : this.url, this.async, this.user, this.password);
@@ -596,7 +663,7 @@ core.prototype = {
 	clone: function(cloneChild, cloneHandlers) {
 		cloneChild = cloneChild !== false;
 		cloneHandlers = cloneHandlers !== false;
-		var list = cloneChild ? this.find('*').add(this.node) : new core.list([this.node]), clone, guid, handler, data = new Object;
+		var list = cloneChild ? this.find('*').add(this.node) : new core.list([this.node]), clone, guid, handler, data = {};
 		list.each(function(index) {
 			guid = this.guid;
 			this.guid = null;
@@ -648,10 +715,6 @@ core.prototype = {
 		core.clear(this.unbind().node).parentNode.removeChild(this.node);
 		return this;
 	},
-	/*
-		ѕо заверению создателей ф-ии replaceHTML, она намного быстрее innerHTML (кроме IE и некоторых версий оперы)
-		—сылка: http://blog.stevenlevithan.com/archives/faster-than-innerhtml
-	*/
 	html: function(str) {
 		if(str !== undefined) {
 			this.empty().node.innerHTML = str;
@@ -671,10 +734,10 @@ core.prototype = {
 		if(!core.handlers[guid]) core.handlers[guid] = {
 			link: this.node,
 			listener: core.handlers.createListener(guid),
-			events: new Object
+			events: {}
 		};
 		if(type && !core.handlers[guid].events[type]) {
-			core.handlers[guid].events[type] = new Object;
+			core.handlers[guid].events[type] = {};
 			core.bind(this.node, type, core.handlers[guid].listener);
 		}
 		if(func) {
@@ -754,7 +817,7 @@ core.prototype = {
 	},
 	removeClass: function(classes) {
 		if(classes) {
-			var classes = ' ' + (classes.join ? classes.join(' ') : classes) + ' ', modified = false, i = 0, className = new Array;
+			var classes = ' ' + (classes.join ? classes.join(' ') : classes) + ' ', modified = false, i = 0, className = [];
 			core.forEach(core.toArray(this.node.className), function(str) {
 				if(classes.indexOf(' ' + str + ' ') == -1) className[i++] = str;
 				else modified = true;
@@ -790,11 +853,11 @@ core.prototype = {
 	attr: function(arg, value) {
 		if(value !== undefined) {
 			var attr = arg;
-			arg = new Object;
+			arg = {};
 			arg[attr] = value;
 		}
 		else if(arg.join || arg.split) {
-			var attributes = core.toArray(arg), length = attributes.length, i = -1, j = 0, result = new Array;
+			var attributes = core.toArray(arg), length = attributes.length, i = -1, j = 0, result = [];
 			while(++i < length) result[j++] = this.node[attributes[i]];
 			return result.length == 1 ? result[0] : result;
 		}
@@ -826,11 +889,11 @@ core.prototype = {
 		return function(arg, value) {
 			if(value !== undefined) {
 				var property = arg;
-				arg = new Object;
+				arg = {};
 				arg[property] = value;
 			}
 			else if(arg.split || arg.join) {
-				var properties = core.toArray(arg), length = properties.length, i = -1, j = 0, result = new Array;
+				var properties = core.toArray(arg), length = properties.length, i = -1, j = 0, result = [];
 				while(++i < length) result[j++] = get(this.node, properties[i]);
 				return result.length == 1 ? result[0] : result;
 			}
@@ -918,7 +981,7 @@ core.prototype = {
 		else children = 'childNodes';
 		return function(tags) {
 			if(tags) {
-				var i = -1, list = new Array, child = this.node[children], length = child.length, j = 0;
+				var i = -1, list = [], child = this.node[children], length = child.length, j = 0;
 				tags = ' ' + (tags.join ? tags.join(' ') : tags.split(',').join(' ')).toUpperCase() + ' ';
 				while(++i < length) if(tags.indexOf(' ' + child[i].tagName + ' ') != -1) list[j++] = child[i];
 				return new core.list(list, false);
@@ -956,7 +1019,7 @@ core.extend(core.prototype, function(traversal, sibling, child) {
 			return node ? (tag && node.tagName != tag.toUpperCase() ? sibling(node, traversal[dir], tag) : node) : null;
 		};
 		core.clear = function(node) {
-			node.childElementCount ? this.cache = new Object : delete this.cache[node.id];
+			node.childElementCount ? this.cache = {} : delete this.cache[node.id];
 			return node;
 		};
 	}
@@ -971,7 +1034,7 @@ core.extend(core.prototype, function(traversal, sibling, child) {
 			return node ? (node.nodeType == 1 && (tag ? tag.toUpperCase() == node.tagName : true) ? node : sibling(node, traversal[dir], tag)) : null;
 		};
 		core.clear = function(node) {
-			node.hasChildNodes() ? this.cache = new Object : delete this.cache[node.id];
+			node.hasChildNodes() ? this.cache = {} : delete this.cache[node.id];
 			return node;
 		};
 	}
@@ -1016,7 +1079,7 @@ core.extend(core.list.prototype, function(slice) {
 		var length = (args = slice.call(args, 1)).length < 2;
 		return length ? {method: 'call', args: args[0]} : {method: 'apply', args: args};
 	}
-	core.forEach('resize,scroll,blur,focus,error,abort,onload,unload,click,dblclick,mousedown,mouseup,mousemove,mouseover,mouseout,keydown,keypress,keyup,change,select,submit,reset'.split(','), function(listener)
+	core.forEach('resize,scroll,move,error,abort,onload,dblclick,keydown,keypress,keyup,change,select,mousemove,mousedown,mouseup,mouseover,mouseout,mousewheel,DOMMouseScroll,selectstart,selectend,click,blur,focus,load,unload,reset,submit,change,abort,orientationchange,touchstart,touchmove,touchend,touchcancel,gesturestart,gesturechange,gestureend,devicemotion,contextmenu,beforeunload'.split(','), function(listener)
 	{
 		return function(type) {
 			core.prototype[type] = function(arg) {
@@ -1062,7 +1125,7 @@ core.extend(core.list.prototype, function(slice) {
 			return this;
 		}
 	};
-}(Array.prototype.slice));
+}(core._Array_prototype.slice));
 core.prototype.store = core.list.prototype.store = function() {
 	return core.storage = this;
 };
