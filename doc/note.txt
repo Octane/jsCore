@@ -1,0 +1,24 @@
+﻿ELEMENT_NODE:           1,
+ATTRIBUTE_NODE:         2,
+TEXT_NODE:              3,
+COMMENT_NODE:           8,
+DOCUMENT_NODE:          9,
+DOCUMENT_FRAGMENT_NODE: 11
+_____________________________
+
+on("click", func)
+on("click, focus", func1, func2)
+on({
+	click: func
+	focus: [func1, func2],
+	"mousemup, mousedown": func3,
+	"ui.collapse, data.remove": [func4, func5]
+})
+
+var obj = {
+	listeners: {
+		done: [function () {}]
+	}
+};
+
+$(obj).fire(done);

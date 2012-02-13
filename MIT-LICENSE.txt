@@ -1,4 +1,4 @@
-﻿Copyright (c) 2009 Dmitry Korobkin, http://www.js-core.ru/
+﻿Copyright (c) 2012 Dmitry Korobkin, http://jscore.ru
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

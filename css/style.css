@@ -1,0 +1,14 @@
+﻿body {
+	font-family: sans-serif;
+	background: #64667d;
+}
+h1 {
+	color: #dbdac8;
+}
+.logo {
+	margin: 0 0.5em 0 0;
+	vertical-align: middle;
+}
+.hidden {
+	display: none;
+}

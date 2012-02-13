@@ -1,0 +1,2 @@
+﻿copy license.js+common\object.js+common\array.js+common\function.js+common\string.js+common\date.js+common\json.js+common\dom.js+begin.js+core.js+features.js+function.js+object.js+array.js+node.js+element.js+inputelement.js+window.js+document.js+nodelist.js+elementlist.js+selector.js+end.js jscore.js
+pause

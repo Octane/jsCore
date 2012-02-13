@@ -1,0 +1,12 @@
+﻿selector -> attrs = {
+	0: "x",
+	1: "y",
+	x: {},
+	y: {}
+}
+
+------------
+String.prototype.repeat
+Number.isInteger
+…
+http://wiki.ecmascript.org/doku.php?id=harmony:proposals
