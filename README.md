@@ -94,5 +94,3 @@ tag#id.class[attr^="value"], a[rel]...
 
 ***
 Отвечу на вопросы по email: [dmitry.korobkin@gmail.com](mailto:dmitry.korobkin@gmail.com) или ICQ: 644768
-
-А еще обязательно читайте [ECMA-262 от Дмитрия Сошникова](http://dmitrysoshnikov.com/)!
