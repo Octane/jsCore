@@ -16,7 +16,7 @@ $("#example-1").append("h1").text("test")
 
 ```html
 <div id="example-1">
-	<h1>test</h1>
+    <h1>test</h1>
 </div>
 ```
 
@@ -47,16 +47,16 @@ node.classList.add("active") //TypeError: node is null
 В jsCore я постараюсь избавиться от этих проблем, уйдя от погони за супер-универсальностью функции `$` и разделив методы для работы с одним элементом и коллекцией. Будет две глобальных функции, возвращающих обёртки с разными прототипами:
 ```javascript
 $(".example-3") // -> {src: document.querySelector(".example-3")}
-	.addClass(...)
-	.append(...)
-	.hide(...)
-	...
+    .addClass(...)
+    .append(...)
+    .hide(...)
+    ...
 
 $$(".example-3") // -> {src: document.querySelectorAll(".example-3")}
-	.filter(...)
-	.each(...)
-	.odd(...)
-	...
+    .filter(...)
+    .each(...)
+    .odd(...)
+    ...
 ```
 
 Для коллекции узлов будет доступен метод `each`, который первым параметром сможет принимать название метода, например:
