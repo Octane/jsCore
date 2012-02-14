@@ -8,7 +8,7 @@ function $Array(array) {
 	this.src = array;
 }
 
-$.Array = $.extend($Array, {
+$.Array = $Object.extend($Array, {
 
 	isArray: Array.isArray,
 
@@ -18,7 +18,7 @@ $.Array = $.extend($Array, {
 
 });
 
-$Array.prototype = $.extend(Object.create($.prototype), {
+$Array.prototype = $Object.extend(Object.create($.prototype), {
 
 	constructor: $Array,
 

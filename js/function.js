@@ -8,7 +8,7 @@ function $Function(func) {
 	this.src = func;
 }
 
-$.Function = $.extend($Function, {
+$.Function = $Object.extend($Function, {
 
 	isFunction: function (obj) {
 		return Object.prototype.toString.call(obj) == "[object Function]";
@@ -16,7 +16,7 @@ $.Function = $.extend($Function, {
 
 });
 
-$Function.prototype = $.extend(Object.create($.prototype), {
+$Function.prototype = $Object.extend(Object.create($.prototype), {
 
 	constructor: $Function,
 

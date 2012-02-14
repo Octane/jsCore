@@ -8,7 +8,7 @@ function $Window(win) {
 	this.src = win;
 }
 
-$.Window = $.extend($Window, {
+$.Window = $Object.extend($Window, {
 
 	isWindow: typeof Window == "undefined" ? function (obj) {
 		//todo contentWindow
@@ -19,7 +19,7 @@ $.Window = $.extend($Window, {
 
 });
 
-$Window.prototype = $.extend(Object.create($.prototype), {
+$Window.prototype = $Object.extend(Object.create($.prototype), {
 
 	constructor: $Window,
 

@@ -8,14 +8,14 @@ function $ElementList(list) {
 	this.src = list;
 }
 
-$.ElementList = $.extend($ElementList, {
+$.ElementList = $Object.extend($ElementList, {
 
 	isElementList: function () {
 	}
 
 });
 
-$ElementList.prototype = $.extend(Object.create($NodeList.prototype), {
+$ElementList.prototype = $Object.extend(Object.create($NodeList.prototype), {
 
 	constructor: $ElementList,
 

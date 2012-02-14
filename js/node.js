@@ -8,7 +8,7 @@ function $Node(node) {
 	this.src = node;
 }
 
-$.Node = $.extend($Node, {
+$.Node = $Object.extend($Node, {
 
 	/**
 	 * Выясняет, является ли объект DOM-узлом
@@ -24,7 +24,7 @@ $.Node = $.extend($Node, {
 
 });
 
-$Node.prototype = $.extend(Object.create($Object.prototype), {
+$Node.prototype = $Object.extend(Object.create($Object.prototype), {
 
 	constructor: $Node,
 

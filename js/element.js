@@ -8,7 +8,7 @@ function $Element(element) {
 	this.src = element;
 }
 
-$.Element = $.extend($Element, {
+$.Element = $Object.extend($Element, {
 
 	ELEMENT_NODE: 1,
 
@@ -25,7 +25,7 @@ $.Element = $.extend($Element, {
 
 });
 
-$Element.prototype = $.extend(Object.create($Node.prototype), {
+$Element.prototype = $Object.extend(Object.create($Node.prototype), {
 
 	constructor: $Element,
 

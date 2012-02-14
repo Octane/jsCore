@@ -8,7 +8,7 @@ function $Document(doc) {
 	this.src = doc;
 }
 
-$.Document = $.extend($Document, {
+$.Document = $Object.extend($Document, {
 
 	DOCUMENT_NODE: 9,
 
@@ -21,7 +21,7 @@ $.Document = $.extend($Document, {
 
 });
 
-$Document.prototype = $.extend(Object.create($.prototype), {
+$Document.prototype = $Object.extend(Object.create($.prototype), {
 
 	constructor: $Document,
 

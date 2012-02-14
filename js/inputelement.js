@@ -8,14 +8,14 @@ function $InputElement(input) {
 	this.src = input;
 }
 
-$.InputElement = $.extend($InputElement, {
+$.InputElement = $Object.extend($InputElement, {
 
 	isInputElement: function () {
 	}
 
 });
 
-$InputElement.prototype = $.extend(Object.create($Element.prototype), {
+$InputElement.prototype = $Object.extend(Object.create($Element.prototype), {
 
 	constructor: $InputElement,
 

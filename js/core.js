@@ -44,32 +44,6 @@ function $(arg) {
 }
 
 /**
- * Копирует свойства в объект
- * @param {Object} target приёмник
- * @param {Object} source источник
- * @return {Object} target
- */
-$.extend = function (target, source/*, source1, source2, …*/) {
-	var key, keys, i = 1, j, len = arguments.length;
-	while (i < len) {
-		source = arguments[i];
-		//используем массив имен свойст вместо for-in,
-		//чтобы избавиться от проверки hasOwnProperty
-		//и обойти баг в IE<9, когда переопределенные
-		//стандартные свойства не становятся enumerable
-		//пример: $.extend(obj, {toString: fn})
-		keys = Object.keys(source);
-		j = keys.length;
-		while (j--) {
-			key = keys[j];
-			target[key] = source[key];
-		}
-		i++;
-	}
-	return target;
-};
-
-/**
  * Конструкторы обёрток наследуют этот метод
  * и помещают исходный объект в src
  */
