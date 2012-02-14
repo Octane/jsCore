@@ -6,5 +6,3 @@ Array.prototype.count = function () {
 };
 */
 
-
-
