@@ -5,4 +5,3 @@ Array.prototype.count = function () {
 	}, 0);
 };
 */
-

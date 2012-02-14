@@ -14,30 +14,35 @@ function $Object(obj) {
  * @param {Object} source источник
  * @return {Object} target
  */
-$Object.extend = function (target, source/*, source1, source2, …*/) {
-	var key, keys, i = 1, j, len = arguments.length;
-	while (i < len) {
-		source = arguments[i];
-		//используем массив имен свойст вместо for-in,
-		//чтобы избавиться от проверки hasOwnProperty
-		//и обойти баг в IE<9, когда переопределенные
-		//стандартные свойства не становятся enumerable
-		//пример: $Object.extend(obj, {toString: fn})
-		keys = Object.keys(source);
-		j = keys.length;
-		while (j--) {
-			key = keys[j];
+$Object.extend = function (target/*, source1, source2, …*/) {
+	Array.prototype.slice.call(arguments, 1).forEach(function (source) {
+		Object.keys(source).forEach(function (key) {
 			target[key] = source[key];
-		}
-		i++;
-	}
+		});
+	});
 	return target;
 };
 
 $.Object = $Object.extend($Object, {
 
-	isObject: function (obj) {
-		return Object.prototype.toString.call(obj) == "[object Object]";
+	/**
+	 * Проверяет, является ли переданный аргумент простым объектом
+	 * @param {Mixed} anything
+	 * @return {Boolean}
+	 */
+	isObject: function (anything) {
+		return Object.prototype.toString.call(anything) == "[object Object]";
+	},
+
+	/**
+	 * Возвращает массив значений свойств объекта
+	 * @param {Object} object
+	 * @return {Array}
+	 */
+	values: function (object) {
+		return Object.keys(object).map(function (key) {
+			return object[key];
+		});
 	}
 
 });
