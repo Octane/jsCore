@@ -10,19 +10,7 @@ function $Array(array) {
 
 $.Array = $Object.extend($Array, {
 
-	/**
-	 * @see Array.isArray
-	 */
-	isArray: Array.isArray,
-
-	/**
-	 * Преобразует объект в массив (перезаписывается в fix.js для IE<9)
-	 * @param {Mixed} anything объект с числовыми ключами и свойством length
-	 * @param {Number} [begin]
-	 * @param {Number} [end]
-	 * @return {Array}
-	 */
-	toArray: Array.prototype.slice.call.bind(Array.prototype.slice)
+	isArray: Array.isArray
 
 });
 

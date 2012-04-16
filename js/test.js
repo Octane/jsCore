@@ -1,1 +1,1 @@
-﻿$console.log($Array.toArray([1,2,3], 1));$console.log($Array.toArray(document.childNodes, -1));(function () {	$console.log($Array.toArray(arguments));}(true, Infinity, false, NaN));$console.log($Array.toArray({}));
+﻿$console.log(Array.from([1,2,3], 1));$console.log(Array.from(document.childNodes, -1));(function () {	$console.log(Array.from(arguments));}(true, Infinity, false, NaN));$console.log(Array.from({}));
