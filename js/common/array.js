@@ -194,7 +194,7 @@ if (!Array.prototype.reduceRight) {
 		var i = this.length, currentValue;
 		if (arguments.length < 2) {
 			if (!this.length) {
-				throw new TypeError('reduce of empty array with no initial value');
+				throw new TypeError("reduce of empty array with no initial value");
 			}
 			while (i--) {
 				if (i in this) {
