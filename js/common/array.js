@@ -7,47 +7,51 @@ if (!Array.isArray) {
 
 //http://wiki.ecmascript.org/doku.php?id=strawman:array_extras
 if (!Array.from) {
+	// для IE<9 перезаписывается в array-ie.js
 	Array.from = Array.prototype.slice.call.bind(Array.prototype.slice);
-	/*@cc_on //для IE<9
-	try {
-		//Array.prototype.slice.call(nodeList) приведет к ошибке
-		Array.from(document.childNodes);
-	}
-	catch (error) {
-		Array._from = Array.from; 
-		Array.from = function (iterable) {
-			var i, array, length;
-			//Array.prototype.slice.call(string) вернет пустой массив
-			if (typeof iterable == "string" || iterable instanceof String) {
-				array = iterable.split("");
-			}
-			else {
-				length = iterable.length;
-				if (length) {
-					//Array.prototype.slice.call(object) выполнится без ошибок
-					if (iterable instanceof Object) {
-						array = Array._from(iterable);
-					}
-					//для NodeList и HTMLCollection
-					else {
-						array = [];
-						i = 0;
-						while (i < length) {
-							if (i in iterable) {
-								array[i] = iterable[i];
-							}
-							i++;
-						}
-					}
+	/*@cc_on
+	(function () {
+		//Array.from для IE<9
+		var arrayFrom = Array.from;
+		try {
+			//[].slice.call(nodeList) приведет к ошибке
+			arrayFrom(document.childNodes);
+		}
+		catch (error) {
+			Array.from = function (iterable) {
+				var i, array, length;
+				//[].slice.call(string) вернет пустой массив
+				if (typeof iterable == "string" || iterable instanceof String) {
+					array = iterable.split("");
 				}
 				else {
-					return [];
+					length = iterable.length;
+					if (length) {
+						//[].slice.call(object) выполнится без ошибок
+						if (iterable instanceof Object) {
+							array = arrayFrom(iterable);
+						}
+						//для NodeList и HTMLCollection
+						else {
+							array = [];
+							i = 0;
+							while (i < length) {
+								if (i in iterable) {
+									array[i] = iterable[i];
+								}
+								i++;
+							}
+						}
+					}
+					else {
+						return [];
+					}
 				}
-			}
-			//[…].slice(undefined, undefined) вернет пустой массив
-			return arguments.length > 1 ? array.slice.apply(array, array.slice.call(arguments, 1)) : array;
-		};
-	}
+				//[…].slice(undefined, undefined) вернет пустой массив
+				return arguments.length > 1 ? array.slice.apply(array, array.slice.call(arguments, 1)) : array;
+			};
+		}
+	}());
 	@*/
 }
 
