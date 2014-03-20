@@ -10,7 +10,7 @@ $.Object = function () {
 		this.src = obj;
 	}
 
-	$($Object).inherit($);
+	$($Object).extend($);
 
 	Object.assign($Object.prototype, {
 

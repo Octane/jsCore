@@ -5,11 +5,10 @@ fs.writeFileSync("jscore.js", [
 	"license.js",
 	"core.js",
 	"function.js",
-	"event_target.js",
 	"object.js",
 	"node.js",
 	"element.js",
-	"list.js",
+	"object_list.js",
 	"node_list.js",
 	"element_list.js",
 	"eof.js"

@@ -13,10 +13,11 @@ $.Function = function () {
 
 		constructor: $Function,
 
-		inherit: function (Parent) {
-			var Func = this.src, proto = Func.prototype;
-			proto = Object.create(Parent.prototype);
-			proto.constructor = Func;
+		extend: function (SuperClass) {
+			var Cls = this.src;
+			Cls.prototype = Object.create(SuperClass.prototype);
+			Cls.prototype.constructor = Cls;
+			Cls.super_ = SuperClass;
 			return this;
 		}
 

@@ -5,11 +5,11 @@
  */
 $.NodeList = function () {
 
-	function $NodeList() {
-		this.src = Array.apply(null, arguments);
+	function $NodeList(nodes) {
+		this.src = Array.from(nodes);
 	}
 
-	$($NodeList).inherit($.List);
+	$($NodeList).extend($.ObjectList);
 
 	Object.assign($NodeList.prototype, {
 

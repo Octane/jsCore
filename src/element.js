@@ -9,7 +9,7 @@ $.Element = function () {
 		this.src = element;
 	}
 
-	$($Element).inherit($.Node);
+	$($Element).extend($.Node);
 
 	Object.assign($Element.prototype, {
 

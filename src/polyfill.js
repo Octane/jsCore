@@ -33,25 +33,25 @@
 			return keys;
 		};
 
-	/*@cc_on
-	//в IE8 переопределенные стандартные методы не становятся enumerable
-	var _getKeys = getKeys,
-		hasBug = [
-			"constructor", "toString", "toLocaleString", "valueOf",
-			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
-		];
-	if (!({toString: null}).propertyIsEnumerable("toString")) {
-		getKeys = function (object) {
-			var keys = _getKeys(object);
-			forEach.call(hasBug, function (key) {
-				if (hasOwnProperty.call(object, key)) {
-					keys.push(key);
-				}
-			});
-			return keys;
-		};
-	}
-	@*/
+	(function () {
+		//в IE8 переопределенные стандартные методы не становятся enumerable
+		var _getKeys = getKeys,
+			hasBug = [
+				"constructor", "toString", "toLocaleString", "valueOf",
+				"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
+			];
+		if (!({toString: null}).propertyIsEnumerable("toString")) {
+			getKeys = function (object) {
+				var keys = _getKeys(object);
+				forEach.call(hasBug, function (key) {
+					if (hasOwnProperty.call(object, key)) {
+						keys.push(key);
+					}
+				});
+				return keys;
+			};
+		}
+	}());
 
 	function implement(object, properties) {
 		forEach.call(getKeys(properties), function (key) {
@@ -292,35 +292,35 @@
 
 	});
 
-	//в IE8 методы массива не работают с DOM-объектами
-	/*@cc_on
-	var slice = Array.prototype.slice;
-	function toArray(iterable) {
-		var i = 0, length = iterable.length, array = [];
-		while (i < length) {
-			array[i] = iterable[i];
-			i++;
+	(function () {
+		//в IE8 методы массива не работают с DOM-объектами
+		var slice = Array.prototype.slice;
+		function toArray(iterable) {
+			var i = 0, length = iterable.length, array = [];
+			while (i < length) {
+				array[i] = iterable[i];
+				i++;
+			}
+			return array;
 		}
-		return array;
-	}
-	try {
-		slice.call(document.createElement("div").childNodes);
-	}
-	catch (error) {
-		Array.prototype.slice = function () {
-			var iterable = this;
-			//IE<9: Object(NodeList) instanceof Object → false
-			if (!(Object(iterable) instanceof Object)) {
-				iterable = toArray(iterable);
-			}
-			//IE<9: [1].slice(0, undefined) → []
-			if (arguments.length > 1) {
-				return slice.call(iterable, arguments[0], arguments[1]);
-			}
-			return slice.call(iterable, arguments[0] || 0);
-		};
-	}
-	@*/
+		try {
+			slice.call(document.documentElement.childNodes);
+		}
+		catch (error) {
+			Array.prototype.slice = function () {
+				var iterable = this;
+				//IE<9: Object(NodeList) instanceof Object → false
+				if (!(Object(iterable) instanceof Object)) {
+					iterable = toArray(iterable);
+				}
+				//IE<9: [1].slice(0, undefined) → []
+				if (arguments.length > 1) {
+					return slice.call(iterable, arguments[0], arguments[1]);
+				}
+				return slice.call(iterable, arguments[0] || 0);
+			};
+		}
+	}());
 
 	//https://developer.mozilla.org/ru/docs/JavaScript/Reference/Global_Objects/Array#Array_generic_methods
 	[
@@ -529,13 +529,23 @@
 
 }());
 
+//IE8
+var HTMLElement;
+if (!HTMLElement) {
+	HTMLElement = Element;
+}
+
 /**
  * Element traversal polyfill
  * http://www.w3.org/TR/ElementTraversal/
  */
 (function () {
 
-	var proto, api = {
+	if ("firstElementChild" in document.documentElement) {
+		return false;
+	}
+
+	var api = {
 
 		//https://developer.mozilla.org/En/DOM/Element.firstElementChild
 		firstElementChild: function () {
@@ -588,39 +598,13 @@
 			return count;
 		}
 
-		//https://developer.mozilla.org/En/DOM/Element.children
-
 	};
 
-	if ("firstElementChild" in document.createElement("div")) {
-		return false;
-	}
-
-	if (typeof HTMLElement != "undefined") {
-		proto = HTMLElement.prototype;
-	}
-	else if (typeof Element != "undefined") {
-		proto = Element.prototype;
-	}
-	else {
-		throw new ReferenceError("HTMLElement is not defined");
-	}
-
-	if (Object.defineProperty) {
-		Object.keys(api).forEach(function (key) {
-			Object.defineProperty(proto, key, {
-				get: api[key]
-			});
+	Object.keys(api).forEach(function (key) {
+		Object.defineProperty(HTMLElement.prototype, key, {
+			get: api[key]
 		});
-	}
-	else if (proto.__defineGetter__) {
-		Object.keys(api).forEach(function (key) {
-			proto.__defineGetter__(key, api[key]);
-		});
-	}
-	else {
-		throw new Error("Getters are not supported");
-	}
+	});
 
 	return true;
 
@@ -632,10 +616,6 @@
 (function () {
 
 	if (window.addEventListener) {
-		return false;
-	}
-
-	if (typeof Element == "undefined") {
 		return false;
 	}
 
@@ -655,8 +635,8 @@
 		return id;
 	}
 
-	attachEvent("onmessage", function () {
-		var key = event.data, data;
+	window.attachEvent("onmessage", function () {
+		var key = window.event.data, data;
 		if (key.startsWith(message)) {
 			data = storage[key];
 			data.callback.call(data.target, data.event);
@@ -683,7 +663,7 @@
 		fakeNode.style.cssText = "position: absolute; top: -9999px; left: -9999px; width: 0; height: 0;";
 		document.body.appendChild(fakeNode);
 		fakeNode.attachEvent("onload", function () {
-			var key = event.key, data = storage[key];
+			var key = window.event.key, data = storage[key];
 			data.callback.call(data.target, data.event);
 			delete storage[key];
 		});
@@ -857,13 +837,13 @@
 		this.fireEvent("on" + event.type, event);
 	}
 
-	[window, document, Element.prototype, XMLHttpRequest.prototype].forEach(function (eventTarget) {
+	[Window.prototype, HTMLDocument.prototype, HTMLElement.prototype, XMLHttpRequest.prototype].forEach(function (eventTarget) {
 		eventTarget.addEventListener = addEventListener;
 		eventTarget.removeEventListener = removeEventListener;
 		eventTarget.dispatchEvent = dispatchEvent;
 	});
 
-	document.createEvent = function () {
+	HTMLDocument.prototype.createEvent = function () {
 		return Object.assign(document.createEventObject(), {
 			initEvent: initEvent,
 			initUIEvent: initUIEvent,
@@ -872,6 +852,98 @@
 			initMutationEvent: initMutationEvent
 		});
 	};
+
+	return true;
+
+}());
+
+/**
+ * classList polyfill
+ */
+(function () {
+
+	if ("classList" in document.documentElement) {
+		return false;
+	}
+
+	function DOMTokenList(element) {
+		this._element = element;
+		this._update();
+	}
+
+	Object.assign(DOMTokenList.prototype, {
+
+		_element: null,
+
+		length: 0,
+
+		_getClasses: function () {
+			return this._element.className.trim().split(/\s\s*/);
+		},
+
+		_setClasses: function () {
+			this._element.className = Array.join(this, " ");
+		},
+
+		_clear: function () {
+			var i = this.length;
+			while (i--) {
+				delete this[i];
+			}
+			this.length = 0;
+		},
+
+		_update: function () {
+			this._clear();
+			Array.prototype.push.apply(this, this._getClasses());
+		},
+
+		item: function (index) {
+			return this[index];
+		},
+
+		add: function () {
+			Array.forEach(arguments, function (className) {
+				if (Array.indexOf(this, className) == -1) {
+					Array.push(this, className);
+				}
+			}, this);
+			this._setClasses();
+		},
+
+		remove: function () {
+			var curClasses = Array.from(this), remClasses = Array.from(arguments);
+			this._clear();
+			Array.forEach(curClasses, function (className) {
+				if (remClasses.indexOf(className) == -1) {
+					Array.push(this, className);
+				}
+			}, this);
+			this._setClasses();
+		},
+
+		toggle: function (className, force) {
+			if (force === false || this.contains(className)) {
+				this.remove(className);
+				return false;
+			}
+			this.add(className);
+			return true;
+		},
+
+		contains: function () {
+			return !Array.find(arguments, function (className) {
+				return Array.indexOf(this, className) == -1;
+			}, this);
+		}
+
+	});
+
+	Object.defineProperty(HTMLElement.prototype, "classList", {
+		get: function () {
+			return new DOMTokenList(this);
+		}
+	})
 
 	return true;
 

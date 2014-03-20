@@ -33,25 +33,25 @@
 			return keys;
 		};
 
-	/*@cc_on
-	//в IE8 переопределенные стандартные методы не становятся enumerable
-	var _getKeys = getKeys,
-		hasBug = [
-			"constructor", "toString", "toLocaleString", "valueOf",
-			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
-		];
-	if (!({toString: null}).propertyIsEnumerable("toString")) {
-		getKeys = function (object) {
-			var keys = _getKeys(object);
-			forEach.call(hasBug, function (key) {
-				if (hasOwnProperty.call(object, key)) {
-					keys.push(key);
-				}
-			});
-			return keys;
-		};
-	}
-	@*/
+	(function () {
+		//в IE8 переопределенные стандартные методы не становятся enumerable
+		var _getKeys = getKeys,
+			hasBug = [
+				"constructor", "toString", "toLocaleString", "valueOf",
+				"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
+			];
+		if (!({toString: null}).propertyIsEnumerable("toString")) {
+			getKeys = function (object) {
+				var keys = _getKeys(object);
+				forEach.call(hasBug, function (key) {
+					if (hasOwnProperty.call(object, key)) {
+						keys.push(key);
+					}
+				});
+				return keys;
+			};
+		}
+	}());
 
 	function implement(object, properties) {
 		forEach.call(getKeys(properties), function (key) {
@@ -292,35 +292,35 @@
 
 	});
 
-	//в IE8 методы массива не работают с DOM-объектами
-	/*@cc_on
-	var slice = Array.prototype.slice;
-	function toArray(iterable) {
-		var i = 0, length = iterable.length, array = [];
-		while (i < length) {
-			array[i] = iterable[i];
-			i++;
+	(function () {
+		//в IE8 методы массива не работают с DOM-объектами
+		var slice = Array.prototype.slice;
+		function toArray(iterable) {
+			var i = 0, length = iterable.length, array = [];
+			while (i < length) {
+				array[i] = iterable[i];
+				i++;
+			}
+			return array;
 		}
-		return array;
-	}
-	try {
-		slice.call(document.createElement("div").childNodes);
-	}
-	catch (error) {
-		Array.prototype.slice = function () {
-			var iterable = this;
-			//IE<9: Object(NodeList) instanceof Object → false
-			if (!(Object(iterable) instanceof Object)) {
-				iterable = toArray(iterable);
-			}
-			//IE<9: [1].slice(0, undefined) → []
-			if (arguments.length > 1) {
-				return slice.call(iterable, arguments[0], arguments[1]);
-			}
-			return slice.call(iterable, arguments[0] || 0);
-		};
-	}
-	@*/
+		try {
+			slice.call(document.documentElement.childNodes);
+		}
+		catch (error) {
+			Array.prototype.slice = function () {
+				var iterable = this;
+				//IE<9: Object(NodeList) instanceof Object → false
+				if (!(Object(iterable) instanceof Object)) {
+					iterable = toArray(iterable);
+				}
+				//IE<9: [1].slice(0, undefined) → []
+				if (arguments.length > 1) {
+					return slice.call(iterable, arguments[0], arguments[1]);
+				}
+				return slice.call(iterable, arguments[0] || 0);
+			};
+		}
+	}());
 
 	//https://developer.mozilla.org/ru/docs/JavaScript/Reference/Global_Objects/Array#Array_generic_methods
 	[
@@ -529,13 +529,23 @@
 
 }());
 
+//IE8
+var HTMLElement;
+if (!HTMLElement) {
+	HTMLElement = Element;
+}
+
 /**
  * Element traversal polyfill
  * http://www.w3.org/TR/ElementTraversal/
  */
 (function () {
 
-	var proto, api = {
+	if ("firstElementChild" in document.documentElement) {
+		return false;
+	}
+
+	var api = {
 
 		//https://developer.mozilla.org/En/DOM/Element.firstElementChild
 		firstElementChild: function () {
@@ -588,39 +598,13 @@
 			return count;
 		}
 
-		//https://developer.mozilla.org/En/DOM/Element.children
-
 	};
 
-	if ("firstElementChild" in document.createElement("div")) {
-		return false;
-	}
-
-	if (typeof HTMLElement != "undefined") {
-		proto = HTMLElement.prototype;
-	}
-	else if (typeof Element != "undefined") {
-		proto = Element.prototype;
-	}
-	else {
-		throw new ReferenceError("HTMLElement is not defined");
-	}
-
-	if (Object.defineProperty) {
-		Object.keys(api).forEach(function (key) {
-			Object.defineProperty(proto, key, {
-				get: api[key]
-			});
+	Object.keys(api).forEach(function (key) {
+		Object.defineProperty(HTMLElement.prototype, key, {
+			get: api[key]
 		});
-	}
-	else if (proto.__defineGetter__) {
-		Object.keys(api).forEach(function (key) {
-			proto.__defineGetter__(key, api[key]);
-		});
-	}
-	else {
-		throw new Error("Getters are not supported");
-	}
+	});
 
 	return true;
 
@@ -632,10 +616,6 @@
 (function () {
 
 	if (window.addEventListener) {
-		return false;
-	}
-
-	if (typeof Element == "undefined") {
 		return false;
 	}
 
@@ -655,8 +635,8 @@
 		return id;
 	}
 
-	attachEvent("onmessage", function () {
-		var key = event.data, data;
+	window.attachEvent("onmessage", function () {
+		var key = window.event.data, data;
 		if (key.startsWith(message)) {
 			data = storage[key];
 			data.callback.call(data.target, data.event);
@@ -683,7 +663,7 @@
 		fakeNode.style.cssText = "position: absolute; top: -9999px; left: -9999px; width: 0; height: 0;";
 		document.body.appendChild(fakeNode);
 		fakeNode.attachEvent("onload", function () {
-			var key = event.key, data = storage[key];
+			var key = window.event.key, data = storage[key];
 			data.callback.call(data.target, data.event);
 			delete storage[key];
 		});
@@ -857,13 +837,13 @@
 		this.fireEvent("on" + event.type, event);
 	}
 
-	[window, document, Element.prototype, XMLHttpRequest.prototype].forEach(function (eventTarget) {
+	[Window.prototype, HTMLDocument.prototype, HTMLElement.prototype, XMLHttpRequest.prototype].forEach(function (eventTarget) {
 		eventTarget.addEventListener = addEventListener;
 		eventTarget.removeEventListener = removeEventListener;
 		eventTarget.dispatchEvent = dispatchEvent;
 	});
 
-	document.createEvent = function () {
+	HTMLDocument.prototype.createEvent = function () {
 		return Object.assign(document.createEventObject(), {
 			initEvent: initEvent,
 			initUIEvent: initUIEvent,
@@ -872,6 +852,98 @@
 			initMutationEvent: initMutationEvent
 		});
 	};
+
+	return true;
+
+}());
+
+/**
+ * classList polyfill
+ */
+(function () {
+
+	if ("classList" in document.documentElement) {
+		return false;
+	}
+
+	function DOMTokenList(element) {
+		this._element = element;
+		this._update();
+	}
+
+	Object.assign(DOMTokenList.prototype, {
+
+		_element: null,
+
+		length: 0,
+
+		_getClasses: function () {
+			return this._element.className.trim().split(/\s\s*/);
+		},
+
+		_setClasses: function () {
+			this._element.className = Array.join(this, " ");
+		},
+
+		_clear: function () {
+			var i = this.length;
+			while (i--) {
+				delete this[i];
+			}
+			this.length = 0;
+		},
+
+		_update: function () {
+			this._clear();
+			Array.prototype.push.apply(this, this._getClasses());
+		},
+
+		item: function (index) {
+			return this[index];
+		},
+
+		add: function () {
+			Array.forEach(arguments, function (className) {
+				if (Array.indexOf(this, className) == -1) {
+					Array.push(this, className);
+				}
+			}, this);
+			this._setClasses();
+		},
+
+		remove: function () {
+			var curClasses = Array.from(this), remClasses = Array.from(arguments);
+			this._clear();
+			Array.forEach(curClasses, function (className) {
+				if (remClasses.indexOf(className) == -1) {
+					Array.push(this, className);
+				}
+			}, this);
+			this._setClasses();
+		},
+
+		toggle: function (className, force) {
+			if (force === false || this.contains(className)) {
+				this.remove(className);
+				return false;
+			}
+			this.add(className);
+			return true;
+		},
+
+		contains: function () {
+			return !Array.find(arguments, function (className) {
+				return Array.indexOf(this, className) == -1;
+			}, this);
+		}
+
+	});
+
+	Object.defineProperty(HTMLElement.prototype, "classList", {
+		get: function () {
+			return new DOMTokenList(this);
+		}
+	})
 
 	return true;
 
@@ -885,15 +957,90 @@ var $ = function () {
 ﻿/**
  * Универсальная функция
  */
-function $(arg) {
-	var type = typeof arg;
-	if (type == "function") {
-		return new $.Function(arg);
+function $(anything) {
+	if (typeof anything == "function") {
+		return new $.Function(anything);
 	}
-	return null;
+	return $.one(anything);
 }
 
 Object.assign($, {
+
+	every: function (iterable, func) {
+		//Array.every игнорирует пропущенные индексы,
+		//и всегда возвращает true для пустого массива
+		var i = Object(iterable).length;
+		if (!i) {
+			return false;
+		}
+		while (i--) {
+			if (i in iterable) {
+				if (func(iterable[i]) === false) {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		return true;
+	},
+
+	isObject: function (anything) {
+		return Object(anything) === anything;
+	},
+
+	isNode: function (anything) {
+		//return Object(anything) instanceof Node;
+		//fix IE8
+		return Object(anything).ownerDocument && $.isElement(anything.ownerDocument.documentElement);
+	},
+
+	isElement: function (anything) {
+		return Object(anything) instanceof HTMLElement;
+	},
+
+	isObjectList: function (anything) {
+		return $.every(anything, $.isObject);
+	},
+
+	isNodeList: function (anything) {
+		return  $.every(anything, $.isNode);
+	},
+
+	isElementList: function (anything) {
+		return  $.every(anything, $.isElement);
+	},
+
+	one: function (anything) {
+		if (typeof anything == "string") {
+			anything = document.querySelector(anything);
+			return anything ? new $.Element(anything) : null;
+		}
+		if ($.isElement(anything)) {
+			return new $.Element(anything);
+		}
+		if ($.isNode(anything)) {
+			return new $.Node(anything);
+		}
+		if ($.isObject(anything)) {
+			return new $.Object(anything);
+		}
+		return null;
+	},
+
+	all: function (anything) {
+		if (typeof anything == "string") {
+			return new $.ElementList(document.querySelectorAll(anything));
+		}
+		if ($.isElementList(anything)) {
+			return new $.ElementList(anything);
+		}
+		if ($.isNodeList(anything)) {
+			return new $.NodeList(anything);
+		}
+		return new $.ObjectList(anything);
+	}
 
 });
 
@@ -928,45 +1075,17 @@ $.Function = function () {
 
 		constructor: $Function,
 
-		inherit: function (Parent) {
-			var Func = this.src, proto = Func.prototype;
-			proto = Object.create(Parent.prototype);
-			proto.constructor = Func;
+		extend: function (SuperClass) {
+			var Cls = this.src;
+			Cls.prototype = Object.create(SuperClass.prototype);
+			Cls.prototype.constructor = Cls;
+			Cls.super_ = SuperClass;
 			return this;
 		}
 
 	});
 
 	return $Function;
-
-}();
-/**
- * …
- * @constructor
- * @extends …
- * @param {…} …
- */
-$.EventTarget = function () {
-
-	function $EventTarget(object) {
-		this.src = object;
-	}
-
-	Object.assign($EventTarget.prototype, {
-
-		on: function (eventType, listener) {
-			$console.error("$EventTarget.prototype.on not implemented");
-			return this;
-		},
-
-		fire: function (eventType, data) {
-			$console.error("$EventTarget.prototype.fire not implemented");
-			return this;
-		}
-
-	});
-
-	return $EventTarget;
 
 }();
 ﻿/**
@@ -981,7 +1100,7 @@ $.Object = function () {
 		this.src = obj;
 	}
 
-	$($Object).inherit($);
+	$($Object).extend($);
 
 	Object.assign($Object.prototype, {
 
@@ -1083,7 +1202,7 @@ $.Node = function () {
 		this.src = node;
 	}
 
-	$($Node).inherit($.Object);
+	$($Node).extend($.Object);
 
 	Object.assign($Node.prototype, {
 
@@ -1141,7 +1260,7 @@ $.Element = function () {
 		this.src = element;
 	}
 
-	$($Element).inherit($.Node);
+	$($Element).extend($.Node);
 
 	Object.assign($Element.prototype, {
 
@@ -1328,115 +1447,19 @@ $.Element = function () {
 
 }();
 ﻿/**
- * Обёртка массива
+ * Обёртка списка
  * @constructor
  * @extends $
  */
-$.List = function () {
+$.ObjectList = function () {
 
-	function $List() {
-		this.src = Array.apply(null, arguments);
+	function $ObjectList(objects) {
+		this.src = Array.from(objects);
 	}
 
-	$($List).inherit($);
+	$($ObjectList).extend($);
 
-	Object.assign($List, {
-
-		from: function (iterable) {
-			return (new this).source(Array.from(iterable));
-		},
-
-		of: function () {
-			return this.from(arguments);
-		},
-
-		concat: function () {
-			return this.from(Array.concat.apply(Array, arguments));
-		},
-
-		every: function () {
-			throw new Error("$List.every not implemented");
-		},
-
-		filter: function () {
-			throw new Error("$List.filter not implemented");
-		},
-
-		forEach: function () {
-			throw new Error("$List.forEach not implemented");
-		},
-
-		indexOf: function () {
-			throw new Error("$List.indexOf not implemented");
-		},
-
-		join: function () {
-			throw new Error("$List.join not implemented");
-		},
-
-		lastIndexOf: function () {
-			throw new Error("$List.lastIndexOf not implemented");
-		},
-
-		map: function () {
-			throw new Error("$List.map not implemented");
-		},
-
-		pop: function () {
-			throw new Error("$List.pop not implemented");
-		},
-
-		push: function () {
-			throw new Error("$List.push not implemented");
-		},
-
-		reduce: function () {
-			throw new Error("$List.reduce not implemented");
-		},
-
-		reduceRight: function () {
-			throw new Error("$List.reduceRight not implemented");
-		},
-
-		reverse: function () {
-			throw new Error("$List.reverse not implemented");
-		},
-
-		shift: function () {
-			throw new Error("$List.shift not implemented");
-		},
-
-		slice: function () {
-			throw new Error("$List.slice not implemented");
-		},
-
-		some: function () {
-			throw new Error("$List.some not implemented");
-		},
-
-		sort: function () {
-			throw new Error("$List.sort not implemented");
-		},
-
-		splice: function () {
-			throw new Error("$List.splice not implemented");
-		},
-
-		unshift: function () {
-			throw new Error("$List.unshift not implemented");
-		},
-
-		find: function () {
-			throw new Error("$List.find not implemented");
-		},
-
-		findIndex: function () {
-			throw new Error("$List.findIndex not implemented");
-		}
-
-	});
-
-	Object.assign($List.prototype, {
+	Object.assign($ObjectList.prototype, {
 
 		count: function () {
 			//подсчет реального количсества элементов
@@ -1469,91 +1492,6 @@ $.List = function () {
 				}
 			}
 			return null;
-		},
-
-		concat: function () {
-			throw new Error("$List.prototype.concat not implemented");
-		},
-
-		every: function () {
-			throw new Error("$List.prototype.every not implemented");
-		},
-
-		filter: function (func, boundThis) {
-			return this.constructor.from(this.src.filter(func, boundThis));
-		},
-
-		forEach: function (func, boundThis) {
-			this.src.forEach(func, boundThis);
-			return this;
-		},
-
-		indexOf: function () {
-			throw new Error("$List.prototype.indexOf not implemented");
-		},
-
-		join: function () {
-			throw new Error("$List.prototype.join not implemented");
-		},
-
-		lastIndexOf: function () {
-			throw new Error("$List.prototype.lastIndexOf not implemented");
-		},
-
-		map: function () {
-			throw new Error("$List.prototype.map not implemented");
-		},
-
-		pop: function () {
-			throw new Error("$List.prototype.pop not implemented");
-		},
-
-		push: function () {
-			throw new Error("$List.prototype.push not implemented");
-		},
-
-		reduce: function () {
-			throw new Error("$List.prototype.reduce not implemented");
-		},
-
-		reduceRight: function () {
-			throw new Error("$List.prototype.reduceRight not implemented");
-		},
-
-		reverse: function () {
-			throw new Error("$List.prototype.reverse not implemented");
-		},
-
-		shift: function () {
-			throw new Error("$List.prototype.shift not implemented");
-		},
-
-		slice: function () {
-			throw new Error("$List.prototype.slice not implemented");
-		},
-
-		some: function () {
-			throw new Error("$List.prototype.some not implemented");
-		},
-
-		sort: function () {
-			throw new Error("$List.prototype.sort not implemented");
-		},
-
-		splice: function () {
-			throw new Error("$List.prototype.splice not implemented");
-		},
-
-		unshift: function () {
-			throw new Error("$List.prototype.unshift not implemented");
-		},
-
-		find: function () {
-			throw new Error("$List.prototype.find not implemented");
-		},
-
-		findIndex: function () {
-			throw new Error("$List.prototype.findIndex not implemented");
 		},
 
 		each: function (method) {
@@ -1600,7 +1538,7 @@ $.List = function () {
 
 	});
 
-	return $List;
+	return $ObjectList;
 
 }();
 ﻿/**
@@ -1610,11 +1548,11 @@ $.List = function () {
  */
 $.NodeList = function () {
 
-	function $NodeList() {
-		this.src = Array.apply(null, arguments);
+	function $NodeList(nodes) {
+		this.src = Array.from(nodes);
 	}
 
-	$($NodeList).inherit($.List);
+	$($NodeList).extend($.ObjectList);
 
 	Object.assign($NodeList.prototype, {
 
@@ -1630,11 +1568,11 @@ $.NodeList = function () {
  */
 $.ElementList = function () {
 
-	function $ElementList() {
-		this.src = Array.apply(null, arguments);
+	function $ElementList(elements) {
+		this.src = Array.from(elements);
 	}
 
-	$($ElementList).inherit($.NodeList);
+	$($ElementList).extend($.NodeList);
 
 
 	Object.assign($ElementList.prototype, {
