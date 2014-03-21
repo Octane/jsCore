@@ -859,7 +859,7 @@ if (!HTMLElement) {
 
 /**
  * classList polyfill
- * todo InvalidCharacterError
+ * todo InvalidCharacterError, IE11 several arguments support
  */
 (function () {
 
@@ -867,110 +867,13 @@ if (!HTMLElement) {
 		return false;
 	}
 
-	var customEventTargetPrototype = {
-
-		addCustomEventListener: function (eventType, callback) {
-			var events, callbacks;
-			if (!this._events) {
-				this._events = {};
-			}
-			events = this._events;
-			if (!events[eventType]) {
-				events[eventType] = [];
-			}
-			callbacks = events[eventType];
-			if (callbacks.indexOf(callback) == -1) {
-				callbacks.push(callback);
-			}
-		},
-
-		removeCustomEventListener: function (eventType, callback) {
-			var events = this._events, callbacks, index;
-			if (!events) {
-				return false;
-			}
-			callbacks = events[eventType];
-			if (!callbacks) {
-				return false;
-			}
-			index = callbacks.indexOf(callback);
-			if (index == -1) {
-				return false;
-			}
-			callbacks.splice(index, 1);
-			if (!callbacks.length) {
-				delete events[eventType];
-			}
-			return true;
-		},
-
-		dispatchCustomEvent: function (event) {
-			var events = this._events, callbacks, i = 0, length;
-			if (!events) {
-				return false;
-			}
-			callbacks = events[event.type];
-			if (!callbacks) {
-				return false;
-			}
-			length = callbacks.length;
-			while (i < length) {
-				callbacks[i].call(this, event);
-				i++;
-			}
-			return true;
-		},
-
-		on: function (eventType, callback) {
-			this.addCustomEventListener(eventType, callback);
-			return this;
-		},
-
-		off: function (eventType, callback) {
-			var events;
-			if (arguments.length == 2) {
-				this.removeCustomEventListener(eventType, callback);
-				return this;
-			}
-			events = this._events;
-			if (events) {
-				delete events[eventType];
-			}
-			return this;
-		},
-
-		fire: function (eventType, data) {
-			var customEvent = createCustomEvent("CustomEvents");
-			customEvent.initCustomEvent(eventType, data);
-			this.dispatchCustomEvent(customEvent);
-			return this;
-		}
-
-	};
-
-	function CustomEvent(eventGroup) {
-		this.group = eventGroup;
+	function DOMTokenList(getTokens, onChange) {
+		this.getTokens = getTokens;
+		this.onChange = onChange;
+		this.push(getTokens());
 	}
 
-	CustomEvent.prototype.initCustomEvent = function (eventType, data) {
-		this.type = eventType;
-		this.data = data;
-		return this;
-	};
-
-	function createCustomEvent(eventGroup) {
-		return new CustomEvent(eventGroup);
-	}
-
-	function CustomDOMTokenList(tokens) {
-		this.push(tokens);
-	}
-
-	CustomDOMTokenList.prototype = Object.assign(Object.create(customEventTargetPrototype), {
-
-		constructor: CustomDOMTokenList,
-
-		length: 0,
+	Object.assign(DOMTokenList.prototype, {
 
 		empty: function () {
 			var i = this.length;
@@ -984,14 +887,19 @@ if (!HTMLElement) {
 			Array.prototype.push.apply(this, tokens);
 		},
 
+		update: function () {
+			this.empty();
+			this.push(this.getTokens());
+		},
+
 		item: function (index) {
-			this.fire("beforeAction");
+			this.update();
 			return this[index];
 		},
 
-		add: function () {
+		add: function (/*tokens*/) {
 			var length;
-			this.fire("beforeAction");
+			this.update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				if (Array.indexOf(this, token) == -1) {
@@ -999,13 +907,13 @@ if (!HTMLElement) {
 				}
 			}, this);
 			if (length != this.length) {
-				this.fire("change");
+				this.onChange();
 			}
 		},
 
-		remove: function () {
+		remove: function (/*tokens*/) {
 			var length;
-			this.fire("beforeAction");
+			this.update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				var index = Array.indexOf(this, token);
@@ -1014,12 +922,12 @@ if (!HTMLElement) {
 				}
 			}, this);
 			if (length != this.length) {
-				this.fire("change");
+				this.onChange();
 			}
 		},
 
 		toggle: function (token, force) {
-			this.fire("beforeAction");
+			this.update();
 			if (force === false || this.contains(token)) {
 				this.remove(token);
 				return false;
@@ -1029,7 +937,7 @@ if (!HTMLElement) {
 		},
 
 		contains: function () {
-			this.fire("beforeAction");
+			this.update();
 			return !Array.find(arguments, function (token) {
 				return Array.indexOf(this, token) == -1;
 			}, this);
@@ -1047,27 +955,19 @@ if (!HTMLElement) {
 
 	Object.defineProperty(HTMLElement.prototype, "classList", {
 		get: function () {
-			var element = this, classList = new CustomDOMTokenList(getClasses(element.className));
-			function update() {
-				classList.empty();
-				classList.push(getClasses(element.className));
+			var element = this;
+			if (!element._classList) {
+				element._classList = new DOMTokenList(
+					function () {
+						return getClasses(element.className);
+					},
+					function () {
+						//this → element._classList
+						element.className = Array.join(this, " ");
+					}
+				);
 			}
-			classList.on("beforeAction", update);
-			classList.on("change", function () {
-				element.className = Array.join(classList, " ");
-			});
-			element.addEventListener("DOMAttrModified", function (event) {
-				if (event.attrName.toLowerCase() == "class") {
-					update();
-				}
-			}, false);
-			//fix IE8
-			element.addEventListener("propertychange", function (event) {
-				if (event.propertyName == "className") {
-					update();
-				}
-			}, false);
-			return classList;
+			return element._classList;
 		}
 	});
 
