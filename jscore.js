@@ -805,6 +805,7 @@ if (!HTMLElement) {
 		});
 	}
 
+	//deprecated
 	function initMutationEvent(type, bubbles, cancelable, relatedNode, prevValue, newValue, attrName, attrChange) {
 		Object.assign(this, {
 			type: type,
@@ -859,6 +860,7 @@ if (!HTMLElement) {
 
 /**
  * classList polyfill
+ * todo InvalidCharacterError, IE11 several arguments support
  */
 (function () {
 
@@ -866,26 +868,15 @@ if (!HTMLElement) {
 		return false;
 	}
 
-	function DOMTokenList(element) {
-		this._element = element;
-		this._update();
+	function DOMTokenList(getTokens, onChange) {
+		this.getTokens = getTokens;
+		this.onChange = onChange;
+		this.push(getTokens());
 	}
 
 	Object.assign(DOMTokenList.prototype, {
 
-		_element: null,
-
-		length: 0,
-
-		_getClasses: function () {
-			return this._element.className.trim().split(/\s\s*/);
-		},
-
-		_setClasses: function () {
-			this._element.className = Array.join(this, " ");
-		},
-
-		_clear: function () {
+		empty: function () {
 			var i = this.length;
 			while (i--) {
 				delete this[i];
@@ -893,57 +884,110 @@ if (!HTMLElement) {
 			this.length = 0;
 		},
 
-		_update: function () {
-			this._clear();
-			Array.prototype.push.apply(this, this._getClasses());
+		push: function (tokens) {
+			Array.prototype.push.apply(this, tokens);
+		},
+
+		update: function () {
+			this.empty();
+			this.push(this.getTokens());
 		},
 
 		item: function (index) {
+			this.update();
 			return this[index];
 		},
 
-		add: function () {
-			Array.forEach(arguments, function (className) {
-				if (Array.indexOf(this, className) == -1) {
-					Array.push(this, className);
+		add: function (/*tokens*/) {
+			var length;
+			this.update();
+			length = this.length;
+			Array.forEach(arguments, function (token) {
+				if (Array.indexOf(this, token) == -1) {
+					Array.push(this, token);
 				}
 			}, this);
-			this._setClasses();
+			if (length != this.length) {
+				this.onChange();
+			}
 		},
 
-		remove: function () {
-			var curClasses = Array.from(this), remClasses = Array.from(arguments);
-			this._clear();
-			Array.forEach(curClasses, function (className) {
-				if (remClasses.indexOf(className) == -1) {
-					Array.push(this, className);
+		remove: function (/*tokens*/) {
+			var length;
+			this.update();
+			length = this.length;
+			Array.forEach(arguments, function (token) {
+				var index = Array.indexOf(this, token);
+				if (index != -1) {
+					Array.splice(this, index, 1);
 				}
 			}, this);
-			this._setClasses();
+			if (length != this.length) {
+				this.onChange();
+			}
 		},
 
-		toggle: function (className, force) {
-			if (force === false || this.contains(className)) {
-				this.remove(className);
+		toggle: function (token, force) {
+			this.update();
+			if (force === false || this.contains(token)) {
+				this.remove(token);
 				return false;
 			}
-			this.add(className);
+			this.add(token);
 			return true;
 		},
 
 		contains: function () {
-			return !Array.find(arguments, function (className) {
-				return Array.indexOf(this, className) == -1;
+			this.update();
+			return !Array.find(arguments, function (token) {
+				return Array.indexOf(this, token) == -1;
 			}, this);
 		}
 
 	});
 
+	function getClasses(className) {
+		className = className.trim();
+		if (className.length) {
+			return className.split(/\s\s*/);
+		}
+		return [];
+	}
+
 	Object.defineProperty(HTMLElement.prototype, "classList", {
 		get: function () {
-			return new DOMTokenList(this);
+			var element = this;
+			if (!element._classList) {
+				element._classList = new DOMTokenList(
+					function () {
+						return getClasses(element.className);
+					},
+					function () {
+						//this → element._classList
+						element.className = Array.join(this, " ");
+					}
+				);
+			}
+/*
+			//Убрал обновление DOMTokenList по следующим причинам:
+			//1. IE11 не обновляет его, когда изменяется свойство className.
+			//2. Применение Mutation Events является устаревшим.
+			//3. Во избежание утечек памяти.
+			element.addEventListener("DOMAttrModified", function (event) {
+				if (event.attrName.toLowerCase() == "class") {
+					element._classList.update();
+				}
+			}, false);
+			//fix IE8
+			element.addEventListener("propertychange", function (event) {
+				if (event.propertyName == "className") {
+					element._classList.update();
+				}
+			}, false);
+*/
+			return element._classList;
 		}
-	})
+	});
 
 	return true;
 
