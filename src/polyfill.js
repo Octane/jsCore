@@ -805,6 +805,7 @@ if (!HTMLElement) {
 		});
 	}
 
+	//deprecated
 	function initMutationEvent(type, bubbles, cancelable, relatedNode, prevValue, newValue, attrName, attrChange) {
 		Object.assign(this, {
 			type: type,
@@ -967,6 +968,23 @@ if (!HTMLElement) {
 					}
 				);
 			}
+/*
+			//Убрал обновление DOMTokenList по следующим причинам:
+			//1. IE11 не обновляет его, когда изменяется свойство className.
+			//2. Применение Mutation Events является устаревшим.
+			//3. Во избежание утечек памяти.
+			element.addEventListener("DOMAttrModified", function (event) {
+				if (event.attrName.toLowerCase() == "class") {
+					element._classList.update();
+				}
+			}, false);
+			//fix IE8
+			element.addEventListener("propertychange", function (event) {
+				if (event.propertyName == "className") {
+					element._classList.update();
+				}
+			}, false);
+*/
 			return element._classList;
 		}
 	});

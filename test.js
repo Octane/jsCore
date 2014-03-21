@@ -14,3 +14,7 @@ console.log(b.className);
 console.log(JSON.stringify(cl1));
 console.log(JSON.stringify(cl2));
 console.log(JSON.stringify(cl3));
+b.className = "c5";
+console.log(JSON.stringify(cl1));
+console.log(JSON.stringify(cl2));
+console.log(JSON.stringify(cl3));
