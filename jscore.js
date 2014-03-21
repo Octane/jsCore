@@ -1029,7 +1029,7 @@ if (!HTMLElement) {
 				return attr.value;
 			},
 			set: function (value) {
-				attr.value = value;
+				attr.value = String(value);
 			}
 		};
 	}
