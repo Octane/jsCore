@@ -871,7 +871,7 @@ if (!HTMLElement) {
 	function DOMTokenList(getTokens, onChange) {
 		this.getTokens = getTokens;
 		this.onChange = onChange;
-		this.push(getTokens());
+		//this.push(getTokens());
 	}
 
 	Object.assign(DOMTokenList.prototype, {
@@ -985,7 +985,68 @@ if (!HTMLElement) {
 				}
 			}, false);
 */
+			element._classList.update();
 			return element._classList;
+		}
+	});
+
+	return true;
+
+}());
+
+/**
+ * dataset polyfill
+ */
+(function () {
+
+	if ("dataset" in document.documentElement) {
+		return false;
+	}
+
+	var DOMStringMap;
+
+	try {
+		Object.defineProperty({}, "test", {});
+		DOMStringMap = function () {};
+	}
+	catch (error) {
+		DOMStringMap = function () {
+			return document.createElement("dataset");
+		};
+	}
+
+	function toUpperCase(str) {
+		return str.charAt(1).toUpperCase();
+	}
+
+	function attrToPropName(attrName) {
+		return attrName.substr(5).replace(/-./g, toUpperCase);
+	}
+
+	function attrToPropDesc(attr) {
+		return {
+			get: function () {
+				return attr.value;
+			},
+			set: function (value) {
+				attr.value = value;
+			}
+		};
+	}
+
+	function fillDataset(dataset, attrs) {
+		Array.forEach(attrs, function (attr) {
+			var attrName = attr.name.toLowerCase();
+			if (attrName.startsWith("data-")) {
+				Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
+			}
+		});
+		return dataset;
+	}
+
+	Object.defineProperty(HTMLElement.prototype, "dataset", {
+		get: function () {
+			return fillDataset(new DOMStringMap, this.attributes);
 		}
 	});
 
