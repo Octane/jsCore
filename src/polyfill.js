@@ -859,6 +859,7 @@ if (!HTMLElement) {
 
 /**
  * classList polyfill
+ * todo InvalidCharacterError
  */
 (function () {
 
@@ -866,26 +867,112 @@ if (!HTMLElement) {
 		return false;
 	}
 
-	function DOMTokenList(element) {
-		this._element = element;
-		this._update();
+	var customEventTargetPrototype = {
+
+		addCustomEventListener: function (eventType, callback) {
+			var events, callbacks;
+			if (!this._events) {
+				this._events = {};
+			}
+			events = this._events;
+			if (!events[eventType]) {
+				events[eventType] = [];
+			}
+			callbacks = events[eventType];
+			if (callbacks.indexOf(callback) == -1) {
+				callbacks.push(callback);
+			}
+		},
+
+		removeCustomEventListener: function (eventType, callback) {
+			var events = this._events, callbacks, index;
+			if (!events) {
+				return false;
+			}
+			callbacks = events[eventType];
+			if (!callbacks) {
+				return false;
+			}
+			index = callbacks.indexOf(callback);
+			if (index == -1) {
+				return false;
+			}
+			callbacks.splice(index, 1);
+			if (!callbacks.length) {
+				delete events[eventType];
+			}
+			return true;
+		},
+
+		dispatchCustomEvent: function (event) {
+			var events = this._events, callbacks, i = 0, length;
+			if (!events) {
+				return false;
+			}
+			callbacks = events[event.type];
+			if (!callbacks) {
+				return false;
+			}
+			length = callbacks.length;
+			while (i < length) {
+				callbacks[i].call(this, event);
+				i++;
+			}
+			return true;
+		},
+
+		on: function (eventType, callback) {
+			this.addCustomEventListener(eventType, callback);
+			return this;
+		},
+
+		off: function (eventType, callback) {
+			var events;
+			if (arguments.length == 2) {
+				this.removeCustomEventListener(eventType, callback);
+				return this;
+			}
+			events = this._events;
+			if (events) {
+				delete events[eventType];
+			}
+			return this;
+		},
+
+		fire: function (eventType, data) {
+			var customEvent = createCustomEvent("CustomEvents");
+			customEvent.initCustomEvent(eventType, data);
+			this.dispatchCustomEvent(customEvent);
+			return this;
+		}
+
+	};
+
+	function CustomEvent(eventGroup) {
+		this.group = eventGroup;
 	}
 
-	Object.assign(DOMTokenList.prototype, {
+	CustomEvent.prototype.initCustomEvent = function (eventType, data) {
+		this.type = eventType;
+		this.data = data;
+		return this;
+	};
 
-		_element: null,
+	function createCustomEvent(eventGroup) {
+		return new CustomEvent(eventGroup);
+	}
+
+	function CustomDOMTokenList(tokens) {
+		this.push(tokens);
+	}
+
+	CustomDOMTokenList.prototype = Object.assign(Object.create(customEventTargetPrototype), {
+
+		constructor: CustomDOMTokenList,
 
 		length: 0,
 
-		_getClasses: function () {
-			return this._element.className.trim().split(/\s\s*/);
-		},
-
-		_setClasses: function () {
-			this._element.className = Array.join(this, " ");
-		},
-
-		_clear: function () {
+		empty: function () {
 			var i = this.length;
 			while (i--) {
 				delete this[i];
@@ -893,57 +980,96 @@ if (!HTMLElement) {
 			this.length = 0;
 		},
 
-		_update: function () {
-			this._clear();
-			Array.prototype.push.apply(this, this._getClasses());
+		push: function (tokens) {
+			Array.prototype.push.apply(this, tokens);
 		},
 
 		item: function (index) {
+			this.fire("beforeAction");
 			return this[index];
 		},
 
 		add: function () {
-			Array.forEach(arguments, function (className) {
-				if (Array.indexOf(this, className) == -1) {
-					Array.push(this, className);
+			var length;
+			this.fire("beforeAction");
+			length = this.length;
+			Array.forEach(arguments, function (token) {
+				if (Array.indexOf(this, token) == -1) {
+					Array.push(this, token);
 				}
 			}, this);
-			this._setClasses();
+			if (length != this.length) {
+				this.fire("change");
+			}
 		},
 
 		remove: function () {
-			var curClasses = Array.from(this), remClasses = Array.from(arguments);
-			this._clear();
-			Array.forEach(curClasses, function (className) {
-				if (remClasses.indexOf(className) == -1) {
-					Array.push(this, className);
+			var length;
+			this.fire("beforeAction");
+			length = this.length;
+			Array.forEach(arguments, function (token) {
+				var index = Array.indexOf(this, token);
+				if (index != -1) {
+					Array.splice(this, index, 1);
 				}
 			}, this);
-			this._setClasses();
+			if (length != this.length) {
+				this.fire("change");
+			}
 		},
 
-		toggle: function (className, force) {
-			if (force === false || this.contains(className)) {
-				this.remove(className);
+		toggle: function (token, force) {
+			this.fire("beforeAction");
+			if (force === false || this.contains(token)) {
+				this.remove(token);
 				return false;
 			}
-			this.add(className);
+			this.add(token);
 			return true;
 		},
 
 		contains: function () {
-			return !Array.find(arguments, function (className) {
-				return Array.indexOf(this, className) == -1;
+			this.fire("beforeAction");
+			return !Array.find(arguments, function (token) {
+				return Array.indexOf(this, token) == -1;
 			}, this);
 		}
 
 	});
 
+	function getClasses(className) {
+		className = className.trim();
+		if (className.length) {
+			return className.split(/\s\s*/);
+		}
+		return [];
+	}
+
 	Object.defineProperty(HTMLElement.prototype, "classList", {
 		get: function () {
-			return new DOMTokenList(this);
+			var element = this, classList = new CustomDOMTokenList(getClasses(element.className));
+			function update() {
+				classList.empty();
+				classList.push(getClasses(element.className));
+			}
+			classList.on("beforeAction", update);
+			classList.on("change", function () {
+				element.className = Array.join(classList, " ");
+			});
+			element.addEventListener("DOMAttrModified", function (event) {
+				if (event.attrName.toLowerCase() == "class") {
+					update();
+				}
+			}, false);
+			//fix IE8
+			element.addEventListener("propertychange", function (event) {
+				if (event.propertyName == "className") {
+					update();
+				}
+			}, false);
+			return classList;
 		}
-	})
+	});
 
 	return true;
 
