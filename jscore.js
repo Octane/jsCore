@@ -3,12 +3,11 @@
 /**
  * Language polyfill
  */
-(function () {
+new function () {
 
 		//На случай, если объект создан с помощью Object.create(null)
 	var hasOwnProperty = Object.prototype.hasOwnProperty,
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
 		forEach = Array.prototype.forEach || function (func, boundThis) {
 			var i = 0, length = this.length;
 			while (i < length) {
@@ -19,7 +18,6 @@
 			}
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys
 		getKeys = Object.keys || function (object) {
 			var key, keys = [];
 			if (Object(object) !== object) {
@@ -33,7 +31,7 @@
 			return keys;
 		};
 
-	(function () {
+	new function () {
 		//в IE8 переопределенные стандартные методы не становятся enumerable
 		var _getKeys = getKeys,
 			hasBug = [
@@ -51,7 +49,7 @@
 				return keys;
 			};
 		}
-	}());
+	};
 
 	function implement(object, properties) {
 		forEach.call(getKeys(properties), function (key) {
@@ -63,7 +61,6 @@
 
 	implement(Object, {
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys
 		keys: getKeys,
 
 		//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
@@ -74,7 +71,6 @@
 			return object;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create
 		create: function (prototype) {
 			if (arguments.length > 1) {
 				throw Error("Object.create implementation only accepts the first parameter");
@@ -88,7 +84,6 @@
 
 	implement(Array, {
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray
 		isArray: function (anything) {
 			return Object.prototype.toString.call(anything) == "[object Array]";
 		},
@@ -111,10 +106,8 @@
 
 	implement(Array.prototype, {
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
 		forEach: forEach,
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map
 		map: function (func, boundThis) {
 			var i = 0, length = this.length, result = [];
 			while (i < length) {
@@ -126,7 +119,6 @@
 			return result;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf
 		indexOf: function (anything) {
 			var i = 0, length = this.length;
 			while (i < length) {
@@ -138,7 +130,6 @@
 			return -1;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/lastIndexOf
 		lastIndexOf: function (anything) {
 			var i = this.length;
 			while (i--) {
@@ -149,7 +140,6 @@
 			return -1;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter
 		filter: function (func, boundThis) {
 			var i = 0, length = this.length, result = [];
 			while (i < length) {
@@ -161,7 +151,6 @@
 			return result;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every
 		every: function (func, boundThis) {
 			var i = 0, length = this.length;
 			while (i < length) {
@@ -173,7 +162,6 @@
 			return true;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some
 		some: function (func, boundThis) {
 			var i = 0, length = this.length;
 			while (i < length) {
@@ -185,7 +173,6 @@
 			return false;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/reduce
 		reduce: function (func, initialValue) {
 			var i = 0, length = this.length, currentValue;
 			if (arguments.length < 2) {
@@ -213,7 +200,6 @@
 			return currentValue;
 		},
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/reduceRight
 		reduceRight: function (func, initialValue) {
 			var i = this.length, currentValue;
 			if (arguments.length < 2) {
@@ -292,7 +278,7 @@
 
 	});
 
-	(function () {
+	new function () {
 		//в IE8 методы массива не работают с DOM-объектами
 		var slice = Array.prototype.slice;
 		function toArray(iterable) {
@@ -320,7 +306,7 @@
 				return slice.call(iterable, arguments[0] || 0);
 			};
 		}
-	}());
+	};
 
 	//https://developer.mozilla.org/ru/docs/JavaScript/Reference/Global_Objects/Array#Array_generic_methods
 	[
@@ -493,7 +479,7 @@
 	implement(Date, {
 
 		now: function () {
-			return + new Date;
+			return (new Date).getTime();
 		}
 
 	});
@@ -527,7 +513,7 @@
 
 	});
 
-}());
+};
 
 //IE8
 var HTMLElement;
@@ -539,11 +525,7 @@ if (!HTMLElement) {
  * Element traversal polyfill
  * http://www.w3.org/TR/ElementTraversal/
  */
-(function () {
-
-	if ("firstElementChild" in document.documentElement) {
-		return false;
-	}
+"firstElementChild" in document.documentElement || new function () {
 
 	var api = {
 
@@ -606,88 +588,65 @@ if (!HTMLElement) {
 		});
 	});
 
-	return true;
+};
 
-}());
+/**
+ * setImmediate polyfill
+ */
+var setImmediate = window.setImmediate || new function () {
+
+	var id = 0, storage = {}, message = "setImmediatePolyfillMessage";
+
+	function fastApply(args) {
+		var func = args[0];
+		switch (args.length) {
+			case 1: return func();
+			case 2: return func(args[1]);
+			case 3: return func(args[1], args[2]);
+		}
+		return func.apply(window, Array.slice(args, 1));
+	}
+
+	function callback(event) {
+		var key, data;
+		event = event || window.event;
+		key = String(event.data);
+		if (key.startsWith(message)) {
+			data = storage[key];
+			if (data) {
+				fastApply(data);
+				delete storage[key];
+			}
+		}
+	}
+
+	function setImmediate() {
+		var key = message + ++id;
+		storage[key] = arguments;
+		postMessage(key, "*");
+		return id;
+	}
+
+	setImmediate.clearImmediate = function (id) {
+		delete storage[message + id];
+	};
+
+	if (window.addEventListener) {
+		window.addEventListener("message", callback, false);
+	}
+	else {
+		window.attachEvent("onmessage", callback);
+	}
+
+	return setImmediate;
+};
+
+var clearImmediate = window.clearImmediate || setImmediate.clearImmediate;
 
 /**
  * IE8 event target polyfill
  */
-(function () {
-
-	if (window.addEventListener) {
-		return false;
-	}
-
-	//асинхронный вызов функций, как setImmediate в IE10
-	//todo setImmediate для всех браузеров
-	//http://learn.javascript.ru/setimmediate
-	//https://developer.mozilla.org/en-US/docs/Web/API/Window.setImmediate
-	var id = 0, storage = {}, message = "EventTargetPolyfillMessage";
-
-	function uid() {
-		if (id == Number.MAX_SAFE_INTEGER) {
-			id = 0;
-		}
-		else {
-			id++;
-		}
-		return id;
-	}
-
-	window.attachEvent("onmessage", function () {
-		var key = window.event.data, data;
-		if (key.startsWith(message)) {
-			data = storage[key];
-			data.callback.call(data.target, data.event);
-			delete storage[key];
-		}
-	});
-
-	function callAsync(callback, element, event) {
-		var key = message + Date.now() + uid();
-		storage[key] = {
-			event: event,
-			target: element,
-			callback: callback
-		};
-		postMessage(key, "*");
-	}
-
-/*
-	// второй рабочий вариант на случай, если мешает флуд в message
-	var callAsync = function () {
-		var fakeNode = document.createElement("img"), storage = {}, id = 0;
-		//fakeNode.src = "about:blank";
-		fakeNode.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
-		fakeNode.style.cssText = "position: absolute; top: -9999px; left: -9999px; width: 0; height: 0;";
-		document.body.appendChild(fakeNode);
-		fakeNode.attachEvent("onload", function () {
-			var key = window.event.key, data = storage[key];
-			data.callback.call(data.target, data.event);
-			delete storage[key];
-		});
-		function uid() {
-			if (id == Number.MAX_SAFE_INTEGER) {
-				id = 0;
-			}
-			else {
-				id++;
-			}
-			return id;
-		}
-		return function (callback, element, event) {
-			var key = "call" + Date.now() + uid(), fakeEvent = document.createEventObject();
-			storage[key] = {
-				event: event,
-				target: element,
-				callback: callback
-			};
-			fakeEvent.key = key;
-			fakeNode.fireEvent("onload", fakeEvent);
-		};
-	}();
-*/
+window.addEventListener || new function () {
 
 	function preventDefault() {
 		this.returnValue = false;
@@ -697,7 +656,7 @@ if (!HTMLElement) {
 		this.cancelBubble = true;
 	}
 
-	function saveAndFixEvent(event) {
+	function fixEvent(event) {
 		var clone = document.createEventObject(event);
 		clone.target = clone.srcElement;
 		//todo
@@ -708,11 +667,17 @@ if (!HTMLElement) {
 		return clone;
 	}
 
+	function fastBind(func, boundThis) {
+		return function (arg) {
+			func.call(boundThis, arg);
+		};
+	}
+
 	function createEventListener(callbacks, element) {
 		return function () {
-			var event = saveAndFixEvent(window.event), i = 0, length = callbacks.length;
+			var event = fixEvent(window.event), i = 0, length = callbacks.length;
 			while (i < length) {
-				callAsync(callbacks[i], element, event);
+				setImmediate(fastBind(callbacks[i], element), event);
 				i++;
 			}
 		};
@@ -838,10 +803,11 @@ if (!HTMLElement) {
 		this.fireEvent("on" + event.type, event);
 	}
 
-	[Window.prototype, HTMLDocument.prototype, HTMLElement.prototype, XMLHttpRequest.prototype].forEach(function (eventTarget) {
-		eventTarget.addEventListener = addEventListener;
-		eventTarget.removeEventListener = removeEventListener;
-		eventTarget.dispatchEvent = dispatchEvent;
+	[Window, HTMLDocument, HTMLElement, XMLHttpRequest].forEach(function (eventTarget) {
+		var proto = eventTarget.prototype;
+		proto.dispatchEvent = dispatchEvent;
+		proto.addEventListener = addEventListener;
+		proto.removeEventListener = removeEventListener;
 	});
 
 	HTMLDocument.prototype.createEvent = function () {
@@ -854,24 +820,17 @@ if (!HTMLElement) {
 		});
 	};
 
-	return true;
-
-}());
+};
 
 /**
  * classList polyfill
  * todo InvalidCharacterError, IE11 several arguments support
  */
-(function () {
-
-	if ("classList" in document.documentElement) {
-		return false;
-	}
+"classList" in document.documentElement || new function () {
 
 	function DOMTokenList(getTokens, onChange) {
 		this.getTokens = getTokens;
 		this.onChange = onChange;
-		//this.push(getTokens());
 	}
 
 	Object.assign(DOMTokenList.prototype, {
@@ -990,18 +949,12 @@ if (!HTMLElement) {
 		}
 	});
 
-	return true;
-
-}());
+};
 
 /**
  * dataset polyfill
  */
-(function () {
-
-	if ("dataset" in document.documentElement) {
-		return false;
-	}
+"dataset" in document.documentElement || new function () {
 
 	var DOMStringMap;
 
@@ -1050,9 +1003,7 @@ if (!HTMLElement) {
 		}
 	});
 
-	return true;
-
-}());
+};
 ﻿/*
 jsCore JavaScript library v0.1
 Copyright 2014, Dmitry Korobkin
@@ -1486,10 +1437,6 @@ $.Element = function () {
 		},
 
 		setData: function () {
-			//todo сделать преобразование ключей по стандарту,
-			//по возможности использовать встроенный интерфейс
-			//https://developer.mozilla.org/en/DOM/element.dataset
-			//http://www.w3.org/TR/html5/elements.html#dom-dataset
 		},
 
 		getData: function () {

@@ -130,10 +130,6 @@ $.Element = function () {
 		},
 
 		setData: function () {
-			//todo сделать преобразование ключей по стандарту,
-			//по возможности использовать встроенный интерфейс
-			//https://developer.mozilla.org/en/DOM/element.dataset
-			//http://www.w3.org/TR/html5/elements.html#dom-dataset
 		},
 
 		getData: function () {
