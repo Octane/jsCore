@@ -52,22 +52,52 @@ var Promise = window.Promise || new function () {
 
 new Promise(function (resolve, reject) {
 
-
 });
 
-function si1(text) {
-	//throw Error(text);
-}
-function si2(a, b, c, text) {
-	console.log(text);
+//setImmediate
+new function () {
+	function si1(text) {
+		//throw Error(text);
+	}
+	function si2(a, b, c, text) {
+		console.log(text);
+	}
+
+	var si1id = setImmediate(si1, "testError");
+	var si2id = setImmediate(si2, null, null, null, "testMessage");
+	clearImmediate(si2id);
+
+	var textNode = document.createTextNode("");
+	document.body.appendChild(textNode);
+	document.addEventListener("mousemove", function (event) {
+		setImmediate(function (x, y) {
+			textNode.nodeValue = x + ", " + y;
+		}, event.pageX, event.pageY);
+	}, false);
 }
 
-var si1id = setImmediate(si1, "testError");
-var si2id = setImmediate(si2, null, null, null, "testMessage");
-clearImmediate(si2id);
+//Array.prototype.copyWithing
+new function () {
 
-var textNode = document.createTextNode("");
-document.body.appendChild(textNode);
-document.addEventListener("mousemove", function (event) {
-	textNode.nodeValue = event.pageX + ", " + event.pageY;
-}, false);
+console.log("copyWithin test: " + [
+
+	[1, 2, 3, 4, 5].copyWithin(0, 3).toString() == [4, 5, 3, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(1, 3).toString() == [1, 4, 5, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(1, 2).toString() == [1, 3, 4, 5, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(2, 2).toString() == [1, 2, 3, 4, 5].toString(),
+
+	[1, 2, 3, 4, 5].copyWithin(0, 3, 4).toString() == [4, 2, 3, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(1, 3, 4).toString() == [1, 4, 3, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(1, 2, 4).toString() == [1, 3, 4, 4, 5].toString(),
+
+	[1, 2, 3, 4, 5].copyWithin(0, -2).toString()      == [4, 5, 3, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(0, -2, -1).toString()  == [4, 2, 3, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(-4, -3, -2).toString() == [1, 3, 3, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(-4, -3, -1).toString() == [1, 3, 4, 4, 5].toString(),
+	[1, 2, 3, 4, 5].copyWithin(-4, -3).toString()     == [1, 3, 4, 5, 5].toString(),
+
+].every(function (testResult) {
+	return testResult;
+}));
+
+}

@@ -8,55 +8,46 @@ new function () {
 		//На случай, если объект создан с помощью Object.create(null)
 	var hasOwnProperty = Object.prototype.hasOwnProperty,
 
-		forEach = Array.prototype.forEach || function (func, boundThis) {
-			var i = 0, length = this.length;
-			while (i < length) {
-				if (i in this) {
-					func.call(boundThis, this[i], i, this);
-				}
-				i++;
-			}
-		},
-
 		getKeys = Object.keys || function (object) {
-			var key, keys = [];
+			var i = 0, key, keys = [];
 			if (Object(object) !== object) {
 				throw TypeError("Object.keys called on non-object");
 			}
 			for (key in object) {
 				if (hasOwnProperty.call(object, key)) {
-					keys.push(key);
+					keys[i++] = key;
 				}
 			}
 			return keys;
 		};
 
-	new function () {
+	!({toString: null}).propertyIsEnumerable("toString") && new function () {
 		//в IE8 переопределенные стандартные методы не становятся enumerable
-		var _getKeys = getKeys,
-			hasBug = [
+		var _getKeys = getKeys, hasBug = [
 				"constructor", "toString", "toLocaleString", "valueOf",
 				"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
 			];
-		if (!({toString: null}).propertyIsEnumerable("toString")) {
-			getKeys = function (object) {
-				var keys = _getKeys(object);
-				forEach.call(hasBug, function (key) {
-					if (hasOwnProperty.call(object, key)) {
-						keys.push(key);
-					}
-				});
-				return keys;
-			};
-		}
+		getKeys = function (object) {
+			var i = hasBug.length, key, keys = _getKeys(object), j = keys.length;
+			while (i--) {
+				key = hasBug[i];
+				if (hasOwnProperty.call(object, key)) {
+					keys[j++] = key;
+				}
+			}
+			return keys;
+		};
 	};
 
 	function implement(object, properties) {
-		forEach.call(getKeys(properties), function (key) {
-			if (!object[key]) {
+		var i = 0, key, keys = getKeys(properties), length = keys.length;
+		while (i < length) {
+			key = keys[i];
+			if (!(key in object)) {
 				object[key] = properties[key];
 			}
-		});
+			i++;
+		}
 	}
 
 	implement(Object, {
@@ -65,9 +56,12 @@ new function () {
 
 		//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
 		assign: function (object, properties) {
-			Object.keys(properties).forEach(function(key) {
+			var i = 0, key, keys = Object.keys(properties), length = keys.length;
+			while (i < length) {
+				key = keys[i];
 				object[key] = properties[key];
-			});
+				i++;
+			}
 			return object;
 		},
 
@@ -106,7 +100,15 @@ new function () {
 
 	implement(Array.prototype, {
 
-		forEach: forEach,
+		forEach: function (func, boundThis) {
+			var i = 0, length = this.length;
+			while (i < length) {
+				if (i in this) {
+					func.call(boundThis, this[i], i, this);
+				}
+				i++;
+			}
+		},
 
 		map: function (func, boundThis) {
 			var i = 0, length = this.length, result = [];
@@ -224,7 +226,6 @@ new function () {
 			return currentValue;
 		},
 
-		//https://gist.github.com/rwldrn/5079436
 		find: function (func, boundThis) {
 			var i = 0, length = this.length, value;
 			while (i < length) {
@@ -239,7 +240,6 @@ new function () {
 			return undefined;
 		},
 
-		//https://gist.github.com/rwldrn/5079427
 		findIndex: function (func, boundThis) {
 			var i = 0, length = this.length, value;
 			while (i < length) {
@@ -254,7 +254,6 @@ new function () {
 			return -1;
 		},
 
-		//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.prototype.fill
 		fill: function (value, start, end) {
 			var i, length = this.length;
 			if (typeof start == "undefined") {
@@ -274,11 +273,39 @@ new function () {
 				i++;
 			}
 			return this;
+		},
+
+		copyWithin: function(target, start, end) {
+			var length = this.length, count, direction,
+				to = target < 0 ? Math.max(length + target, 0) : Math.min(target, length),
+				from = start < 0 ? Math.max(length + start, 0) : Math.min(start, length);
+			end = typeof end == "undefined" ? length : end;
+			end = end < 0 ? Math.max(length + end, 0) : Math.min(end, length);
+			count = Math.min(end - from, length - to);
+			direction = 1;
+			if (from < to && to < (from + count)) {
+				direction = -1;
+				from += count - 1;
+				to += count - 1;
+			}
+			while (count > 0) {
+				if (from in this) {
+					this[to] = this[from];
+				}
+				else {
+					delete this[from];
+				}
+				from += direction;
+				to += direction;
+				count -= 1;
+			}
+			return this;
 		}
 
 	});
 
 	new function () {
+
 		//в IE8 методы массива не работают с DOM-объектами
 		var slice = Array.prototype.slice;
 		function toArray(iterable) {
@@ -295,43 +322,26 @@ new function () {
 		catch (error) {
 			Array.prototype.slice = function () {
 				var iterable = this;
-				//IE<9: Object(NodeList) instanceof Object → false
+				//IE8: Object(NodeList) instanceof Object → false
 				if (!(Object(iterable) instanceof Object)) {
 					iterable = toArray(iterable);
 				}
-				//IE<9: [1].slice(0, undefined) → []
+				//IE8: [1].slice(0, undefined) → []
 				if (arguments.length > 1) {
 					return slice.call(iterable, arguments[0], arguments[1]);
 				}
 				return slice.call(iterable, arguments[0] || 0);
 			};
 		}
+
 	};
 
-	//https://developer.mozilla.org/ru/docs/JavaScript/Reference/Global_Objects/Array#Array_generic_methods
+	//Array generic methods
 	[
-		"concat",
-		"every",
-		"filter",
-		"forEach",
-		"fill",
-		"indexOf",
-		"join",
-		"lastIndexOf",
-		"map",
-		"pop",
-		"push",
-		"reduce",
-		"reduceRight",
-		"reverse",
-		"shift",
-		"slice",
-		"some",
-		"sort",
-		"splice",
-		"unshift",
-		"find",
-		"findIndex"
+		"concat", "every", "fill", "filter", "find", "findIndex",
+		"forEach", "indexOf", "join", "lastIndexOf", "map", "pop",
+		"push", "reduce", "reduceRight", "reverse", "shift", "slice",
+		"some", "sort", "splice", "unshift", "copyWithin"
 	].forEach(function (methodName) {
 		var method = Array.prototype[methodName];
 		if (method && !Array[methodName]) {
@@ -348,7 +358,11 @@ new function () {
 
 	implement(String.prototype, {
 
-		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
+		codePointAt: function () {
+			//todo
+			throw Error("String.prototype.codePointAt not implemented");
+		},
+
 		startsWith: function (string, position) {
 			if (arguments.length == 1) {
 				position = 0;
@@ -356,7 +370,6 @@ new function () {
 			return this.indexOf(string, position) == position;
 		},
 
-		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
 		endsWith: function (string, position) {
 			var lastIndex;
 			if (arguments.length == 1) {
@@ -367,53 +380,33 @@ new function () {
 			return lastIndex != -1 && lastIndex == position;
 		},
 
-		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/contains
 		contains: function (string) {
 			return this.indexOf(string) != -1;
 		},
 
-		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
 		repeat: function (count) {
-			return Array(Number.toInteger(count) + 1).join(this);
+			return Array(count + 1).join(this);
 		},
 
-		trim: function () {
-			//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/Trim
-			//http://blog.stevenlevithan.com/archives/faster-trim-javascript
+		trim: new function () {
 			//http://perfectionkills.com/chr-deviations/
-			//взято из https://github.com/kriskowal/es5-shim/blob/master/es5-shim.js
-			//http://perfectionkills.com/whitespace-deviations/
-			var chr = "[\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF]",
-				left = RegExp("^" + chr + chr + "*"), right = RegExp(chr + chr + "*$");
+			//https://github.com/kriskowal/es5-shim/
+			var whitespace = "[\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF]",
+				//http://blog.stevenlevithan.com/archives/faster-trim-javascript/
+				left = RegExp("^" + whitespace + whitespace + "*"), right = RegExp(whitespace + whitespace + "*$");
 			return function () {
 				return this.replace(left, "").replace(right, "");
 			};
-
-		}()
+		}
 
 	});
 
-	//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#String_generic_methods
+	//String generic methods
 	[
-		"startsWith",
-		"endsWith",
-		"contains",
-		"repeat",
-		"substring",
-		"toLowerCase",
-		"toUpperCase",
-		"charAt",
-		"charCodeAt",
-		"indexOf",
-		"lastIndexOf",
-		"trim",
-		"match",
-		"search",
-		"replace",
-		"split",
-		"substr",
-		"concat",
-		"slice"
+		"charAt", "charCodeAt", "concat", "contains", "endsWith",
+		"indexOf", "lastIndexOf", "match", "repeat", "replace",
+		"search", "slice", "split", "startsWith", "substr",
+		"substring", "toLowerCase", "toUpperCase", "trim"
 	].forEach(function (methodName) {
 		var method = String.prototype[methodName];
 		if (method && !String[methodName]) {
@@ -430,7 +423,6 @@ new function () {
 
 	implement(Function.prototype, {
 
-		//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
 		bind: function () {
 			function newApply(Constructor, args) {
 				var i = 0, len = args.length, argNames = [];
@@ -515,21 +507,18 @@ new function () {
 
 };
 
-//IE8
-var HTMLElement;
-if (!HTMLElement) {
-	HTMLElement = Element;
-}
+/**
+ * IE8 HTMLElement polyfill
+ */
+var HTMLElement = window.HTMLElement || window.Element;
 
 /**
  * Element traversal polyfill
- * http://www.w3.org/TR/ElementTraversal/
  */
 "firstElementChild" in document.documentElement || new function () {
 
 	var api = {
 
-		//https://developer.mozilla.org/En/DOM/Element.firstElementChild
 		firstElementChild: function () {
 			var node = this.firstChild;
 			while (node && node.nodeType != 1) {
@@ -538,7 +527,6 @@ if (!HTMLElement) {
 			return node;
 		},
 
-		//https://developer.mozilla.org/En/DOM/Element.lastElementChild
 		lastElementChild: function () {
 			var node = this.lastChild;
 			while (node && node.nodeType != 1) {
@@ -547,7 +535,6 @@ if (!HTMLElement) {
 			return node;
 		},
 
-		//https://developer.mozilla.org/En/DOM/Element.nextElementSibling
 		nextElementSibling: function () {
 			var node = this;
 			do {
@@ -557,7 +544,6 @@ if (!HTMLElement) {
 			return node;
 		},
 
-		//https://developer.mozilla.org/En/DOM/Element.previousElementSibling
 		previousElementSibling: function () {
 			var node = this;
 			do {
@@ -567,7 +553,6 @@ if (!HTMLElement) {
 			return node;
 		},
 
-		//https://developer.mozilla.org/En/DOM/Element.childElementCount
 		childElementCount: function () {
 			//return this.children.length;
 			//IE считает COMMENT_NODE
@@ -604,14 +589,14 @@ var setImmediate = window.setImmediate || new function () {
 			case 2: return func(args[1]);
 			case 3: return func(args[1], args[2]);
 		}
-		return func.apply(window, Array.slice(args, 1));
+		return func.apply(window, Array.prototype.slice.call(args, 1));
 	}
 
 	function callback(event) {
 		var key, data;
 		event = event || window.event;
-		key = String(event.data);
-		if (key.startsWith(message)) {
+		key = event.data;
+		if (typeof key == "string" && key.startsWith(message)) {
 			data = storage[key];
 			if (data) {
 				fastApply(data);
@@ -659,7 +644,6 @@ window.addEventListener || new function () {
 	function fixEvent(event) {
 		var clone = document.createEventObject(event);
 		clone.target = clone.srcElement;
-		//todo
 		clone.pageX = clone.clientX + document.documentElement.scrollLeft;
 		clone.pageY = clone.clientY + document.documentElement.scrollTop;
 		clone.preventDefault = preventDefault;
