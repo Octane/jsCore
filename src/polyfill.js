@@ -416,10 +416,9 @@ new function () {
 
 	//String generic methods
 	[
-		"charAt", "charCodeAt", "concat", "contains", "endsWith",
-		"indexOf", "lastIndexOf", "match", "repeat", "replace",
-		"search", "slice", "split", "startsWith", "substr",
-		"substring", "toLowerCase", "toUpperCase", "trim"
+		"charAt", "charCodeAt", "concat", "contains", "endsWith", "indexOf", "lastIndexOf",
+		"match", "repeat", "replace", "search", "slice", "split", "startsWith", "substr",
+		"substring", "toLowerCase", "toUpperCase", "trim", "codePointAt"
 	].forEach(function (methodName) {
 		var method = String.prototype[methodName];
 		if (method && !String[methodName]) {
