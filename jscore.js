@@ -275,7 +275,7 @@ new function () {
 			return this;
 		},
 
-		copyWithin: function(target, start, end) {
+		copyWithin: function (target, start, end) {
 			var length = this.length, count, direction,
 				to = target < 0 ? Math.max(length + target, 0) : Math.min(target, length),
 				from = start < 0 ? Math.max(length + start, 0) : Math.min(start, length);
@@ -358,9 +358,22 @@ new function () {
 
 	implement(String.prototype, {
 
-		codePointAt: function () {
-			//todo
-			throw Error("String.prototype.codePointAt not implemented");
+		codePointAt: function (position) {
+			//https://github.com/paulmillr/es6-shim/
+			var length = this.length, first, second, isEnd;
+			if (position < 0 || position >= length) {
+				return undefined;
+			}
+			first = this.charCodeAt(position);
+			isEnd = (position + 1 === length);
+			if (first < 0xD800 || first > 0xDBFF || isEnd) {
+				return first;
+			}
+			second = this.charCodeAt(position + 1);
+			if (second < 0xDC00 || second > 0xDFFF) {
+				return first;
+			}
+			return ((first - 0xD800) * 1024) + (second - 0xDC00) + 0x10000;
 		},
 
 		startsWith: function (string, position) {
