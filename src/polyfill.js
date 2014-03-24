@@ -1,58 +1,41 @@
 ﻿"use strict";
 
 /**
+ * for IE8 (can be removed if not needed, other fixes in a separate file)
+ */
+window.HTMLElement = window.HTMLElement || window.Element;
+window.addEventListener = window.addEventListener || function (type, callback) {
+	window.attachEvent("on" + type, callback);
+};
+
+/**
  * Language polyfill
  */
 new function () {
 
-		//На случай, если объект создан с помощью Object.create(null)
-	var hasOwnProperty = Object.prototype.hasOwnProperty,
-
-		getKeys = Object.keys || function (object) {
-			var i = 0, key, keys = [];
-			if (Object(object) !== object) {
-				throw TypeError("Object.keys called on non-object");
-			}
-			for (key in object) {
-				if (hasOwnProperty.call(object, key)) {
-					keys[i++] = key;
-				}
-			}
-			return keys;
-		};
-
-	!({toString: null}).propertyIsEnumerable("toString") && new function () {
-		//в IE8 переопределенные стандартные методы не становятся enumerable
-		var _getKeys = getKeys, hasBug = [
-				"constructor", "toString", "toLocaleString", "valueOf",
-				"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
-			];
-		getKeys = function (object) {
-			var i = hasBug.length, key, keys = _getKeys(object), j = keys.length;
-			while (i--) {
-				key = hasBug[i];
-				if (hasOwnProperty.call(object, key)) {
-					keys[j++] = key;
-				}
-			}
-			return keys;
-		};
-	};
-
 	function implement(object, properties) {
-		var i = 0, key, keys = getKeys(properties), length = keys.length;
-		while (i < length) {
-			key = keys[i];
+		var key;
+		for (key in properties) {
 			if (!(key in object)) {
 				object[key] = properties[key];
 			}
-			i++;
 		}
 	}
 
 	implement(Object, {
 
-		keys: getKeys,
+		keys: function (object) {
+			var i = 0, key, keys = [];
+			if (Object(object) !== object) {
+				throw TypeError("Object.keys called on non-object");
+			}
+			for (key in object) {
+				if (Object.hasOwnProperty.call(object, key)) {
+					keys[i++] = key;
+				}
+			}
+			return keys;
+		},
 
 		//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
 		assign: function (object, properties) {
@@ -273,68 +256,9 @@ new function () {
 				i++;
 			}
 			return this;
-		},
-
-		copyWithin: function (target, start, end) {
-			var length = this.length, count, direction,
-				to = target < 0 ? Math.max(length + target, 0) : Math.min(target, length),
-				from = start < 0 ? Math.max(length + start, 0) : Math.min(start, length);
-			end = typeof end == "undefined" ? length : end;
-			end = end < 0 ? Math.max(length + end, 0) : Math.min(end, length);
-			count = Math.min(end - from, length - to);
-			direction = 1;
-			if (from < to && to < (from + count)) {
-				direction = -1;
-				from += count - 1;
-				to += count - 1;
-			}
-			while (count > 0) {
-				if (from in this) {
-					this[to] = this[from];
-				}
-				else {
-					delete this[from];
-				}
-				from += direction;
-				to += direction;
-				count -= 1;
-			}
-			return this;
 		}
 
 	});
-
-	new function () {
-
-		//в IE8 методы массива не работают с DOM-объектами
-		var slice = Array.prototype.slice;
-		function toArray(iterable) {
-			var i = 0, length = iterable.length, array = [];
-			while (i < length) {
-				array[i] = iterable[i];
-				i++;
-			}
-			return array;
-		}
-		try {
-			slice.call(document.documentElement.childNodes);
-		}
-		catch (error) {
-			Array.prototype.slice = function () {
-				var iterable = this;
-				//IE8: Object(NodeList) instanceof Object → false
-				if (!(Object(iterable) instanceof Object)) {
-					iterable = toArray(iterable);
-				}
-				//IE8: [1].slice(0, undefined) → []
-				if (arguments.length > 1) {
-					return slice.call(iterable, arguments[0], arguments[1]);
-				}
-				return slice.call(iterable, arguments[0] || 0);
-			};
-		}
-
-	};
 
 	//Array generic methods
 	[
@@ -358,24 +282,6 @@ new function () {
 
 	implement(String.prototype, {
 
-		codePointAt: function (position) {
-			//https://github.com/paulmillr/es6-shim/
-			var length = this.length, first, second, isEnd;
-			if (position < 0 || position >= length) {
-				return undefined;
-			}
-			first = this.charCodeAt(position);
-			isEnd = (position + 1 === length);
-			if (first < 0xD800 || first > 0xDBFF || isEnd) {
-				return first;
-			}
-			second = this.charCodeAt(position + 1);
-			if (second < 0xDC00 || second > 0xDFFF) {
-				return first;
-			}
-			return ((first - 0xD800) * 1024) + (second - 0xDC00) + 0x10000;
-		},
-
 		startsWith: function (string, position) {
 			if (arguments.length == 1) {
 				position = 0;
@@ -393,8 +299,8 @@ new function () {
 			return lastIndex != -1 && lastIndex == position;
 		},
 
-		contains: function (string) {
-			return this.indexOf(string) != -1;
+		contains: function (string, position) {
+			return this.indexOf(string, position) != -1;
 		},
 
 		repeat: function (count) {
@@ -520,9 +426,54 @@ new function () {
 };
 
 /**
- * IE8 HTMLElement polyfill
+ * setImmediate polyfill
+ * todo first run
  */
-var HTMLElement = window.HTMLElement || window.Element;
+window.setImmediate = window.setImmediate || new function () {
+
+	var id = 0, storage = {}, message = "setImmediatePolyfillMessage";
+
+	function fastApply(args) {
+		var func = args[0];
+		switch (args.length) {
+			case 1: return func();
+			case 2: return func(args[1]);
+			case 3: return func(args[1], args[2]);
+		}
+		return func.apply(window, Array.prototype.slice.call(args, 1));
+	}
+
+	function callback(event) {
+		var key, data;
+		event = event || window.event;
+		key = event.data;
+		if (typeof key == "string" && key.startsWith(message)) {
+			data = storage[key];
+			if (data) {
+				fastApply(data);
+				delete storage[key];
+			}
+		}
+	}
+
+	function setImmediate() {
+		var key = message + ++id;
+		storage[key] = arguments;
+		postMessage(key, "*");
+		return id;
+	}
+
+	setImmediate.clearImmediate = function (id) {
+		delete storage[message + id];
+	};
+
+	addEventListener("message", callback, false);
+
+	return setImmediate;
+
+};
+
+window.clearImmediate = window.clearImmediate || setImmediate.clearImmediate;
 
 /**
  * Element traversal polyfill
@@ -588,237 +539,6 @@ var HTMLElement = window.HTMLElement || window.Element;
 };
 
 /**
- * setImmediate polyfill
- */
-var setImmediate = window.setImmediate || new function () {
-
-	var id = 0, storage = {}, message = "setImmediatePolyfillMessage";
-
-	function fastApply(args) {
-		var func = args[0];
-		switch (args.length) {
-			case 1: return func();
-			case 2: return func(args[1]);
-			case 3: return func(args[1], args[2]);
-		}
-		return func.apply(window, Array.prototype.slice.call(args, 1));
-	}
-
-	function callback(event) {
-		var key, data;
-		event = event || window.event;
-		key = event.data;
-		if (typeof key == "string" && key.startsWith(message)) {
-			data = storage[key];
-			if (data) {
-				fastApply(data);
-				delete storage[key];
-			}
-		}
-	}
-
-	function setImmediate() {
-		var key = message + ++id;
-		storage[key] = arguments;
-		postMessage(key, "*");
-		return id;
-	}
-
-	setImmediate.clearImmediate = function (id) {
-		delete storage[message + id];
-	};
-
-	if (window.addEventListener) {
-		window.addEventListener("message", callback, false);
-	}
-	else {
-		window.attachEvent("onmessage", callback);
-	}
-
-	return setImmediate;
-};
-
-var clearImmediate = window.clearImmediate || setImmediate.clearImmediate;
-
-/**
- * IE8 event target polyfill
- */
-window.addEventListener || new function () {
-
-	function preventDefault() {
-		this.returnValue = false;
-	}
-
-	function stopPropagation() {
-		this.cancelBubble = true;
-	}
-
-	function fixEvent(event) {
-		var clone = document.createEventObject(event);
-		clone.target = clone.srcElement;
-		clone.pageX = clone.clientX + document.documentElement.scrollLeft;
-		clone.pageY = clone.clientY + document.documentElement.scrollTop;
-		clone.preventDefault = preventDefault;
-		clone.stopPropagation = stopPropagation;
-		return clone;
-	}
-
-	function fastBind(func, boundThis) {
-		return function (arg) {
-			func.call(boundThis, arg);
-		};
-	}
-
-	function createEventListener(callbacks, element) {
-		return function () {
-			var event = fixEvent(window.event), i = 0, length = callbacks.length;
-			while (i < length) {
-				setImmediate(fastBind(callbacks[i], element), event);
-				i++;
-			}
-		};
-	}
-
-	function addEventListener(eventType, callback, useCapturing) {
-		var element = this, events, event;
-		if (useCapturing) {
-			throw new Error("Capturing phase is not supported");
-		}
-		if (!element._events) {
-			element._events = {};
-		}
-		events = element._events;
-		event = events[eventType];
-		if (!event) {
-			event = {
-				callbacks: []
-			};
-			event.listener = createEventListener(event.callbacks, element);
-			events[eventType] = event;
-			this.attachEvent("on" + eventType, event.listener);
-		}
-		if (event.callbacks.indexOf(callback) == -1) {
-			event.callbacks.push(callback);
-		}
-	}
-
-	function removeEventListener(eventType, callback, useCapturing) {
-		var element = this, events, event, index, callbacks;
-		if (useCapturing) {
-			throw new Error("Capturing phase is not supported");
-		}
-		if (!element._events) {
-			return;
-		}
-		events = element._events;
-		if (!events[eventType]) {
-			return;
-		}
-		event = events[eventType];
-		callbacks = event.callbacks;
-		index = callbacks.indexOf(callback);
-		if (index == -1) {
-			return;
-		}
-		callbacks.splice(index, 1);
-		if (!callbacks.length) {
-			element.detachEvent("on" + eventType, event.listener);
-			delete events[eventType];
-		}
-	}
-
-	//todo поставить в соответсвие параметры функций свойствам объекта события в IE
-	function initEvent(type, bubbles, cancelable) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable
-		});
-	}
-
-	function initUIEvent(type, bubbles, cancelable, windowObject, detail) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			windowObject: windowObject,
-			detail: detail
-		});
-	}
-
-	function initMouseEvent(type, bubbles, cancelable, windowObject, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			windowObject: windowObject,
-			detail: detail,
-			screenX: screenX,
-			screenY: screenY,
-			clientX: clientX,
-			clientY: clientY,
-			ctrlKey: ctrlKey,
-			altKey: altKey,
-			shiftKey: shiftKey,
-			metaKey: metaKey,
-			button: button,
-			relatedTarget: relatedTarget
-		});
-	}
-
-	//deprecated
-	function initMutationEvent(type, bubbles, cancelable, relatedNode, prevValue, newValue, attrName, attrChange) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			relatedNode: relatedNode,
-			prevValue: prevValue,
-			newValue: newValue,
-			attrName: attrName,
-			attrChange: attrChange
-		});
-	}
-
-	function initKeyEvent(type, bubbles, cancelable, windowObject, ctrlKey, altKey, shiftKey, metaKey, keyCode, charCode) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			windowObject: windowObject,
-			ctrlKey: ctrlKey,
-			altKey: altKey,
-			shiftKey: shiftKey,
-			metaKey: metaKey,
-			keyCode: keyCode,
-			charCode: charCode
-		});
-	}
-
-	function dispatchEvent(event) {
-		this.fireEvent("on" + event.type, event);
-	}
-
-	[Window, HTMLDocument, HTMLElement, XMLHttpRequest].forEach(function (eventTarget) {
-		var proto = eventTarget.prototype;
-		proto.dispatchEvent = dispatchEvent;
-		proto.addEventListener = addEventListener;
-		proto.removeEventListener = removeEventListener;
-	});
-
-	HTMLDocument.prototype.createEvent = function () {
-		return Object.assign(document.createEventObject(), {
-			initEvent: initEvent,
-			initUIEvent: initUIEvent,
-			initKeyEvent: initKeyEvent,
-			initMouseEvent: initMouseEvent,
-			initMutationEvent: initMutationEvent
-		});
-	};
-
-};
-
-/**
  * classList polyfill
  * todo InvalidCharacterError, IE11 several arguments support
  */
@@ -853,7 +573,7 @@ window.addEventListener || new function () {
 			return this[index];
 		},
 
-		add: function (/*tokens*/) {
+		add: function () {
 			var length;
 			this.update();
 			length = this.length;
@@ -867,7 +587,7 @@ window.addEventListener || new function () {
 			}
 		},
 
-		remove: function (/*tokens*/) {
+		remove: function () {
 			var length;
 			this.update();
 			length = this.length;
@@ -933,12 +653,6 @@ window.addEventListener || new function () {
 					element._classList.update();
 				}
 			}, false);
-			//fix IE8
-			element.addEventListener("propertychange", function (event) {
-				if (event.propertyName == "className") {
-					element._classList.update();
-				}
-			}, false);
 */
 			element._classList.update();
 			return element._classList;
@@ -949,20 +663,11 @@ window.addEventListener || new function () {
 
 /**
  * dataset polyfill
+ * simple implementation: the new property will not create an attribute
  */
+window.DOMStringMap = window.DOMStringMap || function () {};
+
 "dataset" in document.documentElement || new function () {
-
-	var DOMStringMap;
-
-	try {
-		Object.defineProperty({}, "test", {});
-		DOMStringMap = function () {};
-	}
-	catch (error) {
-		DOMStringMap = function () {
-			return document.createElement("dataset");
-		};
-	}
 
 	function toUpperCase(str) {
 		return str.charAt(1).toUpperCase();

@@ -1,58 +1,41 @@
 ﻿"use strict";
 
 /**
+ * for IE8 (can be removed if not needed, other fixes in a separate file)
+ */
+window.HTMLElement = window.HTMLElement || window.Element;
+window.addEventListener = window.addEventListener || function (type, callback) {
+	window.attachEvent("on" + type, callback);
+};
+
+/**
  * Language polyfill
  */
 new function () {
 
-		//На случай, если объект создан с помощью Object.create(null)
-	var hasOwnProperty = Object.prototype.hasOwnProperty,
-
-		getKeys = Object.keys || function (object) {
-			var i = 0, key, keys = [];
-			if (Object(object) !== object) {
-				throw TypeError("Object.keys called on non-object");
-			}
-			for (key in object) {
-				if (hasOwnProperty.call(object, key)) {
-					keys[i++] = key;
-				}
-			}
-			return keys;
-		};
-
-	!({toString: null}).propertyIsEnumerable("toString") && new function () {
-		//в IE8 переопределенные стандартные методы не становятся enumerable
-		var _getKeys = getKeys, hasBug = [
-				"constructor", "toString", "toLocaleString", "valueOf",
-				"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
-			];
-		getKeys = function (object) {
-			var i = hasBug.length, key, keys = _getKeys(object), j = keys.length;
-			while (i--) {
-				key = hasBug[i];
-				if (hasOwnProperty.call(object, key)) {
-					keys[j++] = key;
-				}
-			}
-			return keys;
-		};
-	};
-
 	function implement(object, properties) {
-		var i = 0, key, keys = getKeys(properties), length = keys.length;
-		while (i < length) {
-			key = keys[i];
+		var key;
+		for (key in properties) {
 			if (!(key in object)) {
 				object[key] = properties[key];
 			}
-			i++;
 		}
 	}
 
 	implement(Object, {
 
-		keys: getKeys,
+		keys: function (object) {
+			var i = 0, key, keys = [];
+			if (Object(object) !== object) {
+				throw TypeError("Object.keys called on non-object");
+			}
+			for (key in object) {
+				if (Object.hasOwnProperty.call(object, key)) {
+					keys[i++] = key;
+				}
+			}
+			return keys;
+		},
 
 		//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
 		assign: function (object, properties) {
@@ -273,68 +256,9 @@ new function () {
 				i++;
 			}
 			return this;
-		},
-
-		copyWithin: function (target, start, end) {
-			var length = this.length, count, direction,
-				to = target < 0 ? Math.max(length + target, 0) : Math.min(target, length),
-				from = start < 0 ? Math.max(length + start, 0) : Math.min(start, length);
-			end = typeof end == "undefined" ? length : end;
-			end = end < 0 ? Math.max(length + end, 0) : Math.min(end, length);
-			count = Math.min(end - from, length - to);
-			direction = 1;
-			if (from < to && to < (from + count)) {
-				direction = -1;
-				from += count - 1;
-				to += count - 1;
-			}
-			while (count > 0) {
-				if (from in this) {
-					this[to] = this[from];
-				}
-				else {
-					delete this[from];
-				}
-				from += direction;
-				to += direction;
-				count -= 1;
-			}
-			return this;
 		}
 
 	});
-
-	new function () {
-
-		//в IE8 методы массива не работают с DOM-объектами
-		var slice = Array.prototype.slice;
-		function toArray(iterable) {
-			var i = 0, length = iterable.length, array = [];
-			while (i < length) {
-				array[i] = iterable[i];
-				i++;
-			}
-			return array;
-		}
-		try {
-			slice.call(document.documentElement.childNodes);
-		}
-		catch (error) {
-			Array.prototype.slice = function () {
-				var iterable = this;
-				//IE8: Object(NodeList) instanceof Object → false
-				if (!(Object(iterable) instanceof Object)) {
-					iterable = toArray(iterable);
-				}
-				//IE8: [1].slice(0, undefined) → []
-				if (arguments.length > 1) {
-					return slice.call(iterable, arguments[0], arguments[1]);
-				}
-				return slice.call(iterable, arguments[0] || 0);
-			};
-		}
-
-	};
 
 	//Array generic methods
 	[
@@ -358,24 +282,6 @@ new function () {
 
 	implement(String.prototype, {
 
-		codePointAt: function (position) {
-			//https://github.com/paulmillr/es6-shim/
-			var length = this.length, first, second, isEnd;
-			if (position < 0 || position >= length) {
-				return undefined;
-			}
-			first = this.charCodeAt(position);
-			isEnd = (position + 1 === length);
-			if (first < 0xD800 || first > 0xDBFF || isEnd) {
-				return first;
-			}
-			second = this.charCodeAt(position + 1);
-			if (second < 0xDC00 || second > 0xDFFF) {
-				return first;
-			}
-			return ((first - 0xD800) * 1024) + (second - 0xDC00) + 0x10000;
-		},
-
 		startsWith: function (string, position) {
 			if (arguments.length == 1) {
 				position = 0;
@@ -393,8 +299,8 @@ new function () {
 			return lastIndex != -1 && lastIndex == position;
 		},
 
-		contains: function (string) {
-			return this.indexOf(string) != -1;
+		contains: function (string, position) {
+			return this.indexOf(string, position) != -1;
 		},
 
 		repeat: function (count) {
@@ -520,9 +426,54 @@ new function () {
 };
 
 /**
- * IE8 HTMLElement polyfill
+ * setImmediate polyfill
+ * todo first run
  */
-var HTMLElement = window.HTMLElement || window.Element;
+window.setImmediate = window.setImmediate || new function () {
+
+	var id = 0, storage = {}, message = "setImmediatePolyfillMessage";
+
+	function fastApply(args) {
+		var func = args[0];
+		switch (args.length) {
+			case 1: return func();
+			case 2: return func(args[1]);
+			case 3: return func(args[1], args[2]);
+		}
+		return func.apply(window, Array.prototype.slice.call(args, 1));
+	}
+
+	function callback(event) {
+		var key, data;
+		event = event || window.event;
+		key = event.data;
+		if (typeof key == "string" && key.startsWith(message)) {
+			data = storage[key];
+			if (data) {
+				fastApply(data);
+				delete storage[key];
+			}
+		}
+	}
+
+	function setImmediate() {
+		var key = message + ++id;
+		storage[key] = arguments;
+		postMessage(key, "*");
+		return id;
+	}
+
+	setImmediate.clearImmediate = function (id) {
+		delete storage[message + id];
+	};
+
+	addEventListener("message", callback, false);
+
+	return setImmediate;
+
+};
+
+window.clearImmediate = window.clearImmediate || setImmediate.clearImmediate;
 
 /**
  * Element traversal polyfill
@@ -588,62 +539,250 @@ var HTMLElement = window.HTMLElement || window.Element;
 };
 
 /**
- * setImmediate polyfill
+ * classList polyfill
+ * todo InvalidCharacterError, IE11 several arguments support
  */
-var setImmediate = window.setImmediate || new function () {
+"classList" in document.documentElement || new function () {
 
-	var id = 0, storage = {}, message = "setImmediatePolyfillMessage";
-
-	function fastApply(args) {
-		var func = args[0];
-		switch (args.length) {
-			case 1: return func();
-			case 2: return func(args[1]);
-			case 3: return func(args[1], args[2]);
-		}
-		return func.apply(window, Array.prototype.slice.call(args, 1));
+	function DOMTokenList(getTokens, onChange) {
+		this.getTokens = getTokens;
+		this.onChange = onChange;
 	}
 
-	function callback(event) {
-		var key, data;
-		event = event || window.event;
-		key = event.data;
-		if (typeof key == "string" && key.startsWith(message)) {
-			data = storage[key];
-			if (data) {
-				fastApply(data);
-				delete storage[key];
+	Object.assign(DOMTokenList.prototype, {
+
+		empty: function () {
+			var i = this.length;
+			while (i--) {
+				delete this[i];
 			}
+			this.length = 0;
+		},
+
+		push: function (tokens) {
+			Array.prototype.push.apply(this, tokens);
+		},
+
+		update: function () {
+			this.empty();
+			this.push(this.getTokens());
+		},
+
+		item: function (index) {
+			this.update();
+			return this[index];
+		},
+
+		add: function () {
+			var length;
+			this.update();
+			length = this.length;
+			Array.forEach(arguments, function (token) {
+				if (Array.indexOf(this, token) == -1) {
+					Array.push(this, token);
+				}
+			}, this);
+			if (length != this.length) {
+				this.onChange();
+			}
+		},
+
+		remove: function () {
+			var length;
+			this.update();
+			length = this.length;
+			Array.forEach(arguments, function (token) {
+				var index = Array.indexOf(this, token);
+				if (index != -1) {
+					Array.splice(this, index, 1);
+				}
+			}, this);
+			if (length != this.length) {
+				this.onChange();
+			}
+		},
+
+		toggle: function (token, force) {
+			this.update();
+			if (force === false || this.contains(token)) {
+				this.remove(token);
+				return false;
+			}
+			this.add(token);
+			return true;
+		},
+
+		contains: function () {
+			this.update();
+			return !Array.find(arguments, function (token) {
+				return Array.indexOf(this, token) == -1;
+			}, this);
 		}
+
+	});
+
+	function getClasses(className) {
+		className = className.trim();
+		if (className.length) {
+			return className.split(/\s\s*/);
+		}
+		return [];
 	}
 
-	function setImmediate() {
-		var key = message + ++id;
-		storage[key] = arguments;
-		postMessage(key, "*");
-		return id;
-	}
+	Object.defineProperty(HTMLElement.prototype, "classList", {
+		get: function () {
+			var element = this;
+			if (!element._classList) {
+				element._classList = new DOMTokenList(
+					function () {
+						return getClasses(element.className);
+					},
+					function () {
+						//this → element._classList
+						element.className = Array.join(this, " ");
+					}
+				);
+			}
+/*
+			//Убрал обновление DOMTokenList по следующим причинам:
+			//1. IE11 не обновляет его, когда изменяется свойство className.
+			//2. Применение Mutation Events является устаревшим.
+			//3. Во избежание утечек памяти.
+			element.addEventListener("DOMAttrModified", function (event) {
+				if (event.attrName.toLowerCase() == "class") {
+					element._classList.update();
+				}
+			}, false);
+*/
+			element._classList.update();
+			return element._classList;
+		}
+	});
 
-	setImmediate.clearImmediate = function (id) {
-		delete storage[message + id];
-	};
-
-	if (window.addEventListener) {
-		window.addEventListener("message", callback, false);
-	}
-	else {
-		window.attachEvent("onmessage", callback);
-	}
-
-	return setImmediate;
 };
 
-var clearImmediate = window.clearImmediate || setImmediate.clearImmediate;
+/**
+ * dataset polyfill
+ * simple implementation: the new property will not create an attribute
+ */
+window.DOMStringMap = window.DOMStringMap || function () {};
+
+"dataset" in document.documentElement || new function () {
+
+	function toUpperCase(str) {
+		return str.charAt(1).toUpperCase();
+	}
+
+	function attrToPropName(attrName) {
+		return attrName.substr(5).replace(/-./g, toUpperCase);
+	}
+
+	function attrToPropDesc(attr) {
+		return {
+			get: function () {
+				return attr.value;
+			},
+			set: function (value) {
+				attr.value = String(value);
+			}
+		};
+	}
+
+	function fillDataset(dataset, attrs) {
+		Array.forEach(attrs, function (attr) {
+			var attrName = attr.name.toLowerCase();
+			if (attrName.startsWith("data-")) {
+				Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
+			}
+		});
+		return dataset;
+	}
+
+	Object.defineProperty(HTMLElement.prototype, "dataset", {
+		get: function () {
+			return fillDataset(new DOMStringMap, this.attributes);
+		}
+	});
+
+};
+/**
+ * IE8 dataset fix
+ */
+try {
+	Object.defineProperty({}, "test", {});
+}
+catch (error) {
+	DOMStringMap = function () {
+		return document.createElement("dataset");
+	};
+}
+
+/**
+ * IE8 Object.keys fix
+ */
+({toString: null}).propertyIsEnumerable("toString") || new function () {
+
+	//в IE8 переопределенные стандартные методы не становятся enumerable
+	var objectKeys = Object.keys, hasBug = [
+			"constructor", "toString", "toLocaleString", "valueOf",
+			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
+		];
+
+	Object.keys = function (object) {
+		var i = hasBug.length, key, keys = objectKeys(object), j = keys.length;
+		while (i--) {
+			key = hasBug[i];
+			if (Object.hasOwnProperty.call(object, key)) {
+				keys[j++] = key;
+			}
+		}
+		return keys;
+	};
+
+};
+
+/**
+ * IE8 Array.slice fix
+ */
+new function () {
+
+	var slice = Array.prototype.slice;
+
+	function toArray(iterable) {
+		var i = 0, length = iterable.length, array = [];
+		while (i < length) {
+			array[i] = iterable[i];
+			i++;
+		}
+		return array;
+	}
+
+	try {
+		//в IE8 методы массива не работают с DOM-объектами
+		Array.slice(document.documentElement.childNodes, 0);
+	}
+	catch (error) {
+		Array.slice = function (iterable, start, end) {
+			var length = arguments.length;
+			//IE8: Object(NodeList) instanceof Object → false
+			var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
+			//IE8: [1].slice(0, undefined) → []
+			if (length == 1 || (length == 2 && start == 0)) {
+				return array == iterable ? slice.call(array, 0) : array;
+			}
+			if (length == 2) {
+				return slice.call(array, start);
+			}
+			return slice.call(array, start, end);
+		};
+	}
+
+};
 
 /**
  * IE8 event target polyfill
  */
-window.addEventListener || new function () {
+document.addEventListener || new function () {
 
 	function preventDefault() {
 		this.returnValue = false;
@@ -815,189 +954,6 @@ window.addEventListener || new function () {
 			initMutationEvent: initMutationEvent
 		});
 	};
-
-};
-
-/**
- * classList polyfill
- * todo InvalidCharacterError, IE11 several arguments support
- */
-"classList" in document.documentElement || new function () {
-
-	function DOMTokenList(getTokens, onChange) {
-		this.getTokens = getTokens;
-		this.onChange = onChange;
-	}
-
-	Object.assign(DOMTokenList.prototype, {
-
-		empty: function () {
-			var i = this.length;
-			while (i--) {
-				delete this[i];
-			}
-			this.length = 0;
-		},
-
-		push: function (tokens) {
-			Array.prototype.push.apply(this, tokens);
-		},
-
-		update: function () {
-			this.empty();
-			this.push(this.getTokens());
-		},
-
-		item: function (index) {
-			this.update();
-			return this[index];
-		},
-
-		add: function (/*tokens*/) {
-			var length;
-			this.update();
-			length = this.length;
-			Array.forEach(arguments, function (token) {
-				if (Array.indexOf(this, token) == -1) {
-					Array.push(this, token);
-				}
-			}, this);
-			if (length != this.length) {
-				this.onChange();
-			}
-		},
-
-		remove: function (/*tokens*/) {
-			var length;
-			this.update();
-			length = this.length;
-			Array.forEach(arguments, function (token) {
-				var index = Array.indexOf(this, token);
-				if (index != -1) {
-					Array.splice(this, index, 1);
-				}
-			}, this);
-			if (length != this.length) {
-				this.onChange();
-			}
-		},
-
-		toggle: function (token, force) {
-			this.update();
-			if (force === false || this.contains(token)) {
-				this.remove(token);
-				return false;
-			}
-			this.add(token);
-			return true;
-		},
-
-		contains: function () {
-			this.update();
-			return !Array.find(arguments, function (token) {
-				return Array.indexOf(this, token) == -1;
-			}, this);
-		}
-
-	});
-
-	function getClasses(className) {
-		className = className.trim();
-		if (className.length) {
-			return className.split(/\s\s*/);
-		}
-		return [];
-	}
-
-	Object.defineProperty(HTMLElement.prototype, "classList", {
-		get: function () {
-			var element = this;
-			if (!element._classList) {
-				element._classList = new DOMTokenList(
-					function () {
-						return getClasses(element.className);
-					},
-					function () {
-						//this → element._classList
-						element.className = Array.join(this, " ");
-					}
-				);
-			}
-/*
-			//Убрал обновление DOMTokenList по следующим причинам:
-			//1. IE11 не обновляет его, когда изменяется свойство className.
-			//2. Применение Mutation Events является устаревшим.
-			//3. Во избежание утечек памяти.
-			element.addEventListener("DOMAttrModified", function (event) {
-				if (event.attrName.toLowerCase() == "class") {
-					element._classList.update();
-				}
-			}, false);
-			//fix IE8
-			element.addEventListener("propertychange", function (event) {
-				if (event.propertyName == "className") {
-					element._classList.update();
-				}
-			}, false);
-*/
-			element._classList.update();
-			return element._classList;
-		}
-	});
-
-};
-
-/**
- * dataset polyfill
- */
-"dataset" in document.documentElement || new function () {
-
-	var DOMStringMap;
-
-	try {
-		Object.defineProperty({}, "test", {});
-		DOMStringMap = function () {};
-	}
-	catch (error) {
-		DOMStringMap = function () {
-			return document.createElement("dataset");
-		};
-	}
-
-	function toUpperCase(str) {
-		return str.charAt(1).toUpperCase();
-	}
-
-	function attrToPropName(attrName) {
-		return attrName.substr(5).replace(/-./g, toUpperCase);
-	}
-
-	function attrToPropDesc(attr) {
-		return {
-			get: function () {
-				return attr.value;
-			},
-			set: function (value) {
-				attr.value = String(value);
-			}
-		};
-	}
-
-	function fillDataset(dataset, attrs) {
-		Array.forEach(attrs, function (attr) {
-			var attrName = attr.name.toLowerCase();
-			if (attrName.startsWith("data-")) {
-				Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
-			}
-		});
-		return dataset;
-	}
-
-	Object.defineProperty(HTMLElement.prototype, "dataset", {
-		get: function () {
-			return fillDataset(new DOMStringMap, this.attributes);
-		}
-	});
 
 };
 ﻿/*

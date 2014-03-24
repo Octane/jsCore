@@ -2,6 +2,7 @@ var fs = require("fs");
 
 fs.writeFileSync("jscore.js", [
 	"polyfill.js",
+	"ie8_polyfill.js",
 	"license.js",
 	"core.js",
 	"function.js",
