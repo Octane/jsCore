@@ -994,637 +994,101 @@ document.addEventListener || new function () {
 	};
 
 };
-﻿/*
-jsCore JavaScript library v0.1
-Copyright 2014, Dmitry Korobkin
-Released under the MIT License.
-*/
-var $ = function () {
-﻿/**
- * Универсальная функция
+/**
+ * jsCore JavaScript library v0.1
+ * Copyright 2014, Dmitry Korobkin
+ * Released under the MIT License.
  */
-function $(anything) {
-	if (typeof anything == "function") {
-		return new $.Function(anything);
-	}
-	return $.one(anything);
-}
+var lib = {
 
-Object.assign($, {
+	//example: if ([test1(), test2()].every(lib.isTrue))
+	isTrue: function (arg) {
+		return bool === true;
+	},
 
-	every: function (iterable, func) {
-		//Array.every игнорирует пропущенные индексы,
-		//и всегда возвращает true для пустого массива
-		var i = Object(iterable).length;
-		if (!i) {
-			return false;
-		}
-		while (i--) {
-			if (i in iterable) {
-				if (func(iterable[i]) === false) {
-					return false;
-				}
-			}
-			else {
-				return false;
-			}
-		}
-		return true;
+	isFalse: function (arg) {
+		return bool === false;
+	},
+
+	isHTML: function (string) {
+		return string[0] == "<" && string[string.length - 1] == ">";
 	},
 
 	isObject: function (anything) {
 		return Object(anything) === anything;
 	},
 
-	isNode: function (anything) {
-		//return Object(anything) instanceof Node;
-		//fix IE8
-		return Object(anything).ownerDocument && $.isElement(anything.ownerDocument.documentElement);
-	},
-
-	isElement: function (anything) {
+	isHTMLElement: function (anything) {
 		return Object(anything) instanceof HTMLElement;
 	},
 
-	isObjectList: function (anything) {
-		return $.every(anything, $.isObject);
+	extendClass: function (Class, SuperClass) {
+		Class.prototype = Object.create(SuperClass.prototype);
+		Class.prototype.constructor = Class;
+		Class.super_ = SuperClass;
+		return Class;
 	},
 
-	isNodeList: function (anything) {
-		return  $.every(anything, $.isNode);
-	},
-
-	isElementList: function (anything) {
-		return  $.every(anything, $.isElement);
-	},
-
-	one: function (anything) {
-		if (typeof anything == "string") {
-			anything = document.querySelector(anything);
-			return anything ? new $.Element(anything) : null;
-		}
-		if ($.isElement(anything)) {
-			return new $.Element(anything);
-		}
-		if ($.isNode(anything)) {
-			return new $.Node(anything);
-		}
-		if ($.isObject(anything)) {
-			return new $.Object(anything);
-		}
-		return null;
-	},
-
-	all: function (anything) {
-		if (typeof anything == "string") {
-			return new $.ElementList(document.querySelectorAll(anything));
-		}
-		if ($.isElementList(anything)) {
-			return new $.ElementList(anything);
-		}
-		if ($.isNodeList(anything)) {
-			return new $.NodeList(anything);
-		}
-		return new $.ObjectList(anything);
-	}
-
-});
-
-Object.assign($.prototype, {
-
-	src: null,
-
-	/**
-	 * Конструкторы обёрток наследуют этот метод
-	 * и помещают исходный объект в src
-	 */
-	source: function (src) {
-		if (arguments.length) {
-			this.src = src;
-		}
-		return this.src;
-	}
-
-});
-﻿/**
- * Обёртка функции
- * @constructor
- * @extends $
- */
-$.Function = function () {
-
-	function $Function(func) {
-		this.src = func;
-	}
-
-	$Function.prototype = Object.assign(Object.create($.prototype), {
-
-		constructor: $Function,
-
-		extend: function (SuperClass) {
-			var Cls = this.src;
-			Cls.prototype = Object.create(SuperClass.prototype);
-			Cls.prototype.constructor = Cls;
-			Cls.super_ = SuperClass;
-			return this;
-		}
-
-	});
-
-	return $Function;
-
-}();
-﻿/**
- * Обёртка объекта
- * @constructor
- * @extends $
- * @param {Object} obj
- */
-$.Object = function () {
-
-	function $Object(obj) {
-		this.src = obj;
-	}
-
-	$($Object).extend($);
-
-	Object.assign($Object.prototype, {
-
-		/**
-		 * Общий интерфейс для get-set методов (prop, attr и др.),
-		 * поведение зависит от args:
-		 * ["key"]                    → get("key")
-		 * [["key1", "key2"]]         → {key1: get("key1"), key2: get("key2")}
-		 * ["key", val]               — set("key", val)
-		 * [{key1: val1, key2: val2}] — set("key1", val1), set("key2", val2)
-		 * @param {String} $get название get-метода (getProp, getAttr и др.)
-		 * @param {String} $set название set-метода (setProp, setAttr и др.)
-		 * @param {Arguments} args объект аргументов функции
-		 * @return {Mixed}
-		 */
-		_getOrSet: function ($get, $set, args) {
-			var i, key, keys, obj, arg = args[0];
-			//$(…).prop("x", 1)
-			if (args.length == 2) {
-				return this[$set](arg, args[1]);
-			}
-			//$(…).prop("x")
-			if (typeof arg == "string") {
-				return this[$get](arg);
-			}
-			//$(…).prop(["x", "y"])
-			if (Array.isArray(arg)) {
-				obj = {};
-				i = arg.length;
-				while (i--) {
-					key = arg[i];
-					obj[key] = this[$get](key);
-				}
-				return obj;
-			}
-			//$(…).prop({x: 1, y: 2})
-			keys = Object.keys(arg);
-			i = keys.length;
-			while (i--) {
-				key = keys[i];
-				this[$set](key, arg[key]);
-			}
-			return this;
-		},
-
-		is: function (arg) {
-			if (typeof arg == "function") {
-				return Boolean(arg(this.src));
-			}
-			return false;
-		},
-
-		not: function (arg) {
-			return !this.is(arg);
-		},
-
-		hasProp: function (name) {
-			return name in this.src;
-		},
-
-		delProp: function (name) {
-			delete this.src[name];
-			return this;
-		},
-
-		setProp: function (name, val) {
-			this.src[name] = val;
-			return this;
-		},
-
-		getProp: function (name) {
-			return this.src[name];
-		},
-
-		/**
-		 * Возвращает или устанавливает значения свойств
-		 * $(obj).prop("x")          → obj.x
-		 * $(obj).prop(["x", "y"])   → {x: obj.x, y: obj.y}
-		 * $(obj).prop("x", 1)       — obj.x = 1
-		 * $(obj).prop({x: 1, y: 2}) — obj.x = 1, obj.y = 2
-		 */
-		prop: function () {
-			return this._getOrSet("getProp", "setProp", arguments);
-		}
-
-	});
-
-	return $Object;
-
-}();
-﻿/**
- * Обёртка узла
- * @constructor
- * @extends $Object
- */
-$.Node = function () {
-
-	function $Node(node) {
-		this.src = node;
-	}
-
-	$($Node).extend($.Object);
-
-	Object.assign($Node.prototype, {
-
-		is: function (anything) {
-			//todo другие типы arg
-			if (typeof anything == "string") {
-				return this.src.nodeValue == anything;
-			}
-			return $.Object.prototype.is.call(this, anything);
-		},
-
-		parent: function () {
-		},
-
-		ancestor: function () {
-		},
-
-		appendTo: function () {
-		},
-
-		prependTo: function () {
-		},
-
-		insAfter: function () {
-		},
-
-		insBefore: function () {
-		},
-
-		wrap: function () {
-		},
-
-		remove: function () {
-		},
-
-		clone: function () {
-		},
-
-		toList: function () {
-		}
-
-	});
-
-	return $Node;
-
-}();
-﻿/**
- * Обёртка элемента
- * @constructor
- * @extends $Node
- */
-$.Element = function () {
-
-	function $Element(element) {
-		this.src = element;
-	}
-
-	$($Element).extend($.Node);
-
-	Object.assign($Element.prototype, {
-
-		is: function (arg) {
-			//todo другие типы arg
-			if (typeof arg == "string") {
-				return this.isEqToSel(arg);
-			}
-			return $Object.prototype.is.call(this, arg);
-		},
-
-		_isEqToSel: function (sel) {
-			//todo implement matchesSelector
-			var i, name, names, attr, val, attrs, el = this.src, comp = $.selector.comparison;
-			if ("id" in sel && sel.id != el.id) {
-				return false;
-			}
-			if ("tag" in sel && sel.tag != el.tagName.toLowerCase()) {
-				return false;
-			}
-			if (sel.attrs) {
-				names = sel.attrNames;
-				attrs = this.attr(names);
-				i = names.length;
-				while (i--) {
-					name = names[i];
-					val  = attrs[name];
-					attr = sel.attrs[name];
-					if (val === null || ("value" in attr && !comp[attr.comparison](val, attr.value))) {
-						return false;
-					}
-				}
-			}
-			if (sel.classes) {
-				return this.hasClass(sel.classes);
-			}
-			return true;
-		},
-
-		/**
-		 * Сравнивает элемент с селектором
-		 * @param {String} sel
-		 * @return {Boolean}
-		 */
-		isEqToSel: function (sel) {
-			sel = $.selector.apart(sel);
-			var i = sel.length;
-			while (i--) {
-				if (!this._isEqToSel(sel[i])) {
-					return false;
-				}
-			}
-			return true;
-		},
-
-		after: function () {
-		},
-
-		before: function () {
-		},
-
-		next: function () {
-		},
-
-		prev: function () {
-		},
-
-		first: function () {
-		},
-
-		last: function () {
-		},
-
-		children: function () {
-		},
-
-		descendant: function (sel) {
-		},
-
-		descendants: function () {
-		},
-
-		append: function () {
-		},
-
-		prepend: function () {
-		},
-
-		empty: function () {
-		},
-
-		hasAttr: function () {
-		},
-
-		delAttr: function (name) {
-			this.src.removeAttr(name);
-			return this;
-		},
-
-		setAttr: function (name, val) {
-			this.src.setAttribute(name, String(val));
-			return this;
-		},
-
-		getAttr: function (name) {
-			var val = this.src.getAttribute(name);
-			return val === null ? null : String(val);
-		},
-
-		attr: function () {
-			return this._getOrSet("getAttr", "setAttr", arguments);
-		},
-
-		hasData: function () {
-		},
-
-		delData: function () {
-		},
-
-		setData: function () {
-		},
-
-		getData: function () {
-		},
-
-		data: function () {
-			return this._getOrSet("getData", "setData", arguments);
-		},
-
-		setCSSProp: function () {
-		},
-
-		getCSSProp: function () {
-		},
-
-		css: function () {
-		},
-
-		hasClass: function () {
-		},
-
-		delClass: function () {
-		},
-
-		addClass: function () {
-		},
-
-		toggleClass: function () {
-		},
-
-		classes: function () {
-		},
-
-		animate: function () {
-			//requestAnimationFrame
-			//http://hacks.mozilla.org/2011/08/animating-with-javascript-from-setinterval-to-requestanimationframe/
-			//http://habrahabr.ru/company/microsoft/blog/137705/
-			//http://jsfiddle.net/paul/XQpzU/
-			/*window.requestAnimFrame = (function() {
-				return
-					window.requestAnimationFrame ||
-					window.msRequestAnimationFrame ||
-					window.mozRequestAnimationFrame ||
-					window.oRequestAnimationFrame ||
-					window.webkitRequestAnimationFrame ||
-					(function(callback) { window.setTimeout(callback, 1000 / 60); });
-			})();*/
-		},
-
-		subscribe: function (evType, func, useCapturing) {
-		},
-
-		toList: function () {
-			return new $.ElementList([this.src]);
-		}
-
-	});
-
-	return $Element;
-
-}();
-﻿/**
- * Обёртка списка
- * @constructor
- * @extends $
- */
-$.ObjectList = function () {
-
-	function $ObjectList(objects) {
-		this.src = Array.from(objects);
-	}
-
-	$($ObjectList).extend($);
-
-	Object.assign($ObjectList.prototype, {
-
-		count: function () {
-			//подсчет реального количсества элементов
-			//http://javascript.ru/forum/misc/25392-rabota-s-massivom.html#post155335
-			return this.src.reduce(function (length) {
+	//Array generic methods
+	array: {
+
+		//подсчет реального количсества элементов
+		//http://javascript.ru/forum/misc/25392-rabota-s-massivom.html#post155335
+		count: function (iterable) {
+			return Array.reduce(iterable, function (length) {
 				return length + 1;
 			}, 0);
 		},
 
-		nth: function (i) {
-			return $(this.src[i]);
+		contains: function (iterable, anything, position) {
+			return Array.indexOf(iterable, anything, position) != -1;
 		},
 
-		first: function () {
-			var array = this.src, length = array.length, i = 0;
+		unique: function (iterable) {
+			var anything, array = [], i = 0, j = 0, length = iterable.length;
 			while (i < length) {
-				if (i in array) {
-					return $(array[i]);
+				anything = iterable[i];
+				if (array.indexOf(anything) == -1) {
+					array[j++] = anything;
 				}
 				i++;
 			}
-			return null;
+			return array;
 		},
 
-		last: function () {
-			var array = this.src, i = array.length;
+		//Array.every игнорирует пропущенные индексы,
+		//и всегда возвращает true для пустого массива
+		every: function (iterable, func, boundThis) {
+			var i = Object(iterable).length;
+			if (!i) {
+				return false;
+			}
 			while (i--) {
-				if (i in array) {
-					return $(array[i]);
+				if (i in iterable) {
+					if (func.call(boundThis, iterable[i]) === false) {
+						return false;
+					}
+				}
+				else {
+					return false;
 				}
 			}
-			return null;
-		},
-
-		each: function (method) {
-			var array = this.src, i, length, arg1, rest, $wrap;
-			if (typeof method == "function") {
-				return this.forEach(method, arguments[1]);
-			}
-			i = 0;
-			length = array.length;
-			switch (arguments.length) {
-				case 1:
-					while (i < length) {
-						if (i in array) {
-							$(array[i])[method]();
-						}
-						i++;
-					}
-					break;
-				case 2:
-					arg1 = arguments[1];
-					while (i < length) {
-						if (i in array) {
-							$(array[i])[method](arg1);
-						}
-						i++;
-					}
-					break;
-				default:
-					rest = Array.slice(arguments, 1);
-					while (i < length) {
-						if (i in array) {
-							$wrap = $(array[i]);
-							$wrap[method].apply($wrap, rest);
-						}
-						i++;
-					}
-			}
-			return this;
-		},
-
-		toArray: function () {
-			return this.src;
+			return true;
 		}
 
-	});
+	},
 
-	return $ObjectList;
+	event: {
 
-}();
-﻿/**
- * Обёртка коллекции узлов
- * @constructor
- * @extends $List
- */
-$.NodeList = function () {
+		//example: element.addEventListener("click", lib.event.preventDefault, false)
+		preventDefault: function (event) {
+			event.preventDefault();
+		},
 
-	function $NodeList(nodes) {
-		this.src = Array.from(nodes);
+		stopPropagation: function (event) {
+			event.stopPropagation();
+		}
+
 	}
 
-	$($NodeList).extend($.ObjectList);
-
-	Object.assign($NodeList.prototype, {
-
-	});
-
-	return $NodeList;
-
-}();
-﻿/**
- * Обёртка коллекции элементов
- * @constructor
- * @extends $NodeList
- */
-$.ElementList = function () {
-
-	function $ElementList(elements) {
-		this.src = Array.from(elements);
-	}
-
-	$($ElementList).extend($.NodeList);
-
-
-	Object.assign($ElementList.prototype, {
-
-	});
-
-	return $ElementList;
-
-}();
-
-	return $;
-
-}();
+};
