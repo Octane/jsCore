@@ -54,6 +54,27 @@ new Promise(function (resolve, reject) {
 
 });
 
+//requestAnimationFrame
+new function () {
+
+	var b = document.body, i = 10, t = 0, times = [];
+
+	function test(time) {
+		//times.push(Math.round(time - t));
+		times.push(time);
+		t = time;
+		if (i--) {
+			requestAnimationFrame(test, b);
+		}
+		else {
+			console.log(times.join("\n"));
+		}
+	}
+
+	requestAnimationFrame(test, b);
+
+}
+
 //setImmediate
 new function () {
 
@@ -72,7 +93,9 @@ new function () {
 	document.body.appendChild(textNode);
 	document.addEventListener("mousemove", function (event) {
 		setImmediate(function (x, y) {
-			textNode.nodeValue = x + ", " + y;
+			requestAnimationFrame(function () {
+				textNode.nodeValue = x + ", " + y;
+			});
 		}, event.pageX, event.pageY);
 	}, false);
 
