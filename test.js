@@ -41,7 +41,11 @@ window.Promise = window.Promise || new function () {
 		},
 
 		"catch": function (onRejected) {
-			return then(undefined, onRejected);
+			return this.then(undefined, onRejected);
+		},
+
+		catch_: function (onRejected) {
+			return this["catch"](onRejected);
 		}
 
 	});
@@ -55,28 +59,7 @@ new Promise(function (resolve, reject) {
 });
 
 
-//requestAnimationFrame
-new function () {
-
-	var b = document.body, i = 10, t = 0, times = [];
-
-	function test(time) {
-		//times.push(Math.round(time - t));
-		times.push(time);
-		t = time;
-		if (i--) {
-			requestAnimationFrame(test, b);
-		}
-		else {
-			console.log(times.join("\n"));
-		}
-	}
-
-	requestAnimationFrame(test, b);
-
-}
-
-//setImmediate
+//setImmediate & requestAnimationFrame test
 new function () {
 
 	function si1(text) {
@@ -95,9 +78,26 @@ new function () {
 	document.addEventListener("mousemove", function (event) {
 		setImmediate(function (x, y) {
 			requestAnimationFrame(function () {
-				textNode.nodeValue = x + ", " + y;
+				setImmediate(function (l, t) {
+					textNode.nodeValue = "left: " + l + ", top: " + t;
+				}, x, y);
 			});
 		}, event.pageX, event.pageY);
 	}, false);
+
+	var fps = document.createTextNode(""), count = 0, time = Date.now(), fix = 0;
+	document.body.appendChild(fps);
+	function testFPS() {
+		count++;
+		var t = Date.now();
+		if (t - time >= 1000) {
+			fix = count;
+
+			time = t;
+			count = 0;
+		}
+		fps.nodeValue = ", fps = " + fix + ", frame = " + count;
+		requestAnimationFrame(testFPS);
+	}
 
 }

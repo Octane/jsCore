@@ -994,6 +994,62 @@ document.addEventListener || new function () {
 	};
 
 };
+
+/**
+ * IE8 getComputedStyle polyfill
+ */
+window.getComputedStyle = window.getComputedStyle || new function () {
+
+	function CSSStyleDeclaration() {
+		return document.createElement("compStyle");
+	}
+
+	function toUpperCase(str) {
+		return str.charAt(1).toUpperCase();
+	}
+
+	function toLowerCamelCase(propName) {
+		return propName.replace(/-./g, toUpperCase);
+	}
+
+	function getPropertyValue(propName) {
+		propName = propName.toLowerCase();
+		return this[propName == "float" ? "cssFloat" : toLowerCamelCase(propName)];
+	}
+
+	function createPropDesc(obj, propName) {
+		return {
+			get: function () {
+				return obj[propName];
+			}
+		};
+	}
+
+	function createCSSFloatDesc(obj) {
+		return {
+			get: function () {
+				return obj.styleFloat;
+			}
+		};
+	}
+
+	function getComputedStyle(element) {
+		var compStyle = element._compStyle, currStyle;
+		if (!compStyle) {
+			compStyle = element._compStyle = new CSSStyleDeclaration;
+			currStyle = element.currentStyle;
+			Object.keys(currStyle).forEach(function (propName) {
+				Object.defineProperty(compStyle, propName, createPropDesc(currStyle, propName));
+			});
+			Object.defineProperty(compStyle, "cssFloat", createCSSFloatDesc(currStyle));
+			compStyle.getPropertyValue = getPropertyValue;
+		}
+		return compStyle;
+	}
+
+	return getComputedStyle;
+
+};
 /**
  * jsCore JavaScript library v0.1
  * Copyright 2014, Dmitry Korobkin
@@ -1011,7 +1067,7 @@ var lib = {
 	},
 
 	isHTML: function (string) {
-		return string[0] == "<" && string[string.length - 1] == ">";
+		return string.startsWith("<") && string.endsWith(">");
 	},
 
 	isObject: function (anything) {
@@ -1022,11 +1078,15 @@ var lib = {
 		return Object(anything) instanceof HTMLElement;
 	},
 
-	extendClass: function (Class, SuperClass) {
-		Class.prototype = Object.create(SuperClass.prototype);
-		Class.prototype.constructor = Class;
-		Class.super_ = SuperClass;
-		return Class;
+	class_: {
+
+		extend: function (Class, SuperClass) {
+			Class.prototype = Object.create(SuperClass.prototype);
+			Class.prototype.constructor = Class;
+			Class.super_ = SuperClass;
+			return Class;
+		}
+
 	},
 
 	//Array generic methods
@@ -1088,6 +1148,60 @@ var lib = {
 		stopPropagation: function (event) {
 			event.stopPropagation();
 		}
+
+	},
+
+	html: {
+
+		parse: function (string) {
+			var node = document.createElement("div"),
+				frag = document.createDocumentFragment();
+			node.innerHTML = string;
+			while (node.hasChildNodes()) {
+				frag.appendChild(node.firstChild);
+			}
+			return frag;
+		}
+
+	},
+
+	Template: new function () {
+
+		function Template(template) {
+			this.template = Array.join(template, "");
+		}
+
+		//example: new lib.Template("Hi, {NAME}").match({name: "John"}) → "Hi, John"
+		Template.prototype.match = function (stringMap) {
+			return Object.keys(stringMap).reduceRight(function (template, key) {
+				return template.split("{" + key.toUpperCase() + "}").join(stringMap[key]);
+			}, this.template);
+		};
+
+		return Template;
+
+	},
+
+	I18n: new function () {
+
+		//todo http://jaysoo.ca/2014/03/20/i18n-with-es6-template-strings/
+
+		function I18n() {}
+
+		I18n.prototype.use = function (params) {
+			/*
+				params = {
+					locale: "ru-RU",
+					defaultCurrency: 'RUR',
+					messageBundle: {
+						"english {0} template": "russian {0} template"
+					}
+				}
+			*/
+			return function () {};
+		};
+
+		return I18n;
 
 	}
 
