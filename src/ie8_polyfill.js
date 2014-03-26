@@ -263,13 +263,13 @@ window.getComputedStyle = window.getComputedStyle || new function () {
 		return str.charAt(1).toUpperCase();
 	}
 
-	function toLowerCamelCase(propName) {
+	function toCamelCase(propName) {
 		return propName.replace(/-./g, toUpperCase);
 	}
 
 	function getPropertyValue(propName) {
 		propName = propName.toLowerCase();
-		return this[propName == "float" ? "cssFloat" : toLowerCamelCase(propName)];
+		return this[propName == "float" ? "cssFloat" : toCamelCase(propName)];
 	}
 
 	function createPropDesc(obj, propName) {

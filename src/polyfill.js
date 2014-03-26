@@ -4,7 +4,7 @@
  * for IE8 (can be removed if not needed, other fixes in a separate file)
  */
 window.HTMLElement = window.HTMLElement || window.Element;
-window.addEventListener = window.addEventListener || function (type, callback) {
+Window.prototype.addEventListener = Window.prototype.addEventListener || function (type, callback) {
 	window.attachEvent("on" + type, callback);
 };
 

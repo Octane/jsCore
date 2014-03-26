@@ -1,4 +1,6 @@
-﻿console.clear();
+﻿"use strict";
+
+console.clear();
 
 /**
  * Promise polyfill
