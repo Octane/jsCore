@@ -22,6 +22,28 @@ new function () {
 		}
 	}
 
+	function fastApply(method, args) {
+		switch (args.length) {
+			case 1: return method.call(args[0]);
+			case 2: return method.call(args[0], args[1]);
+			case 3: return method.call(args[0], args[1], args[2]);
+		}
+		return method.apply(args[0], Array.prototype.slice.call(args, 1));
+	}
+
+	function createGeneric(method) {
+		return function () {
+			return fastApply(method, arguments);
+		};
+	}
+
+	function createGenerics(source, names) {
+		return names.reduce(function (methods, name) {
+			methods[name] = createGeneric(source[name]);
+			return methods;
+		}, {});
+	}
+
 	implement(Object, {
 
 		keys: function (object) {
@@ -260,25 +282,13 @@ new function () {
 
 	});
 
-	//Array generic methods
-	[
-		"concat", "every", "fill", "filter", "find", "findIndex",
-		"forEach", "indexOf", "join", "lastIndexOf", "map", "pop",
-		"push", "reduce", "reduceRight", "reverse", "shift", "slice",
-		"some", "sort", "splice", "unshift", "copyWithin"
-	].forEach(function (methodName) {
-		var method = Array.prototype[methodName];
-		if (method && !Array[methodName]) {
-			Array[methodName] = function (firstArgument) {
-				switch (arguments.length) {
-					case 1: return method.call(firstArgument);
-					case 2: return method.call(firstArgument, arguments[1]);
-					case 3: return method.call(firstArgument, arguments[1], arguments[2]);
-				}
-				return method.apply(firstArgument, Array.prototype.slice.call(arguments, 1));
-			};
-		}
-	});
+	implement(Array, createGenerics(Array.prototype, [
+		"concat", "every", "fill", "filter", "find",
+		"findIndex", "forEach", "indexOf", "join",
+		"lastIndexOf", "map", "pop", "push", "reduce",
+		"reduceRight", "reverse", "shift", "slice",
+		"some", "sort", "splice", "unshift"
+	]));
 
 	implement(String.prototype, {
 
@@ -312,7 +322,8 @@ new function () {
 			//https://github.com/kriskowal/es5-shim/
 			var whitespace = "[\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF]",
 				//http://blog.stevenlevithan.com/archives/faster-trim-javascript/
-				left = RegExp("^" + whitespace + whitespace + "*"), right = RegExp(whitespace + whitespace + "*$");
+				left = RegExp("^" + whitespace + whitespace + "*"),
+				right = RegExp(whitespace + whitespace + "*$");
 			return function () {
 				return this.replace(left, "").replace(right, "");
 			};
@@ -320,28 +331,17 @@ new function () {
 
 	});
 
-	//String generic methods
-	[
-		"charAt", "charCodeAt", "concat", "contains", "endsWith", "indexOf", "lastIndexOf",
-		"match", "repeat", "replace", "search", "slice", "split", "startsWith", "substr",
-		"substring", "toLowerCase", "toUpperCase", "trim", "codePointAt"
-	].forEach(function (methodName) {
-		var method = String.prototype[methodName];
-		if (method && !String[methodName]) {
-			String[methodName] = function (firstArgument) {
-				switch (arguments.length) {
-					case 1: return method.call(firstArgument);
-					case 2: return method.call(firstArgument, arguments[1]);
-					case 3: return method.call(firstArgument, arguments[1], arguments[2]);
-				}
-				return method.apply(firstArgument, Array.prototype.slice.call(arguments, 1));
-			};
-		}
-	});
+	implement(String, createGenerics(String.prototype, [
+		"charAt", "charCodeAt", "concat", "contains","endsWith",
+		"indexOf", "lastIndexOf", "match", "repeat", "replace",
+		"search", "slice", "split", "startsWith", "substr",
+		"substring", "toLowerCase", "toUpperCase", "trim"
+	]));
 
 	implement(Function.prototype, {
 
-		bind: function () {
+		bind: new function () {
+
 			function newApply(Constructor, args) {
 				var i = 0, len = args.length, argNames = [];
 				while (i < len) {
@@ -351,11 +351,12 @@ new function () {
 				argNames = argNames.join(",");
 				return Function("Constructor", argNames, "return new Constructor(" + argNames + ")").apply(window, [Constructor].concat(args));
 			}
+
 			return function (boundThis) {
 				if (typeof this != "function") {
 					throw TypeError("Function.prototype.bind called on non-function");
 				}
-				var targetFunc = this, boundArgs = Array.prototype.slice.call(arguments, 1);
+				var targetFunc = this, boundArgs = Array.slice(arguments, 1);
 				function boundFunc() {
 					var allArgs, len;
 					function NOP() {}
@@ -366,7 +367,7 @@ new function () {
 						return new NOP;
 					}
 					else {
-						allArgs = boundArgs.concat(Array.prototype.slice.call(arguments));
+						allArgs = boundArgs.concat(Array.from(arguments));
 						len = allArgs.length;
 					}
 					//в strict режиме this может быть undefined
@@ -382,7 +383,8 @@ new function () {
 				boundFunc._protoMagic = false;
 				return boundFunc;
 			};
-		}()
+
+		}
 
 	});
 
@@ -440,7 +442,7 @@ window.setImmediate = window.setImmediate || new function () {
 			case 2: return func(args[1]);
 			case 3: return func(args[1], args[2]);
 		}
-		return func.apply(window, Array.prototype.slice.call(args, 1));
+		return func.apply(window, Array.slice(args, 1));
 	}
 
 	function callback(event) {
