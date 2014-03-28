@@ -10,6 +10,7 @@ http.createServer(function (request, response) {
 		filename = path.join(process.cwd(), uri),
 		contentTypesByExtension = {
 			".html": "text/html",
+			".txt":  "text/plain",
 			".css":  "text/css",
 			".js":   "text/javascript",
 			".ico":  "image/x-icon"

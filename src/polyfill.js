@@ -745,3 +745,170 @@ window.DOMStringMap = window.DOMStringMap || function () {};
 	});
 
 };
+
+/**
+ * Promise polyfill
+ */
+window.Promise = window.Promise || new function () {
+
+	var PENDING = 0,
+		SETTED  = 1;
+
+	function isSetted(promise) {
+		return promise.state == SETTED;
+	}
+
+	function Promise(resolver) {
+		if (typeof resolver != "function") {
+			throw TypeError("Promise resolver is not a function");
+		}
+		if (Object(this).constructor !== Promise) {
+			return new Promise(resolver);
+		}
+		this.resolver = resolver;
+		this.state = PENDING;
+	}
+
+	Object.assign(Promise, {
+
+		//todo thanable value support, fix IE8
+		resolve: function (value) {
+			if (Object(value).constructor === Promise) {
+				return value;
+			}
+			return new Promise(function (resolve) {
+				resolve(value);
+			});
+		},
+
+		reject: function (reason) {
+			return new Promise(function (resolve, reject) {
+				reject(reason);
+			});
+		},
+
+		//not implemented in native Promise
+		//cast: function () {},
+
+		race: function (promises) {
+			return new Promise(function (resolve, reject) {
+				Array.forEach(promises, function (promise) {
+					promise.then(resolve, reject);
+				});
+			});
+		},
+
+		all: function (promises) {
+			return new Promise(function (resolve, reject) {
+				var results = Array(promises.length);
+				function tryResolve() {
+					if (Array.every(promises, isSetted)) {
+						resolve(results);
+					}
+				}
+				Array.forEach(promises, function (promise, index) {
+					promise.then(
+						function (data) {
+							results[index] = data;
+							tryResolve();
+						},
+						reject
+					);
+				});
+			});
+		}
+
+	});
+
+	Object.assign(Promise.prototype, {
+
+		then: function (onFulfilled, onRejected) {
+
+			var promise = this, lastData;
+
+			function nextResolve(data) {
+				setImmediate(function () {
+					if (promise.onFulfilled) {
+						promise.onFulfilled(data);
+					}
+				});
+			}
+
+			function nextReject(error) {
+				setImmediate(function () {
+					if (promise.onRejected) {
+						promise.onRejected(error);
+					}
+				});
+			}
+
+			function resolve(data) {
+				setImmediate(function () {
+					var crashed = false;
+					lastData = data;
+					if (promise.state == PENDING) {
+						promise.state = SETTED;
+						if (onFulfilled) {
+							try {
+								lastData = onFulfilled(data);
+							}
+							catch (error) {
+								nextReject(error);
+								crashed = true;
+							}
+						}
+						if (!crashed) {
+							nextResolve(lastData);
+						}
+					}
+				});
+			}
+
+			function reject(error) {
+				setImmediate(function () {
+					var crashed = false;
+					if (promise.state == PENDING) {
+						promise.state = SETTED;
+						if (onRejected) {
+							try {
+								onRejected(error);
+							}
+							catch (error) {
+								nextReject(error);
+								crashed = true;
+							}
+						}
+						if (!crashed) {
+							nextResolve(lastData);
+						}
+					}
+				});
+			}
+
+			try {
+				promise.resolver(resolve, reject);
+			}
+			catch (error) {
+				if (promise.state == PENDING) {
+					reject(error);
+				}
+			}
+
+			return new Promise(function (resolve, reject) {
+				promise.onFulfilled = resolve;
+				promise.onRejected = reject;
+			});
+
+		},
+
+		"catch": function (onRejected) {
+			return this.then(undefined, onRejected);
+		}
+
+	});
+
+	return Promise;
+
+};
+
+Promise.prototype.catch_ = Promise.prototype["catch"];

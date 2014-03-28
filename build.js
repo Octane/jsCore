@@ -10,7 +10,8 @@ fs.writeFileSync("jscore.js", [
 	"event.js",
 	"html.js",
 	"template.js",
-	"i18n.js"
+	"i18n.js",
+	"ajax.js"
 ].reduce(function (result, fileName) {
 	return result + fs.readFileSync("src/" + fileName, "utf8").replace(strict, "");
 }, strict), "utf8");

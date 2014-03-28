@@ -305,3 +305,15 @@ window.getComputedStyle = window.getComputedStyle || new function () {
 	return getComputedStyle;
 
 };
+
+/**
+ * IE8 textContent polyfill
+ */
+"textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {
+	get: function () {
+		return this.innerText;
+	},
+	set: function (value) {
+		this.innerText = value;
+	}
+});
