@@ -253,7 +253,7 @@ document.addEventListener || new function () {
 /**
  * IE8 getComputedStyle polyfill
  */
-window.getComputedStyle = window.getComputedStyle || new function () {
+window.getComputedStyle || new function () {
 
 	function CSSStyleDeclaration() {
 		return document.createElement("compStyle");
@@ -302,7 +302,7 @@ window.getComputedStyle = window.getComputedStyle || new function () {
 		return compStyle;
 	}
 
-	return getComputedStyle;
+	window.getComputedStyle = getComputedStyle;
 
 };
 

@@ -3,10 +3,14 @@
 /**
  * for IE8 (can be removed if not needed, other fixes in a separate file)
  */
-window.HTMLElement = window.HTMLElement || window.Element;
-Window.prototype.addEventListener = Window.prototype.addEventListener || function (type, callback) {
-	window.attachEvent("on" + type, callback);
-};
+if (!window.HTMLElement) {
+	window.HTMLElement = window.Element;
+}
+if (!Window.prototype.addEventListener) {
+	Window.prototype.addEventListener = function (type, callback) {
+		window.attachEvent("on" + type, callback);
+	};
+}
 
 /**
  * Language polyfill
@@ -429,9 +433,8 @@ new function () {
 
 /**
  * setImmediate polyfill
- * todo first run
  */
-window.setImmediate = window.setImmediate || new function () {
+window.setImmediate || new function () {
 
 	var id = 0, storage = {}, message = "setImmediatePolyfillMessage";
 
@@ -465,55 +468,57 @@ window.setImmediate = window.setImmediate || new function () {
 		return id;
 	}
 
-	setImmediate.clearImmediate = function (id) {
+	function clearImmediate(id) {
 		delete storage[message + id];
-	};
+	}
 
 	addEventListener("message", callback, false);
 
-	return setImmediate;
+	window.setImmediate = setImmediate;
+	window.clearImmediate = setImmediate;
 
 };
-
-window.clearImmediate = window.clearImmediate || setImmediate.clearImmediate;
 
 /**
  * requestAnimationFrame polyfill
  */
-window.requestAnimationFrame = [
-	window.requestAnimationFrame,
-	window.oRequestAnimationFrame,
-	window.msRequestAnimationFrame,
-	window.mozRequestAnimationFrame,
-	window.webkitRequestAnimationFrame,
-	new function () {
-		var fps = 60, delay = 1000 / fps, navigationStart, prevCallTime;
-		navigationStart = prevCallTime = Date.now();
-		return function (callback) {
-			var currCallTime = Date.now(),
-				timeout = Math.max(0, delay - (currCallTime - prevCallTime)),
-				timeToCall = currCallTime + timeout;
-			prevCallTime = timeToCall;
-			return setTimeout(function () {
-				callback(timeToCall - navigationStart);
-			}, timeout);
-		};
-	}
-].find(Boolean);
+window.requestAnimationFrame || new function () {
 
-window.cancelAnimationFrame = [
-	window.cancelAnimationFrame,
-	window.oCancelAnimationFrame,
-	window.msCancelAnimationFrame,
-	window.mozCancelAnimationFrame,
-	window.webkitCancelAnimationFrame,
-	window.cancelRequestAnimationFrame,
-	window.oCancelRequestAnimationFrame,
-	window.msCancelRequestAnimationFrame,
-	window.mozCancelRequestAnimationFrame,
-	window.webkitCancelRequestAnimationFrame,
-	window.clearTimeout
-].find(Boolean);
+	window.requestAnimationFrame = [
+		window.oRequestAnimationFrame,
+		window.msRequestAnimationFrame,
+		window.mozRequestAnimationFrame,
+		window.webkitRequestAnimationFrame,
+		new function () {
+			var fps = 60, delay = 1000 / fps, navigationStart, prevCallTime;
+			navigationStart = prevCallTime = Date.now();
+			return function (callback) {
+				var currCallTime = Date.now(),
+					timeout = Math.max(0, delay - (currCallTime - prevCallTime)),
+					timeToCall = currCallTime + timeout;
+				prevCallTime = timeToCall;
+				return setTimeout(function () {
+					callback(timeToCall - navigationStart);
+				}, timeout);
+			};
+		}
+	].find(Boolean);
+
+	window.cancelAnimationFrame = [
+		window.oCancelAnimationFrame,
+		window.msCancelAnimationFrame,
+		window.mozCancelAnimationFrame,
+		window.webkitCancelAnimationFrame,
+		window.cancelRequestAnimationFrame,
+		window.oCancelRequestAnimationFrame,
+		window.msCancelRequestAnimationFrame,
+		window.mozCancelRequestAnimationFrame,
+		window.webkitCancelRequestAnimationFrame,
+		window.clearTimeout
+	].find(Boolean);
+
+};
+
 
 /**
  * Element traversal polyfill
@@ -697,9 +702,11 @@ window.cancelAnimationFrame = [
  * dataset polyfill
  * simple implementation: the new property will not create an attribute
  */
-window.DOMStringMap = window.DOMStringMap || function () {};
-
 "dataset" in document.documentElement || new function () {
+
+	if (!window.DOMStringMap) {
+		window.DOMStringMap = function () {};
+	}
 
 	function toUpperCase(str) {
 		return str.charAt(1).toUpperCase();
@@ -739,9 +746,29 @@ window.DOMStringMap = window.DOMStringMap || function () {};
 };
 
 /**
+ * matches polyfill
+ */
+HTMLElement.prototype.matches || new function () {
+
+	var proto = HTMLElement.prototype;
+
+	proto.matches = [
+		proto.matchesSelector,
+		proto.oMatchesSelector,
+		proto.msMatchesSelector,
+		proto.mozMatchesSelector,
+		proto.webkitMatchesSelector,
+		function (selector) {
+			return Array.indexOf(document.querySelectorAll(selector), this) != -1;
+		}
+	].find(Boolean);
+
+};
+
+/**
  * Promise polyfill
  */
-window.Promise = window.Promise || new function () {
+window.Promise || new function () {
 
 	var PENDING = 0,
 		SETTED  = 1;
@@ -769,7 +796,7 @@ window.Promise = window.Promise || new function () {
 
 	Object.assign(Promise, {
 
-		//todo thanable value support, fix IE8
+		//todo thenable value support
 		resolve: function (value) {
 			if (value instanceof Promise) {
 				return value;
@@ -827,10 +854,10 @@ window.Promise = window.Promise || new function () {
 				});
 			}
 
-			function nextReject(error) {
+			function nextReject(reason) {
 				setImmediate(function () {
 					if (promise.onRejected) {
-						promise.onRejected(error);
+						promise.onRejected(reason);
 					}
 				});
 			}
@@ -845,8 +872,8 @@ window.Promise = window.Promise || new function () {
 							try {
 								lastData = onFulfilled(data);
 							}
-							catch (error) {
-								nextReject(error);
+							catch (reason) {
+								nextReject(reason);
 								crashed = true;
 							}
 						}
@@ -857,17 +884,17 @@ window.Promise = window.Promise || new function () {
 				});
 			}
 
-			function reject(error) {
+			function reject(reason) {
 				setImmediate(function () {
 					var crashed = false;
 					if (promise.state == PENDING) {
 						promise.state = SETTED;
 						if (onRejected) {
 							try {
-								onRejected(error);
+								onRejected(reason);
 							}
-							catch (error) {
-								nextReject(error);
+							catch (reason) {
+								nextReject(reason);
 								crashed = true;
 							}
 						}
@@ -881,9 +908,9 @@ window.Promise = window.Promise || new function () {
 			try {
 				promise.resolver(resolve, reject);
 			}
-			catch (error) {
+			catch (reason) {
 				if (promise.state == PENDING) {
-					reject(error);
+					reject(reason);
 				}
 			}
 
@@ -900,7 +927,7 @@ window.Promise = window.Promise || new function () {
 
 	});
 
-	return Promise;
+	window.Promise = Promise;
 
 };
 

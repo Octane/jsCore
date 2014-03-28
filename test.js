@@ -89,3 +89,47 @@ console.log("reject " + (Promise.reject(prom) === prom));
 console.log("all " + (Promise.all(prom) === prom));
 console.log("race " + (Promise.race(prom) === prom));
 */
+
+
+/*
+function spawn(generatorFunc) {
+	function continuer(verb, arg) {
+		var result;
+		try {
+			result = generator[verb](arg);
+		}
+		catch (err) {
+			return Promise.reject(err);
+		}
+		if (result.done) {
+			return result.value;
+		} else {
+			return Promise.resolve(result.value).then(onFulfilled, onRejected);
+		}
+	}
+	var generator = generatorFunc();
+	var onFulfilled = continuer.bind(undefined, "next");
+	var onRejected = continuer.bind(undefined, "throw");
+	return onFulfilled();
+}
+
+function * generator() {
+
+
+	var promise = new Promise(function (resolve) {
+			resolve("O_o");
+		});
+
+	var result = yield promise;
+	alert(result);
+
+}
+
+//spawn(gen);
+
+var gen = generator(), promise = gen.next().value;
+
+promise.then(function (data) {
+	gen.next(data);
+});
+*/

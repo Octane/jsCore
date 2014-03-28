@@ -20,7 +20,7 @@ Object.assign(lib, {
 	},
 
 	isHTMLElement: function (anything) {
-		return Object(anything) instanceof HTMLElement;
+		return anything instanceof HTMLElement;
 	}
 
 });
