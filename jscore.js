@@ -557,15 +557,7 @@ window.cancelAnimationFrame = [
 		},
 
 		childElementCount: function () {
-			//return this.children.length;
-			//IE считает COMMENT_NODE
-			var children = this.children, i = children.length, count = 0;
-			while (i--) {
-				if (children[i].nodeType == 1) {
-					count++;
-				}
-			}
-			return count;
+			return this.children.length;
 		}
 
 	};
@@ -758,11 +750,17 @@ window.Promise = window.Promise || new function () {
 		return promise.state == SETTED;
 	}
 
+	function tryResolve(promises, resolve, results) {
+		if (Array.every(promises, isSetted)) {
+			resolve(results);
+		}
+	}
+
 	function Promise(resolver) {
 		if (typeof resolver != "function") {
 			throw TypeError("Promise resolver is not a function");
 		}
-		if (Object(this).constructor !== Promise) {
+		if (!(this instanceof Promise)) {
 			return new Promise(resolver);
 		}
 		this.resolver = resolver;
@@ -773,7 +771,7 @@ window.Promise = window.Promise || new function () {
 
 		//todo thanable value support, fix IE8
 		resolve: function (value) {
-			if (Object(value).constructor === Promise) {
+			if (value instanceof Promise) {
 				return value;
 			}
 			return new Promise(function (resolve) {
@@ -800,17 +798,12 @@ window.Promise = window.Promise || new function () {
 
 		all: function (promises) {
 			return new Promise(function (resolve, reject) {
-				var results = Array(promises.length);
-				function tryResolve() {
-					if (Array.every(promises, isSetted)) {
-						resolve(results);
-					}
-				}
+				var results = [];
 				Array.forEach(promises, function (promise, index) {
 					promise.then(
 						function (data) {
 							results[index] = data;
-							tryResolve();
+							tryResolve(promises, resolve, results);
 						},
 						reject
 					);
@@ -1231,6 +1224,37 @@ window.getComputedStyle = window.getComputedStyle || new function () {
 		this.innerText = value;
 	}
 });
+
+/**
+ * IE8 children fix
+ */
+document.createElement("div").appendChild(document.createComment("test")).parentNode.children.length && new function () {
+
+	var ELEMENT_NODE = 1;
+
+	function StaticHTMLCollection() {}
+
+	StaticHTMLCollection.prototype.item = function (index) {
+		return this[index] || null;
+	};
+
+	Object.defineProperty(HTMLElement.prototype, "children", {
+		get: function () {
+			var i = 0, node, nodes = this.childNodes, length = nodes.length,
+				j = 0, elements = new StaticHTMLCollection;
+			while (i < length) {
+				node = nodes[i];
+				if (node.nodeType == ELEMENT_NODE) {
+					elements[j++] = node;
+				}
+				i++;
+			}
+			elements.length = j;
+			return elements;
+		}
+	});
+
+};
 
 
 /**

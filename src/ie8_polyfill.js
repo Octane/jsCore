@@ -317,3 +317,34 @@ window.getComputedStyle = window.getComputedStyle || new function () {
 		this.innerText = value;
 	}
 });
+
+/**
+ * IE8 children fix
+ */
+document.createElement("div").appendChild(document.createComment("test")).parentNode.children.length && new function () {
+
+	var ELEMENT_NODE = 1;
+
+	function StaticHTMLCollection() {}
+
+	StaticHTMLCollection.prototype.item = function (index) {
+		return this[index] || null;
+	};
+
+	Object.defineProperty(HTMLElement.prototype, "children", {
+		get: function () {
+			var i = 0, node, nodes = this.childNodes, length = nodes.length,
+				j = 0, elements = new StaticHTMLCollection;
+			while (i < length) {
+				node = nodes[i];
+				if (node.nodeType == ELEMENT_NODE) {
+					elements[j++] = node;
+				}
+				i++;
+			}
+			elements.length = j;
+			return elements;
+		}
+	});
+
+};
