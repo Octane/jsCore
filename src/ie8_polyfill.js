@@ -5,7 +5,7 @@ try {
 	Object.defineProperty({}, "test", {});
 }
 catch (error) {
-	DOMStringMap = function () {
+	StaticDOMStringMap = function () {
 		return document.createElement("dataset");
 	};
 }
@@ -57,7 +57,7 @@ new function () {
 	catch (error) {
 		Array.slice = function (iterable, start, end) {
 			var length = arguments.length;
-			//IE8: Object(NodeList) instanceof Object → false
+			//IE8: NodeList instanceof Object → false
 			var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
 			//IE8: [1].slice(0, undefined) → []
 			if (length == 1 || (length == 2 && start == 0)) {
@@ -352,30 +352,16 @@ window.getComputedStyle || new function () {
 /**
  * IE8 children fix
  */
-document.createElement("div").appendChild(document.createComment("test")).parentNode.children.length && new function () {
+(function () {
 
-	var ELEMENT_NODE = 1;
+	var node = document.createElement("div");
+	node.appendChild(document.createComment("test"));
+	return node.children.length;
 
-	function StaticHTMLCollection() {}
-
-	StaticHTMLCollection.prototype.item = function (index) {
-		return this[index] || null;
-	};
+}()) && new function () {
 
 	Object.defineProperty(HTMLElement.prototype, "children", {
-		get: function () {
-			var i = 0, node, nodes = this.childNodes, length = nodes.length,
-				j = 0, elements = new StaticHTMLCollection;
-			while (i < length) {
-				node = nodes[i];
-				if (node.nodeType == ELEMENT_NODE) {
-					elements[j++] = node;
-				}
-				i++;
-			}
-			elements.length = j;
-			return elements;
-		}
+		get: Object.getOwnPropertyDescriptor(HTMLDocument.prototype, "children").get
 	});
 
 };

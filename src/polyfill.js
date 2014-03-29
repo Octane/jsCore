@@ -318,7 +318,7 @@ new function () {
 		},
 
 		repeat: function (count) {
-			return Array(count + 1).join(this);
+			return new Array(count + 1).join(this);
 		},
 
 		trim: new function () {
@@ -567,10 +567,43 @@ window.requestAnimationFrame || new function () {
 
 	};
 
-	Object.keys(api).forEach(function (key) {
-		Object.defineProperty(HTMLElement.prototype, key, {
-			get: api[key]
+	[HTMLDocument, HTMLElement].forEach(function (Constructor) {
+		Object.keys(api).forEach(function (key) {
+			Object.defineProperty(Constructor.prototype, key, {
+				get: api[key]
+			});
 		});
+	});
+
+};
+
+/**
+ * Element traversal polyfill (children)
+ */
+"children" in document.createDocumentFragment() || new function () {
+
+	var ELEMENT_NODE = 1;
+
+	function StaticHTMLCollection() {}
+
+	StaticHTMLCollection.prototype.item = function (index) {
+		return this[index] || null;
+	};
+
+	Object.defineProperty((window.DocumentFragment || window.HTMLDocument).prototype, "children", {
+		get: function () {
+			var i = 0, node, nodes = this.childNodes, length = nodes.length,
+				j = 0, elements = new StaticHTMLCollection;
+			while (i < length) {
+				node = nodes[i];
+				if (node.nodeType == ELEMENT_NODE) {
+					elements[j++] = node;
+				}
+				i++;
+			}
+			elements.length = j;
+			return elements;
+		}
 	});
 
 };
@@ -702,11 +735,8 @@ window.requestAnimationFrame || new function () {
  * dataset polyfill
  * simple implementation: the new property will not create an attribute
  */
+function StaticDOMStringMap() {}
 "dataset" in document.documentElement || new function () {
-
-	if (!window.DOMStringMap) {
-		window.DOMStringMap = function () {};
-	}
 
 	function toUpperCase(str) {
 		return str.charAt(1).toUpperCase();
@@ -739,7 +769,7 @@ window.requestAnimationFrame || new function () {
 
 	Object.defineProperty(HTMLElement.prototype, "dataset", {
 		get: function () {
-			return fillDataset(new DOMStringMap, this.attributes);
+			return fillDataset(new StaticDOMStringMap, this.attributes);
 		}
 	});
 
@@ -750,7 +780,26 @@ window.requestAnimationFrame || new function () {
  */
 HTMLElement.prototype.matches || new function () {
 
-	var proto = HTMLElement.prototype;
+	var ELEMENT_NODE = 1, proto = HTMLElement.prototype;
+
+	function isContains(root, element, selector) {
+		return Array.indexOf(root.querySelectorAll(selector), element) != -1;
+	}
+
+	function matches(selector) {
+		var root = this.parentNode, contains;
+		if (root) {
+			if (root.nodeType == ELEMENT_NODE) {
+				root = root.ownerDocument;
+			}
+			return isContains(root, this, selector);
+		}
+		root = document.createDocumentFragment();
+		root.appendChild(this);
+		contains = isContains(root, this, selector);
+		root.removeChild(this);
+		return contains;
+	}
 
 	proto.matches = [
 		proto.matchesSelector,
@@ -758,9 +807,7 @@ HTMLElement.prototype.matches || new function () {
 		proto.msMatchesSelector,
 		proto.mozMatchesSelector,
 		proto.webkitMatchesSelector,
-		function (selector) {
-			return Array.indexOf(document.querySelectorAll(selector), this) != -1;
-		}
+		matches
 	].find(Boolean);
 
 };
@@ -770,24 +817,25 @@ HTMLElement.prototype.matches || new function () {
  */
 window.Promise || new function () {
 
-	var PENDING = 0,
-		SETTED  = 1;
+	var PENDING = 0, SETTED  = 1;
+
+	function isPromise(anything) {
+		return anything instanceof Promise;
+	}
 
 	function isSetted(promise) {
 		return promise.state == SETTED;
 	}
 
-	function tryResolve(promises, values, resolve) {
-		if (Array.every(promises, isSetted)) {
-			resolve(values);
-		}
+	function allSetted(promises) {
+		return Array.every(promises, isSetted);
 	}
 
 	function Promise(resolver) {
 		if (typeof resolver != "function") {
 			throw TypeError("Promise resolver is not a function");
 		}
-		if (!(this instanceof Promise)) {
+		if (!isPromise(this)) {
 			return new Promise(resolver);
 		}
 		this.resolver = resolver;
@@ -798,7 +846,7 @@ window.Promise || new function () {
 
 		//todo thenable value support
 		resolve: function (value) {
-			if (value instanceof Promise) {
+			if (isPromise(value)) {
 				return value;
 			}
 			return new Promise(function (resolve) {
@@ -830,7 +878,9 @@ window.Promise || new function () {
 					promise.then(
 						function (value) {
 							values[index] = value;
-							tryResolve(promises, values, resolve);
+							if (allSetted(promises)) {
+								resolve(values);
+							}
 						},
 						reject
 					);

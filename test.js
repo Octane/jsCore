@@ -1,8 +1,5 @@
 ﻿"use strict";
 
-console.clear();
-
-
 var k = 0;
 
 new Promise(function (resolve, reject) {
@@ -165,5 +162,130 @@ lib.ajax.get("MIT-LICENSE.txt").then(function (data) {
 	//console.log("ajax promise: 2nd then");
 	//todo fix IE8 stack owerflow
 
+});
+*/
+
+
+/*
+function * generatorFunc() {
+
+	var promise1 = new Promise(function (resolve) {
+		setTimeout(function () { resolve(1); }, 1000);
+	});
+
+	var first = yield promise1;
+
+	var promise2 = new Promise(function (resolve) {
+		setTimeout(function () { resolve(first + 1); }, 1000);
+	});
+
+	var second = yield promise2;
+
+	var promise3 = new Promise(function (resolve) {
+		setTimeout(function () { resolve(second + 1); }, 1000);
+	});
+
+	var third = yield promise3;
+
+	alert("result: " + third);
+
+}
+
+
+var gen = generatorFunc();
+
+gen.next().value.then(function (value) {
+
+	gen.next(value).value.then(function (value) {
+
+		gen.next(value).value.then(function (value) {
+
+			return gen.next(value).value;
+
+		});
+
+	});
+
+});
+*/
+
+/*
+function spawn(generatorFunc) {
+
+	var generator = generatorFunc();
+
+	function continuer(value) {
+		var result = generator.next(value);
+		if (result.done) {
+			return result.value;
+		} else {
+			return result.value.then(continuer);
+		}
+	}
+
+	return continuer();
+}
+
+spawn(function * () {
+
+	var promise1 = new Promise(function (resolve) {
+		setTimeout(function () { resolve(1); }, 1000);
+	});
+
+	var first = yield promise1;
+
+	var promise2 = new Promise(function (resolve) {
+		setTimeout(function () { resolve(first + 1); }, 1000);
+	});
+
+	var second = yield promise2;
+
+	var promise3 = new Promise(function (resolve) {
+		setTimeout(function () { resolve(second + 1); }, 1000);
+	});
+
+	var third = yield promise3;
+
+	alert("result: " + third);
+
+});
+*/
+
+/*
+function promiseQueue(promises) {
+	return new Promise(function (resolve) {
+		var values = [];
+		function fulfill(index) {
+			var promise = promises[index];
+			if (promise) {
+				promise.then(function (value) {
+					values[index] = value;
+					fulfill(index + 1);
+				});
+			}
+			else {
+				resolve(values);
+			}
+		}
+		fulfill(0);
+	});
+}
+
+
+var promise1 = new Promise(function (resolve) {
+	setTimeout(function () { resolve(1); }, 100);
+});
+
+var promise2 = new Promise(function (resolve) {
+	setTimeout(function () { resolve(2); }, 100);
+});
+
+var promise3 = new Promise(function (resolve) {
+	setTimeout(function () { resolve(3); }, 100);
+});
+
+
+promiseQueue([promise1, promise2, promise3]).then(function (value) {
+	alert(value);
 });
 */
