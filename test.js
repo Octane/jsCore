@@ -289,3 +289,44 @@ promiseQueue([promise1, promise2, promise3]).then(function (value) {
 	alert(value);
 });
 */
+
+var promise = new Promise(function (resolve, reject) {
+
+	setTimeout(function () {
+		resolve(1);
+		//reject(Error("test error"));
+	}, 100);
+
+});
+
+
+promise = promise.then(
+
+	function (value) {
+		var promise = new Promise(function (resolve, reject) {
+			setTimeout(function () {
+				resolve(value + 1);
+				//reject(Error("test error"));
+			}, 100);
+		});
+		return promise;
+	},
+
+	function (reason) {
+		return Error("other error");
+	}
+
+);
+
+promise = promise.then(
+
+	function (value) {
+		console.log(">>>>>>>> " + value);
+		return value;
+	},
+
+	function (reason) {
+		console.log(">>>>>>>> " + reason);
+	}
+
+);

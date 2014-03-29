@@ -817,18 +817,18 @@ HTMLElement.prototype.matches || new function () {
  */
 window.Promise || new function () {
 
-	var PENDING = 0, SETTED  = 1;
+	var PENDING = 0, SETTLED  = 1;
 
 	function isPromise(anything) {
 		return anything instanceof Promise;
 	}
 
-	function isSetted(promise) {
-		return promise.state == SETTED;
+	function isSettled(promise) {
+		return promise.state == SETTLED;
 	}
 
-	function allSetted(promises) {
-		return Array.every(promises, isSetted);
+	function allSettled(promises) {
+		return Array.every(promises, isSettled);
 	}
 
 	function Promise(resolver) {
@@ -878,7 +878,7 @@ window.Promise || new function () {
 					promise.then(
 						function (value) {
 							values[index] = value;
-							if (allSetted(promises)) {
+							if (allSettled(promises)) {
 								resolve(values);
 							}
 						},
@@ -917,7 +917,7 @@ window.Promise || new function () {
 					var crashed;
 					lastValue = value;
 					if (promise.state == PENDING) {
-						promise.state = SETTED;
+						promise.state = SETTLED;
 						if (onFulfilled) {
 							try {
 								lastValue = onFulfilled(value);
@@ -928,7 +928,12 @@ window.Promise || new function () {
 							}
 						}
 						if (!crashed) {
-							nextResolve(lastValue);
+							if (isPromise(lastValue)) {
+								lastValue.then(nextResolve, nextReject);
+							}
+							else {
+								nextResolve(lastValue);
+							}
 						}
 					}
 				});
@@ -938,7 +943,7 @@ window.Promise || new function () {
 				setImmediate(function () {
 					var crashed;
 					if (promise.state == PENDING) {
-						promise.state = SETTED;
+						promise.state = SETTLED;
 						if (onRejected) {
 							try {
 								onRejected(reason);
