@@ -777,9 +777,9 @@ window.Promise || new function () {
 		return promise.state == SETTED;
 	}
 
-	function tryResolve(promises, resolve, results) {
+	function tryResolve(promises, resolve, values) {
 		if (Array.every(promises, isSetted)) {
-			resolve(results);
+			resolve(values);
 		}
 	}
 
@@ -825,12 +825,12 @@ window.Promise || new function () {
 
 		all: function (promises) {
 			return new Promise(function (resolve, reject) {
-				var results = [];
+				var values = [];
 				Array.forEach(promises, function (promise, index) {
 					promise.then(
 						function (value) {
-							results[index] = value;
-							tryResolve(promises, resolve, results);
+							values[index] = value;
+							tryResolve(promises, resolve, values);
 						},
 						reject
 					);

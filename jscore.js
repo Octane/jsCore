@@ -777,9 +777,9 @@ window.Promise || new function () {
 		return promise.state == SETTED;
 	}
 
-	function tryResolve(promises, resolve, results) {
+	function tryResolve(promises, resolve, values) {
 		if (Array.every(promises, isSetted)) {
-			resolve(results);
+			resolve(values);
 		}
 	}
 
@@ -825,12 +825,12 @@ window.Promise || new function () {
 
 		all: function (promises) {
 			return new Promise(function (resolve, reject) {
-				var results = [];
+				var values = [];
 				Array.forEach(promises, function (promise, index) {
 					promise.then(
-						function (data) {
-							results[index] = data;
-							tryResolve(promises, resolve, results);
+						function (value) {
+							values[index] = value;
+							tryResolve(promises, resolve, values);
 						},
 						reject
 					);
@@ -844,12 +844,12 @@ window.Promise || new function () {
 
 		then: function (onFulfilled, onRejected) {
 
-			var promise = this, lastData;
+			var promise = this, lastValue;
 
-			function nextResolve(data) {
+			function nextResolve(value) {
 				setImmediate(function () {
 					if (promise.onFulfilled) {
-						promise.onFulfilled(data);
+						promise.onFulfilled(value);
 					}
 				});
 			}
@@ -862,23 +862,23 @@ window.Promise || new function () {
 				});
 			}
 
-			function resolve(data) {
+			function resolve(value) {
 				setImmediate(function () {
-					var crashed = false;
-					lastData = data;
+					var crashed;
+					lastValue = value;
 					if (promise.state == PENDING) {
 						promise.state = SETTED;
 						if (onFulfilled) {
 							try {
-								lastData = onFulfilled(data);
+								lastValue = onFulfilled(value);
 							}
 							catch (reason) {
-								nextReject(reason);
 								crashed = true;
+								nextReject(reason);
 							}
 						}
 						if (!crashed) {
-							nextResolve(lastData);
+							nextResolve(lastValue);
 						}
 					}
 				});
@@ -886,7 +886,7 @@ window.Promise || new function () {
 
 			function reject(reason) {
 				setImmediate(function () {
-					var crashed = false;
+					var crashed;
 					if (promise.state == PENDING) {
 						promise.state = SETTED;
 						if (onRejected) {
@@ -894,12 +894,13 @@ window.Promise || new function () {
 								onRejected(reason);
 							}
 							catch (reason) {
-								nextReject(reason);
 								crashed = true;
+								nextReject(reason);
+
 							}
 						}
 						if (!crashed) {
-							nextResolve(lastData);
+							nextResolve(lastValue);
 						}
 					}
 				});
