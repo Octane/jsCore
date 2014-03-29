@@ -777,7 +777,7 @@ window.Promise || new function () {
 		return promise.state == SETTED;
 	}
 
-	function tryResolve(promises, resolve, values) {
+	function tryResolve(promises, values, resolve) {
 		if (Array.every(promises, isSetted)) {
 			resolve(values);
 		}
@@ -830,7 +830,7 @@ window.Promise || new function () {
 					promise.then(
 						function (value) {
 							values[index] = value;
-							tryResolve(promises, resolve, values);
+							tryResolve(promises, values, resolve);
 						},
 						reject
 					);

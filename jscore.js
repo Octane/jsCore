@@ -777,7 +777,7 @@ window.Promise || new function () {
 		return promise.state == SETTED;
 	}
 
-	function tryResolve(promises, resolve, values) {
+	function tryResolve(promises, values, resolve) {
 		if (Array.every(promises, isSetted)) {
 			resolve(values);
 		}
@@ -830,7 +830,7 @@ window.Promise || new function () {
 					promise.then(
 						function (value) {
 							values[index] = value;
-							tryResolve(promises, resolve, values);
+							tryResolve(promises, values, resolve);
 						},
 						reject
 					);
@@ -1037,8 +1037,15 @@ document.addEventListener || new function () {
 	}
 
 	function createEventListener(callbacks, element) {
-		return function () {
-			var event = fixEvent(window.event), i = 0, length = callbacks.length;
+		return function (event) {
+			var i = 0, length = callbacks.length, type;
+			if (event) {
+				//custom event
+				event.target = element;
+			}
+			else {
+				event = fixEvent(window.event);
+			}
 			while (i < length) {
 				setImmediate(fastBind(callbacks[i], element), event);
 				i++;
@@ -1062,6 +1069,7 @@ document.addEventListener || new function () {
 			};
 			event.listener = createEventListener(event.callbacks, element);
 			events[eventType] = event;
+			//todo exclude custom event
 			this.attachEvent("on" + eventType, event.listener);
 		}
 		if (event.callbacks.indexOf(callback) == -1) {
@@ -1162,8 +1170,28 @@ document.addEventListener || new function () {
 		});
 	}
 
+	function CustomEvent() {}
+
+	CustomEvent.prototype.initCustomEvent = function (type, bubbles, cancelable, detail) {
+		Object.assign(this, {
+			type: type,
+			bubbles: bubbles,
+			cancelable: cancelable,
+			detail: detail
+		});
+	}
+
 	function dispatchEvent(event) {
-		this.fireEvent("on" + event.type, event);
+		var events;
+		if (event instanceof CustomEvent) {
+			events = this._events;
+			if (events && events[event.type]) {
+				events[event.type].listener(event);
+			}
+		}
+		else {
+			this.fireEvent("on" + event.type, event);
+		}
 	}
 
 	[Window, HTMLDocument, HTMLElement, XMLHttpRequest].forEach(function (eventTarget) {
@@ -1173,7 +1201,10 @@ document.addEventListener || new function () {
 		proto.removeEventListener = removeEventListener;
 	});
 
-	HTMLDocument.prototype.createEvent = function () {
+	HTMLDocument.prototype.createEvent = function (group) {
+		if (group == "CustomEvent") {
+			return new CustomEvent;
+		}
 		return Object.assign(document.createEventObject(), {
 			initEvent: initEvent,
 			initUIEvent: initUIEvent,
@@ -1281,6 +1312,56 @@ document.createElement("div").appendChild(document.createComment("test")).parent
 			return elements;
 		}
 	});
+
+};
+
+/**
+ * IE8 XHMLHttpRequest events polyfill
+ */
+"onload" in new XMLHttpRequest || new function () {
+
+	var refreshRate = 100, proto = XMLHttpRequest.prototype,
+		send = proto.send, abort = proto.abort;
+
+	function fireEvent(xhr, eventType, detail) {
+		var event = document.createEvent("CustomEvent");
+		event.initCustomEvent(eventType, false, false, null);
+		xhr.dispatchEvent(event);
+		event.target = xhr;
+		eventType = "on" + eventType;
+		if (xhr[eventType]) {
+			setImmediate(function () {
+				xhr[eventType](event);
+			});
+		}
+	}
+
+	proto.send = function (data) {
+		var xhr = this;
+		function check() {
+			if (xhr.readyState == 4) {
+				if (xhr.status >= 200 && xhr.status < 400) {
+					fireEvent(xhr, "load");
+				}
+				else {
+					fireEvent(xhr, "error");
+				}
+			}
+			else {
+				xhr.timeoutId = setTimeout(check, refreshRate);
+			}
+		}
+		//todo send FormData
+		send.call(xhr, arguments.length ? data : null);
+		xhr.timeoutId = setTimeout(check, refreshRate);
+	};
+
+	proto.abort = function () {
+		var xhr = this;
+		clearTimeout(xhr.timeoutId);
+		abort.call(xhr);
+		fireEvent(xhr, "abort");
+	};
 
 };
 
@@ -1456,7 +1537,7 @@ lib.ajax = {
 	//todo
 
 	//returns promise
-	get: function (params) {
+	get: function (url) {
 		/*
 			params = {
 				method:   string,
@@ -1468,18 +1549,17 @@ lib.ajax = {
 				async:    boolean
 			}
 		*/
-		var xhr = new XMLHttpRequest;
-		xhr.open("GET", params.url, true);
-		xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 		return new Promise(function (resolve, reject) {
-			//todo fix IE8 XHMLHttpRequest events
+			var xhr = new XMLHttpRequest;
+			xhr.open("GET", url);
+			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 			xhr.onload = function () {
 				resolve(xhr.responseText);
 			};
 			xhr.onerror = function () {
 				reject(Error(xhr.statusText));
 			};
-			xhr.send(null);
+			xhr.send();
 		});
 	}
 

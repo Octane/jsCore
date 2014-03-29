@@ -5,7 +5,7 @@ lib.ajax = {
 	//todo
 
 	//returns promise
-	get: function (params) {
+	get: function (url) {
 		/*
 			params = {
 				method:   string,
@@ -17,18 +17,17 @@ lib.ajax = {
 				async:    boolean
 			}
 		*/
-		var xhr = new XMLHttpRequest;
-		xhr.open("GET", params.url, true);
-		xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 		return new Promise(function (resolve, reject) {
-			//todo fix IE8 XHMLHttpRequest events
+			var xhr = new XMLHttpRequest;
+			xhr.open("GET", url);
+			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 			xhr.onload = function () {
 				resolve(xhr.responseText);
 			};
 			xhr.onerror = function () {
 				reject(Error(xhr.statusText));
 			};
-			xhr.send(null);
+			xhr.send();
 		});
 	}
 

@@ -133,3 +133,37 @@ promise.then(function (data) {
 	gen.next(data);
 });
 */
+
+new function () {
+
+	document.body.addEventListener("custom-event", function (event) {
+
+		console.log(event.type, event.detail);
+
+	});
+
+	var customEvent = document.createEvent("CustomEvent");
+	customEvent.initCustomEvent("custom-event", false, false, "works!");
+
+	document.body.dispatchEvent(customEvent);
+
+};
+
+
+lib.ajax.get("MIT-LICENSE.txt").then(function (data) {
+
+	var pre = document.createElement("pre");
+	pre.textContent = data;
+	document.body.appendChild(pre);
+
+}).then(function () {
+
+	console.log("ajax promise: 1st then");
+
+})/*.then(function () {
+
+	//console.log("ajax promise: 2nd then");
+	//todo fix IE8 stack owerflow
+
+});
+*/
