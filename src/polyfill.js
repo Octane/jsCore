@@ -828,8 +828,8 @@ window.Promise || new function () {
 				var results = [];
 				Array.forEach(promises, function (promise, index) {
 					promise.then(
-						function (data) {
-							results[index] = data;
+						function (value) {
+							results[index] = value;
 							tryResolve(promises, resolve, results);
 						},
 						reject
@@ -844,12 +844,12 @@ window.Promise || new function () {
 
 		then: function (onFulfilled, onRejected) {
 
-			var promise = this, lastData;
+			var promise = this, lastValue;
 
-			function nextResolve(data) {
+			function nextResolve(value) {
 				setImmediate(function () {
 					if (promise.onFulfilled) {
-						promise.onFulfilled(data);
+						promise.onFulfilled(value);
 					}
 				});
 			}
@@ -862,23 +862,23 @@ window.Promise || new function () {
 				});
 			}
 
-			function resolve(data) {
+			function resolve(value) {
 				setImmediate(function () {
-					var crashed = false;
-					lastData = data;
+					var crashed;
+					lastValue = value;
 					if (promise.state == PENDING) {
 						promise.state = SETTED;
 						if (onFulfilled) {
 							try {
-								lastData = onFulfilled(data);
+								lastValue = onFulfilled(value);
 							}
 							catch (reason) {
-								nextReject(reason);
 								crashed = true;
+								nextReject(reason);
 							}
 						}
 						if (!crashed) {
-							nextResolve(lastData);
+							nextResolve(lastValue);
 						}
 					}
 				});
@@ -886,7 +886,7 @@ window.Promise || new function () {
 
 			function reject(reason) {
 				setImmediate(function () {
-					var crashed = false;
+					var crashed;
 					if (promise.state == PENDING) {
 						promise.state = SETTED;
 						if (onRejected) {
@@ -894,12 +894,13 @@ window.Promise || new function () {
 								onRejected(reason);
 							}
 							catch (reason) {
-								nextReject(reason);
 								crashed = true;
+								nextReject(reason);
+
 							}
 						}
 						if (!crashed) {
-							nextResolve(lastData);
+							nextResolve(lastValue);
 						}
 					}
 				});
