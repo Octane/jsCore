@@ -831,6 +831,14 @@ window.Promise || new function () {
 		return Array.every(promises, isSettled);
 	}
 
+	function onFulfilled(value) {
+		return value;
+	}
+
+	function onRejected(reason) {
+		throw reason;
+	}
+
 	function Promise(resolver) {
 		if (typeof resolver != "function") {
 			throw TypeError("Promise resolver is not a function");
@@ -844,12 +852,12 @@ window.Promise || new function () {
 
 	Object.assign(Promise, {
 
-		//todo thenable value support
 		resolve: function (value) {
 			if (isPromise(value)) {
-				return value;
+				//todo thenable value support
+				return value.then(onFulfilled, onRejected);
 			}
-			return new Promise(function (resolve) {
+			return new Promise(function (resolve, reject) {
 				resolve(value);
 			});
 		},
@@ -951,7 +959,6 @@ window.Promise || new function () {
 							catch (reason) {
 								crashed = true;
 								nextReject(reason);
-
 							}
 						}
 						if (!crashed) {
