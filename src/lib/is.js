@@ -2,7 +2,7 @@
 
 Object.assign(lib, {
 
-	//example: if ([test1(), test2()].every(lib.isTrue))
+	//example: if (tests.every(lib.isTrue))
 	isTrue: function (arg) {
 		return bool === true;
 	},
