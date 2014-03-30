@@ -930,9 +930,9 @@ window.Promise || new function () {
 							try {
 								lastValue = onFulfilled(value);
 							}
-							catch (reason) {
+							catch (error) {
 								crashed = true;
-								nextReject(reason);
+								nextReject(error);
 							}
 						}
 						if (!crashed) {
@@ -956,9 +956,9 @@ window.Promise || new function () {
 							try {
 								onRejected(reason);
 							}
-							catch (reason) {
+							catch (error) {
 								crashed = true;
-								nextReject(reason);
+								nextReject(error);
 							}
 						}
 						if (!crashed) {
@@ -971,9 +971,9 @@ window.Promise || new function () {
 			try {
 				promise.resolver(resolve, reject);
 			}
-			catch (reason) {
+			catch (error) {
 				if (promise.state == PENDING) {
-					reject(reason);
+					reject(error);
 				}
 			}
 
