@@ -1124,19 +1124,17 @@ function StaticDOMStringMap() {}
 					//если documentFragment.constructor === document.constructor
 					return false;
 				}
-				//todo IE8 removedNode.parentNode != null
 				root = this.parentNode;
-				if (root === null) {
-					root = document.createDocumentFragment();
-					root.appendChild(this);
-					contains = isContains(root, this, selector);
-					root.removeChild(this);
-					return contains;
+				if (root) {
+					if (root.nodeType == Node.ELEMENT_NODE) {
+						root = root.ownerDocument;
+					}
+					return isContains(root, this, selector);
 				}
-				if (root.nodeType == Node.ELEMENT_NODE) {
-					root = root.ownerDocument;
-				}
-				return isContains(root, this, selector);
+				root = document.createDocumentFragment();
+				root.appendChild(this);
+				contains = isContains(root, this, selector);
+				root.removeChild(this);
 			}
 		].find(Boolean)
 
