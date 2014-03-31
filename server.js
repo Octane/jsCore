@@ -1,4 +1,5 @@
 "use strict";
+
 //http://stackoverflow.com/a/13635318
 var http = require("http"),
 	url  = require("url"),

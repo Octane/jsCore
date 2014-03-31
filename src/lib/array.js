@@ -44,7 +44,7 @@ lib.array = {
 			}
 		}
 		return true;
-	}
+	},
 
 	//удаляет несуществующие индексы
 	refine: function (iterable) {
