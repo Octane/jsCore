@@ -28,12 +28,11 @@ document.addEventListener || new function () {
 	function createEventListener(callbacks, element) {
 		return function (event) {
 			var i = 0, length = callbacks.length, type;
-			if (event) {
-				//custom event
+			if (event instanceof CustomEvent) {
 				event.target = element;
 			}
 			else {
-				event = fixEvent(window.event);
+				event = fixEvent(event);
 			}
 			while (i < length) {
 				setImmediate(fastBind(callbacks[i], element), event);

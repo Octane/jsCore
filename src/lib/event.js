@@ -9,6 +9,58 @@ lib.event = {
 
 	stopPropagation: function (event) {
 		event.stopPropagation();
+	},
+
+	//returns promise
+	when: function (eventType, selector, root) {
+		return Promise.resolve(new Promise(function (resolve) {
+			lib.event.one(eventType, selector, root, resolve);
+		}));
+	},
+
+	one: function (eventType, selector, root, callback) {
+		var eventDetails = lib.event.on(eventType, selector, root, function (event) {
+			lib.event.off(eventDetails);
+			callback(event);
+		});
+		return eventDetails;
+	},
+
+	//returns event details
+	on: function (eventType, selector, root, callback) {
+		var listener;
+		if (typeof root == "function") {
+			callback = root;
+			root = document;
+		}
+		if (typeof selector != "string") {
+			root = selector;
+			selector = "";
+		}
+		if (!root) {
+			root = document;
+		}
+		if (selector) {
+			listener = function (event) {
+				var target = event.target;
+				if (target.matches && target.matches(selector)) {
+					callback.call(root, event);
+				}
+			};
+		}
+		else {
+			listener = callback;
+		}
+		root.addEventListener(eventType, listener);
+		return {
+			root: root,
+			type: eventType,
+			callback: listener
+		};
+	},
+
+	off: function (eventDetails) {
+		eventDetails.root.removeEventListener(eventDetails.type, eventDetails.callback);
 	}
 
 };

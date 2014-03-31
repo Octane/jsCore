@@ -28,14 +28,14 @@ lib.array = {
 
 	//Array.every игнорирует пропущенные индексы,
 	//и всегда возвращает true для пустого массива
-	every: function (iterable, func, boundThis) {
+	all: function (iterable, func, boundThis) {
 		var i = Object(iterable).length;
 		if (!i) {
 			return false;
 		}
 		while (i--) {
 			if (i in iterable) {
-				if (func.call(boundThis, iterable[i]) === false) {
+				if (!func.call(boundThis, iterable[i])) {
 					return false;
 				}
 			}
@@ -44,6 +44,32 @@ lib.array = {
 			}
 		}
 		return true;
+	},
+
+	any: function (iterable, func, boundThis) {
+		var i = Object(iterable).length;
+		if (!i) {
+			return false;
+		}
+		while (i--) {
+			if (i in iterable) {
+				if (func.call(boundThis, iterable[i])) {
+					return true;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		return false;
+	},
+
+	//удаляет несуществующие индексы
+	refine: function (iterable) {
+		return Array.reduce(iterable, function (array, anything) {
+			array.push(anything);
+			return array;
+		}, []);
 	}
 
 };

@@ -1119,18 +1119,24 @@ function StaticDOMStringMap() {}
 			proto.mozMatchesSelector,
 			proto.webkitMatchesSelector,
 			function (selector) {
-				var root = this.parentNode, contains;
-				if (root) {
-					if (root.nodeType == Node.ELEMENT_NODE) {
-						root = root.ownerDocument;
-					}
-					return isContains(root, this, selector);
+				var root, contains;
+				if (this === document) {
+					//если documentFragment.constructor === document.constructor
+					return false;
 				}
-				root = document.createDocumentFragment();
-				root.appendChild(this);
-				contains = isContains(root, this, selector);
-				root.removeChild(this);
-				return contains;
+				//todo IE8 removedNode.parentNode != null
+				root = this.parentNode;
+				if (root === null) {
+					root = document.createDocumentFragment();
+					root.appendChild(this);
+					contains = isContains(root, this, selector);
+					root.removeChild(this);
+					return contains;
+				}
+				if (root.nodeType == Node.ELEMENT_NODE) {
+					root = root.ownerDocument;
+				}
+				return isContains(root, this, selector);
 			}
 		].find(Boolean)
 
@@ -1278,12 +1284,11 @@ document.addEventListener || new function () {
 	function createEventListener(callbacks, element) {
 		return function (event) {
 			var i = 0, length = callbacks.length, type;
-			if (event) {
-				//custom event
+			if (event instanceof CustomEvent) {
 				event.target = element;
 			}
 			else {
-				event = fixEvent(window.event);
+				event = fixEvent(event);
 			}
 			while (i < length) {
 				setImmediate(fastBind(callbacks[i], element), event);
@@ -1562,11 +1567,11 @@ var lib = {};
 Object.assign(lib, {
 
 	//example: if (tests.every(lib.isTrue))
-	isTrue: function (arg) {
+	isTrue: function (bool) {
 		return bool === true;
 	},
 
-	isFalse: function (arg) {
+	isFalse: function (bool) {
 		return bool === false;
 	},
 
@@ -1625,14 +1630,14 @@ lib.array = {
 
 	//Array.every игнорирует пропущенные индексы,
 	//и всегда возвращает true для пустого массива
-	every: function (iterable, func, boundThis) {
+	all: function (iterable, func, boundThis) {
 		var i = Object(iterable).length;
 		if (!i) {
 			return false;
 		}
 		while (i--) {
 			if (i in iterable) {
-				if (func.call(boundThis, iterable[i]) === false) {
+				if (!func.call(boundThis, iterable[i])) {
 					return false;
 				}
 			}
@@ -1641,6 +1646,32 @@ lib.array = {
 			}
 		}
 		return true;
+	},
+
+	any: function (iterable, func, boundThis) {
+		var i = Object(iterable).length;
+		if (!i) {
+			return false;
+		}
+		while (i--) {
+			if (i in iterable) {
+				if (func.call(boundThis, iterable[i])) {
+					return true;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		return false;
+	},
+
+	//удаляет несуществующие индексы
+	refine: function (iterable) {
+		return Array.reduce(iterable, function (array, anything) {
+			array.push(anything);
+			return array;
+		}, []);
 	}
 
 };
@@ -1655,6 +1686,58 @@ lib.event = {
 
 	stopPropagation: function (event) {
 		event.stopPropagation();
+	},
+
+	//returns promise
+	when: function (eventType, selector, root) {
+		return Promise.resolve(new Promise(function (resolve) {
+			lib.event.one(eventType, selector, root, resolve);
+		}));
+	},
+
+	one: function (eventType, selector, root, callback) {
+		var eventDetails = lib.event.on(eventType, selector, root, function (event) {
+			lib.event.off(eventDetails);
+			callback(event);
+		});
+		return eventDetails;
+	},
+
+	//returns event details
+	on: function (eventType, selector, root, callback) {
+		var listener;
+		if (typeof root == "function") {
+			callback = root;
+			root = document;
+		}
+		if (typeof selector != "string") {
+			root = selector;
+			selector = "";
+		}
+		if (!root) {
+			root = document;
+		}
+		if (selector) {
+			listener = function (event) {
+				var target = event.target;
+				if (target.matches && target.matches(selector)) {
+					callback.call(root, event);
+				}
+			};
+		}
+		else {
+			listener = callback;
+		}
+		root.addEventListener(eventType, listener);
+		return {
+			root: root,
+			type: eventType,
+			callback: listener
+		};
+	},
+
+	off: function (eventDetails) {
+		eventDetails.root.removeEventListener(eventDetails.type, eventDetails.callback);
 	}
 
 };
@@ -1734,7 +1817,7 @@ lib.ajax = {
 				async:    boolean
 			}
 		*/
-		return new Promise(function (resolve, reject) {
+		return Promise.resolve(new Promise(function (resolve, reject) {
 			var xhr = new XMLHttpRequest;
 			xhr.open("GET", url);
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -1745,7 +1828,7 @@ lib.ajax = {
 				reject(Error(xhr.statusText));
 			};
 			xhr.send();
-		});
+		}));
 	}
 
 };

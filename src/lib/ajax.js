@@ -17,7 +17,7 @@ lib.ajax = {
 				async:    boolean
 			}
 		*/
-		return new Promise(function (resolve, reject) {
+		return Promise.resolve(new Promise(function (resolve, reject) {
 			var xhr = new XMLHttpRequest;
 			xhr.open("GET", url);
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -28,7 +28,7 @@ lib.ajax = {
 				reject(Error(xhr.statusText));
 			};
 			xhr.send();
-		});
+		}));
 	}
 
 };

@@ -3,11 +3,11 @@
 Object.assign(lib, {
 
 	//example: if (tests.every(lib.isTrue))
-	isTrue: function (arg) {
+	isTrue: function (bool) {
 		return bool === true;
 	},
 
-	isFalse: function (arg) {
+	isFalse: function (bool) {
 		return bool === false;
 	},
 
