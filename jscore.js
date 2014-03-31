@@ -1644,25 +1644,7 @@ lib.array = {
 			}
 		}
 		return true;
-	},
-
-	any: function (iterable, func, boundThis) {
-		var i = Object(iterable).length;
-		if (!i) {
-			return false;
-		}
-		while (i--) {
-			if (i in iterable) {
-				if (func.call(boundThis, iterable[i])) {
-					return true;
-				}
-			}
-			else {
-				return false;
-			}
-		}
-		return false;
-	},
+	}
 
 	//удаляет несуществующие индексы
 	refine: function (iterable) {
