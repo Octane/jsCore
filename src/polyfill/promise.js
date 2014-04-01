@@ -133,7 +133,7 @@ window.Promise || new function () {
 					settled = true;
 					setImmediate(function () {
 						try {
-							promise._value = onFulfilled(value);
+							promise._value = onFulfilled(promise._value);
 							promise._fulfilled = true;
 						}
 						catch (error) {
@@ -159,7 +159,7 @@ window.Promise || new function () {
 					settled = true;
 					setImmediate(function () {
 						try {
-							promise._reason = onRejected(reason);
+							promise._reason = onRejected(promise._reason);
 							promise._rejected = true;
 						}
 						catch (error) {
@@ -178,6 +178,9 @@ window.Promise || new function () {
 					});
 				}
 			}
+
+			onFulfilled = onFulfilled || defaultOnFulfilled;
+			onRejected = onRejected || defaultOnRejected;
 
 			try {
 				if (promise._pending) {

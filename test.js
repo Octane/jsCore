@@ -117,7 +117,7 @@ new Promise(function (resolve, reject) {
 ).then(
 	function (data) {
 		console.log("3 fulfilled");
-		throw Error("3 test error");
+		//throw Error("3 test error");
 		return ++k;
 	},
 	function (error) {
