@@ -34,3 +34,11 @@ if (!Number.toInteger) {
 		return (number < 0 ? -1 : 1) * Math.floor(Math.abs(number));
 	};
 }
+
+if (!Number.parseInt) {
+	Number.parseInt = parseInt;
+}
+
+if (!Number.parseFloat) {
+	Number.parseFloat = parseFloat;
+}

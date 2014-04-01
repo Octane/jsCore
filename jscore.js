@@ -452,6 +452,14 @@ if (!Number.toInteger) {
 		return (number < 0 ? -1 : 1) * Math.floor(Math.abs(number));
 	};
 }
+
+if (!Number.parseInt) {
+	Number.parseInt = parseInt;
+}
+
+if (!Number.parseFloat) {
+	Number.parseFloat = parseFloat;
+}
 ﻿
 
 //Array and String generic methods polyfill
@@ -558,45 +566,64 @@ window.setImmediate || new function () {
 
 window.Promise || new function () {
 
-	var PENDING = 0, SETTLED  = 1;
+	//todo thenable value support
 
 	function isPromise(anything) {
 		return anything instanceof Promise;
 	}
 
 	function isSettled(promise) {
-		return promise.state == SETTLED;
+		return promise._fulfilled || promise._rejected;
 	}
 
 	function allSettled(promises) {
 		return Array.every(promises, isSettled);
 	}
 
-	function onFulfilled(value) {
+	function defaultOnFulfilled(value) {
 		return value;
 	}
 
-	function onRejected(reason) {
+	function defaultOnRejected(reason) {
 		throw reason;
 	}
 
-	function Promise(resolver) {
-		if (typeof resolver != "function") {
-			throw TypeError("Promise resolver is not a function");
+	function tryCall(callback, data) {
+		//Aurora 30 throws exception outside, Chrome 35 catches.
+		try {
+			callback(data);
 		}
+		catch (error) {
+		}
+	}
+
+	function callEach(callbacks, data) {
+		callbacks.forEach(function (callback) {
+			setImmediate(tryCall, callback, data);
+		});
+	}
+
+	function Promise(resolver) {
 		if (!isPromise(this)) {
 			return new Promise(resolver);
 		}
-		this.resolver = resolver;
-		this.state = PENDING;
+		Object.assign(this, {
+			_resolver: resolver,
+			_pending: true,
+			_fulfilled: false,
+			_rejected: false,
+			_value: undefined,
+			_reason: undefined,
+			_onFulfilled: [],
+			_onRejected: []
+		});
 	}
 
 	Object.assign(Promise, {
 
 		resolve: function (value) {
 			if (isPromise(value)) {
-				//todo thenable value support
-				return value.then(onFulfilled, onRejected);
+				return value.then(defaultOnFulfilled, defaultOnRejected);
 			}
 			return new Promise(function (resolve, reject) {
 				resolve(value);
@@ -608,9 +635,6 @@ window.Promise || new function () {
 				reject(reason);
 			});
 		},
-
-		//not implemented in native Promise
-		//cast: function () {},
 
 		race: function (promises) {
 			return new Promise(function (resolve, reject) {
@@ -641,86 +665,111 @@ window.Promise || new function () {
 
 	Object.assign(Promise.prototype, {
 
+		_enqueue: function (onFulfilled, onRejected) {
+			this._onFulfilled.push(onFulfilled || defaultOnFulfilled);
+			this._onRejected.push(onRejected || defaultOnRejected);
+		},
+
+		_clearQueue: function () {
+			this._onFulfilled = [];
+			this._onRejected = [];
+		},
+
 		then: function (onFulfilled, onRejected) {
 
-			var promise = this, lastValue;
+			var promise = this, settled;
 
-			function nextResolve(value) {
-				setImmediate(function () {
-					if (promise.onFulfilled) {
-						promise.onFulfilled(value);
-					}
-				});
+			function fulfillQueue(value) {
+				promise._value = value;
+				callEach(promise._onFulfilled, value);
+				promise._clearQueue();
 			}
 
-			function nextReject(reason) {
-				setImmediate(function () {
-					if (promise.onRejected) {
-						promise.onRejected(reason);
-					}
-				});
+			function rejectQueue(reason) {
+				promise._reason = reason;
+				callEach(promise._onRejected, reason);
+				promise._clearQueue();
 			}
 
-			function resolve(value) {
-				setImmediate(function () {
-					var crashed;
-					lastValue = value;
-					if (promise.state == PENDING) {
-						promise.state = SETTLED;
-						if (onFulfilled) {
-							try {
-								lastValue = onFulfilled(value);
-							}
-							catch (error) {
-								crashed = true;
-								nextReject(error);
-							}
+			function onFulfilledCaller(value) {
+				promise._value = value;
+				if (!settled) {
+					settled = true;
+					setImmediate(function () {
+						try {
+							promise._value = onFulfilled(value);
+							promise._fulfilled = true;
 						}
-						if (!crashed) {
-							if (isPromise(lastValue)) {
-								lastValue.then(nextResolve, nextReject);
+						catch (error) {
+							promise._reason = error;
+							promise._rejected = true;
+							rejectQueue(promise._reason);
+						}
+						if (promise._fulfilled) {
+							if (isPromise(promise._value)) {
+								promise._value.then(fulfillQueue, rejectQueue);
 							}
 							else {
-								nextResolve(lastValue);
+								fulfillQueue(promise._value);
 							}
 						}
-					}
-				});
+					});
+				}
 			}
 
-			function reject(reason) {
-				setImmediate(function () {
-					var crashed;
-					if (promise.state == PENDING) {
-						promise.state = SETTLED;
-						if (onRejected) {
-							try {
-								onRejected(reason);
+			function onRejectedCaller(reason) {
+				promise._reason = reason;
+				if (!settled) {
+					settled = true;
+					setImmediate(function () {
+						try {
+							promise._reason = onRejected(reason);
+							promise._rejected = true;
+						}
+						catch (error) {
+							promise._reason = error;
+							promise._rejected = true;
+							rejectQueue(promise._reason);
+						}
+						if (promise._rejected) {
+							if (isPromise(promise._reason)) {
+								promise._reason.then(fulfillQueue, rejectQueue);
 							}
-							catch (error) {
-								crashed = true;
-								nextReject(error);
+							else {
+								fulfillQueue(promise._value);
 							}
 						}
-						if (!crashed) {
-							nextResolve(lastValue);
-						}
-					}
-				});
+					});
+				}
 			}
 
 			try {
-				promise.resolver(resolve, reject);
+				if (promise._pending) {
+					promise._pending = false;
+					promise._resolver(onFulfilledCaller, onRejectedCaller);
+				}
+				else {
+					if (isSettled(promise)) {
+						if (promise._fulfilled) {
+							onFulfilledCaller(promise._value);
+						}
+						else {
+							onRejectedCaller(promise._reason);
+						}
+					}
+					else {
+						promise._enqueue(onFulfilled, onRejected);
+					}
+				}
 			}
 			catch (error) {
-				if (promise.state == PENDING) {
-					reject(error);
+				if (!isSettled(promise)) {
+					onRejectedCaller(error);
 				}
 			}
 
 			return new Promise(function (resolve, reject) {
-				promise.onFulfilled = resolve;
-				promise.onRejected = reject;
+				promise._enqueue(resolve, reject);
 			});
 
 		},
