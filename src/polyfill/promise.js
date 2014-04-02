@@ -9,7 +9,7 @@ window.Promise || new function () {
 	}
 
 	function isSettled(promise) {
-		return promise._fulfilled || promise._rejected;
+		return promise._settled;
 	}
 
 	function allSettled(promises) {
@@ -46,6 +46,7 @@ window.Promise || new function () {
 		Object.assign(this, {
 			_resolver: resolver,
 			_pending: true,
+			_settled: false,
 			_fulfilled: false,
 			_rejected: false,
 			_value: undefined,
@@ -128,10 +129,11 @@ window.Promise || new function () {
 			}
 
 			function onFulfilledCaller(value) {
-				promise._value = value;
 				if (!settled) {
 					settled = true;
+					promise._value = value;
 					setImmediate(function () {
+						promise._settled = true;
 						try {
 							promise._value = onFulfilled(promise._value);
 							promise._fulfilled = true;
@@ -154,10 +156,11 @@ window.Promise || new function () {
 			}
 
 			function onRejectedCaller(reason) {
-				promise._reason = reason;
 				if (!settled) {
 					settled = true;
+					promise._reason = reason;
 					setImmediate(function () {
+						promise._settled = true;
 						try {
 							promise._reason = onRejected(promise._reason);
 							promise._rejected = true;
@@ -187,22 +190,18 @@ window.Promise || new function () {
 					promise._pending = false;
 					promise._resolver(onFulfilledCaller, onRejectedCaller);
 				}
+				else if (promise._fulfilled) {
+					onFulfilledCaller(promise._value);
+				}
+				else if (promise._rejected) {
+					onRejectedCaller(promise._reason);
+				}
 				else {
-					if (isSettled(promise)) {
-						if (promise._fulfilled) {
-							onFulfilledCaller(promise._value);
-						}
-						else {
-							onRejectedCaller(promise._reason);
-						}
-					}
-					else {
-						promise._enqueue(onFulfilled, onRejected);
-					}
+					promise._enqueue(onFulfilled, onRejected);
 				}
 			}
 			catch (error) {
-				if (!isSettled(promise)) {
+				if (!promise._fulfilled || !promise._rejected) {
 					onRejectedCaller(error);
 				}
 			}

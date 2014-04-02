@@ -26,7 +26,7 @@ lib.event.when("click", "body, pre, h1").then(function (event) {
 });
 
 // • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
-
+/*
 var promise = new Promise(function (resolve, reject) {
 
 	console.log("resolver called");
@@ -80,9 +80,9 @@ promise.then(function (value) {
 	})
 	throw reason;
 });
-
+*/
 // • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
-
+/*
 var k = 0;
 
 new Promise(function (resolve, reject) {
@@ -140,30 +140,40 @@ new Promise(function (resolve, reject) {
 ).then();
 
 console.log("k = " + k);
-
+*/
 // • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
-
+/*
 var p1 = new Promise(function (resolve, reject) {
-	//resolve("p1 resolve");
-	reject(Error("p1 reject"));
+	//setTimeout(function () {
+		//resolve(">>>p1 resolve");
+		reject(Error(">>>p1 reject"));
+	//}, 300);
 });
+p1.name = "p1";
 var p2 = new Promise(function (resolve, reject) {
-	resolve("p2 resolve");
-	//reject(Error("p2 reject"));
+	//setTimeout(function () {
+		//resolve(">>>p2 resolve");
+		reject(Error(">>>p2 reject"));
+	//}, 200);
 });
+p2.name = "p2";
 var p3 = new Promise(function (resolve, reject) {
-	//resolve("p3 resolve");
-	reject(Error("p3 reject"));
+	//setTimeout(function () {
+		//resolve(">>>p3 resolve");
+		reject(Error(">>>p3 reject"));
+	//}, 100);
 });
-
-Promise.race([p1, p2, p3]).then(function (data) {
-	console.log(data);
+p3.name = "p3";
+var all = Promise.race([p1, p2, p3]);
+all.name = "all";
+all.then(function (value) {
+	console.log("•" + value);
 }, function (error) {
 	console.log(error.message);
 });
-
+*/
 // • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
-
+/*
 new Promise(function (resolve, reject) {
 	console.log("x resolver");
 	//resolve(5);
@@ -182,3 +192,4 @@ function (reason) {
 	console.log("2 reject");
 	console.log("reason: " + reason);
 });
+*/
