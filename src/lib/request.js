@@ -25,7 +25,7 @@ lib.request = new function () {
 				resolve(xhr.responseText);
 			};
 			xhr.onerror = function () {
-				reject(Error(xhr.statusText));
+				reject(new Error(xhr.statusText));
 			};
 			xhr.send();
 		}));

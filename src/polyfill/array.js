@@ -4,7 +4,7 @@ if (!Array.from) {
 	Array.from = function (iterable) {
 		if (arguments.length > 1) {
 			//todo map
-			throw Error("Array.from implementation only accepts the first parameter");
+			throw new Error("Array.from implementation only accepts the first parameter");
 		}
 		return Object(iterable).length ? Array.slice(iterable, 0) : [];
 	};

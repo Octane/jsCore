@@ -15,7 +15,7 @@ if (!Function.prototype.bind) {
 
 		return function (boundThis) {
 			if (typeof this != "function") {
-				throw TypeError("Function.prototype.bind called on non-function");
+				throw new TypeError("Function.prototype.bind called on non-function");
 			}
 			var targetFunc = this, boundArgs = Array.slice(arguments, 1);
 			function boundFunc() {

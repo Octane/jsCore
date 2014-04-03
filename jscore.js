@@ -61,7 +61,7 @@ if (!window.HTMLElement) {
 if (!Object.create) {
 	Object.create = function (prototype) {
 		if (arguments.length > 1) {
-			throw Error("Object.create implementation only accepts the first parameter");
+			throw new Error("Object.create implementation only accepts the first parameter");
 		}
 		function NOP() {}
 		NOP.prototype = prototype;
@@ -169,7 +169,7 @@ if (!Array.prototype.reduce) {
 		var i = 0, length = this.length, currentValue;
 		if (arguments.length < 2) {
 			if (!length) {
-				throw TypeError("Reduce of empty array with no initial value");
+				throw new TypeError("Reduce of empty array with no initial value");
 			}
 			while (i < length) {
 				if (i in this) {
@@ -198,7 +198,7 @@ if (!Array.prototype.reduceRight) {
 		var i = this.length, currentValue;
 		if (arguments.length < 2) {
 			if (!this.length) {
-				throw TypeError("Reduce of empty array with no initial value");
+				throw new TypeError("Reduce of empty array with no initial value");
 			}
 			while (i--) {
 				if (i in this) {
@@ -235,7 +235,7 @@ if (!Function.prototype.bind) {
 
 		return function (boundThis) {
 			if (typeof this != "function") {
-				throw TypeError("Function.prototype.bind called on non-function");
+				throw new TypeError("Function.prototype.bind called on non-function");
 			}
 			var targetFunc = this, boundArgs = Array.slice(arguments, 1);
 			function boundFunc() {
@@ -274,8 +274,8 @@ if (!String.prototype.trim) {
 		//https://github.com/kriskowal/es5-shim/
 		var whitespace = "[\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF]",
 			//http://blog.stevenlevithan.com/archives/faster-trim-javascript/
-			left = RegExp("^" + whitespace + whitespace + "*"),
-			right = RegExp(whitespace + whitespace + "*$");
+			left = new RegExp("^" + whitespace + whitespace + "*"),
+			right = new RegExp(whitespace + whitespace + "*$");
 		return function () {
 			return this.replace(left, "").replace(right, "");
 		};
@@ -315,7 +315,7 @@ if (!Array.from) {
 	Array.from = function (iterable) {
 		if (arguments.length > 1) {
 			//todo map
-			throw Error("Array.from implementation only accepts the first parameter");
+			throw new Error("Array.from implementation only accepts the first parameter");
 		}
 		return Object(iterable).length ? Array.slice(iterable, 0) : [];
 	};
@@ -603,9 +603,6 @@ window.Promise || new function () {
 	}
 
 	function Promise(resolver) {
-		if (!isPromise(this)) {
-			return new Promise(resolver);
-		}
 		Object.assign(this, {
 			_resolver: resolver,
 			_pending: true,
@@ -1857,7 +1854,7 @@ lib.request = new function () {
 				resolve(xhr.responseText);
 			};
 			xhr.onerror = function () {
-				reject(Error(xhr.statusText));
+				reject(new Error(xhr.statusText));
 			};
 			xhr.send();
 		}));

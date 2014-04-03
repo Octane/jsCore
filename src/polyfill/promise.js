@@ -39,9 +39,6 @@ window.Promise || new function () {
 	}
 
 	function Promise(resolver) {
-		if (!isPromise(this)) {
-			return new Promise(resolver);
-		}
 		Object.assign(this, {
 			_resolver: resolver,
 			_pending: true,
