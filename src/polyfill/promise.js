@@ -25,7 +25,6 @@ window.Promise || new function () {
 	}
 
 	function tryCall(callback, data) {
-		//Aurora 30 throws exception outside, Chrome 35 catches.
 		try {
 			callback(data);
 		}

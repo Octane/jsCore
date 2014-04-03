@@ -206,6 +206,8 @@ document.addEventListener || new function () {
 
 "onload" in new XMLHttpRequest || new function () {
 
+	//todo ontimeout
+
 	var refreshRate = 100, proto = XMLHttpRequest.prototype,
 		send = proto.send, abort = proto.abort;
 

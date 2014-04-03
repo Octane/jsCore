@@ -1,11 +1,8 @@
 "use strict";
 
-lib.ajax = {
+lib.request = new function () {
 
-	//todo
-
-	//returns promise
-	get: function (url) {
+	function request(params) {
 		/*
 			params = {
 				method:   string,
@@ -17,6 +14,9 @@ lib.ajax = {
 				async:    boolean
 			}
 		*/
+	}
+
+	request.get = function (url) {
 		return Promise.resolve(new Promise(function (resolve, reject) {
 			var xhr = new XMLHttpRequest;
 			xhr.open("GET", url);
@@ -29,6 +29,8 @@ lib.ajax = {
 			};
 			xhr.send();
 		}));
-	}
+	};
+
+	return request;
 
 };

@@ -11,10 +11,19 @@ http.createServer(function (request, response) {
 		filename = path.join(process.cwd(), uri),
 		contentTypesByExtension = {
 			".html": "text/html",
-			".txt":  "text/plain",
-			".css":  "text/css",
-			".js":   "text/javascript",
-			".ico":  "image/x-icon"
+			".css": "text/css",
+			".gif": "image/gif",
+			".ico": "image/x-icon",
+			".jpeg": "image/jpeg",
+			".jpg": "image/jpeg",
+			".js": "text/javascript",
+			".json": "application/json",
+			".pdf": "application/pdf",
+			".png": "image/png",
+			".svg": "image/svg+xml",
+			".swf": "application/x-shockwave-flash",
+			".txt": "text/plain",
+			".xml": "text/xml"
 		};
 		fs.exists(filename, function (exists) {
 			var headers, contentType;

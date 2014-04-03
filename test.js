@@ -2,7 +2,7 @@
 
 // • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
 
-lib.ajax.get("MIT-LICENSE.txt").then(function (data) {
+lib.request.get("MIT-LICENSE.txt").then(function (data) {
 
 	var pre = document.createElement("pre");
 	pre.append(data);

@@ -372,7 +372,7 @@ function StaticDOMStringMap() {}
 
 	Object.keys(api).forEach(implement);
 
-	proto = document.constructor;
+	proto = document.constructor.prototype;
 	["query", "queryAll"].forEach(implement);
 
 	proto = document.createDocumentFragment().constructor.prototype;

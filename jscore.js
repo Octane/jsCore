@@ -589,7 +589,6 @@ window.Promise || new function () {
 	}
 
 	function tryCall(callback, data) {
-		//Aurora 30 throws exception outside, Chrome 35 catches.
 		try {
 			callback(data);
 		}
@@ -1199,7 +1198,7 @@ function StaticDOMStringMap() {}
 
 	Object.keys(api).forEach(implement);
 
-	proto = document.constructor;
+	proto = document.constructor.prototype;
 	["query", "queryAll"].forEach(implement);
 
 	proto = document.createDocumentFragment().constructor.prototype;
@@ -1510,6 +1509,8 @@ document.addEventListener || new function () {
 };
 
 "onload" in new XMLHttpRequest || new function () {
+
+	//todo ontimeout
 
 	var refreshRate = 100, proto = XMLHttpRequest.prototype,
 		send = proto.send, abort = proto.abort;
@@ -1831,12 +1832,9 @@ lib.I18n = new function () {
 };
 
 
-lib.ajax = {
+lib.request = new function () {
 
-	//todo
-
-	//returns promise
-	get: function (url) {
+	function request(params) {
 		/*
 			params = {
 				method:   string,
@@ -1848,6 +1846,9 @@ lib.ajax = {
 				async:    boolean
 			}
 		*/
+	}
+
+	request.get = function (url) {
 		return Promise.resolve(new Promise(function (resolve, reject) {
 			var xhr = new XMLHttpRequest;
 			xhr.open("GET", url);
@@ -1860,6 +1861,49 @@ lib.ajax = {
 			};
 			xhr.send();
 		}));
+	};
+
+	return request;
+
+};
+
+
+lib.dom = {
+
+	query: function (selector, root) {
+		return new Promise(function (resolve, reject) {
+			var element = (root || document).query(selector);
+			if (element) {
+				resolve(element);
+			}
+			else {
+				reject(new Error("not matched"));
+			}
+		});
+	},
+
+	queryAll: function (selector, root) {
+		return new Promise(function (resolve, reject) {
+			var list = (root || document).queryAll(selector);
+			if (list.length) {
+				resolve(list);
+			}
+			else {
+				reject(new Error("not matched"));
+			}
+		});
+	},
+
+	ready: function () {
+		//todo img, iframe support
+		return new Promise(function (resolve) {
+			if (document.readyState == "complete") {
+				resolve();
+			}
+			else {
+				lib.event.one("DOMContentLoaded", document, resolve);
+			}
+		});
 	}
 
 };
