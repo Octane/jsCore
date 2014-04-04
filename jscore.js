@@ -1807,22 +1807,25 @@ lib.Template = new function () {
 
 lib.I18n = new function () {
 
-	//todo http://jaysoo.ca/2014/03/20/i18n-with-es6-template-strings/
+	function use(locale, messageBundle) {
+		this.locale = locale;
+		this.messageBundle = messageBundle;
+	}
 
-	function I18n() {}
-
-	I18n.prototype.use = function (params) {
-		/*
-			params = {
-				locale: "ru-RU",
-				defaultCurrency: 'RUR',
-				messageBundle: {
-					"english {0} template": "russian {0} template"
-				}
+	function I18n(locale, messageBundle) {
+		function i18n(message, replacements) {
+			if (message in i18n.messageBundle) {
+				message = i18n.messageBundle[message];
 			}
-		*/
-		return function () {};
-	};
+			if (replacements) {
+				return new lib.Template(message).match(replacements);
+			}
+			return message;
+		}
+		i18n.use = use;
+		i18n.use(locale, messageBundle);
+		return i18n;
+	}
 
 	return I18n;
 
