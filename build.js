@@ -40,7 +40,8 @@ try {
 		"lib/template.js",
 		"lib/i18n.js",
 		"lib/request.js",
-		"lib/dom.js"
+		"lib/dom.js",
+		"lib/date.js"
 
 	].reduce(function (result, fileName) {
 		return result + fs.readFileSync("src/" + fileName, "utf8").replace(strict, "");
