@@ -206,49 +206,69 @@ document.addEventListener || new function () {
 
 "onload" in new XMLHttpRequest || new function () {
 
-	//todo ontimeout
+	var proto = XMLHttpRequest.prototype,
+		abort = proto.abort,
+		send = proto.send,
+		open = proto.open;
 
-	var refreshRate = 100, proto = XMLHttpRequest.prototype,
-		send = proto.send, abort = proto.abort;
+	Object.assign(proto, {
 
-	function fireEvent(xhr, eventType, detail) {
-		var event = document.createEvent("CustomEvent");
-		event.initCustomEvent(eventType, false, false, null);
-		xhr.dispatchEvent(event);
-		event.target = xhr;
-		eventType = "on" + eventType;
-		if (xhr[eventType]) {
-			setImmediate(function () {
-				xhr[eventType](event);
-			});
-		}
-	}
+		UNSENT: 0,
+		OPENED: 1,
+		HEADERS_RECEIVED: 2,
+		LOADING: 3,
+		DONE: 4,
 
-	proto.send = function (data) {
-		var xhr = this;
-		function check() {
-			if (xhr.readyState == 4) {
-				if (xhr.status >= 200 && xhr.status < 400) {
-					fireEvent(xhr, "load");
-				}
-				else {
-					fireEvent(xhr, "error");
-				}
+		_unbind: function () {
+			this.onreadystatechange = null;
+		},
+
+		_fireEvent: function (eventType) {
+			var event = document.createEvent("CustomEvent");
+			event.initCustomEvent(eventType, false, false, null);
+			this.dispatchEvent(event);
+			event.target = this;
+			eventType = "on" + eventType;
+			if (this[eventType]) {
+				setImmediate(function () {
+					event.target[eventType](event);
+				});
 			}
-			else {
-				xhr.timeoutId = setTimeout(check, refreshRate);
-			}
-		}
-		//todo send FormData
-		send.call(xhr, arguments.length ? data : null);
-		xhr.timeoutId = setTimeout(check, refreshRate);
-	};
+		},
 
-	proto.abort = function () {
-		var xhr = this;
-		clearTimeout(xhr.timeoutId);
-		abort.call(xhr);
-		fireEvent(xhr, "abort");
-	};
+		_onReadyStateChange: function () {
+			if (this.readyState == this.DONE) {
+				this._unbind();
+				this._fireEvent("load");
+			}
+		},
+
+		open: function () {
+			try {
+				open.apply(this, arguments);
+			}
+			catch (error) {
+				this._unbind();
+				this._fireEvent("error");
+			}
+		},
+
+		send: function () {
+			this.onreadystatechange = this._onReadyStateChange;
+			try {
+				send.apply(this, arguments);
+			}
+			catch (error) {
+				this._unbind();
+				this._fireEvent("error");
+			}
+		},
+
+		abort: function () {
+			abort.call(this);
+			this._fireEvent("abort");
+		}
+
+	});
 
 };
