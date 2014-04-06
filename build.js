@@ -23,6 +23,7 @@ try {
 		"polyfill/promise.js",
 		"polyfill/requestanimationframe.js",
 		"polyfill/htmlelement.js",
+		"polyfill/formdata.js",
 
 		"polyfill/ie8/fix/slice.js",
 		"polyfill/ie8/fix/dataset.js",
