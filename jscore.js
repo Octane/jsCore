@@ -1344,13 +1344,9 @@ catch (error) {
 	node.appendChild(document.createComment("test"));
 	return node.children.length;
 
-}()) && new function () {
-
-	Object.defineProperty(HTMLElement.prototype, "children", {
-		get: Object.getOwnPropertyDescriptor(HTMLDocument.prototype, "children").get
-	});
-
-};
+}()) && Object.defineProperty(HTMLElement.prototype, "children", {
+	get: Object.getOwnPropertyDescriptor(document.constructor.prototype, "children").get
+});
 
 //IE8 setImmediate polyfill
 document instanceof Object || new function () {
