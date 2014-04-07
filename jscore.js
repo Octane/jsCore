@@ -1911,9 +1911,13 @@ lib.Template = new function () {
 
 lib.I18n = new function () {
 
-	function use(locale, messageBundle) {
+	function use(locale) {
+		this.messageBundle = this[locale];
+	}
+
+	function add(locale, messageBundle) {
 		this.locale = locale;
-		this.messageBundle = messageBundle;
+		this[locale] = messageBundle;
 	}
 
 	function I18n(locale, messageBundle) {
@@ -1926,8 +1930,10 @@ lib.I18n = new function () {
 			}
 			return message;
 		}
+		i18n.add = add;
 		i18n.use = use;
-		i18n.use(locale, messageBundle);
+		i18n.add(locale, messageBundle);
+		i18n.use(locale);
 		return i18n;
 	}
 
