@@ -2,6 +2,8 @@
 
 lib.request = new function () {
 
+	//todo refactoring
+
 	function toQueryParam(key, value) {
 		return encodeURIComponent(key) + "=" + encodeURIComponent(value);
 	}
@@ -52,8 +54,12 @@ lib.request = new function () {
 			};
 
 		if (Object(data) === data) {
-			if (data instanceof FormData && data.fake) {
-				data = data.toString();
+			if (data instanceof FormData) {
+				headers["Content-Type"] = "multipart/form-data";
+				if (data.fake) {
+					data = data.toString();
+					headers["Content-Type"] += "; boundary=" + data.boundary;
+				}
 			}
 			else {
 				data = toQueryString(data);
@@ -61,7 +67,7 @@ lib.request = new function () {
 		}
 
 		if (method == "POST") {
-			headers["Content-Type"] = "application/x-www-form-urlencoded";
+			headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded; charset=UTF-8";
 		}
 		else if (typeof data == "string") {
 			url += "?" + (caching ? data : getRndQueryParam() + "&" + data);
@@ -131,8 +137,16 @@ lib.request = new function () {
 			return request(params);
 		},
 
-		getJSON: function (params) {
+		json: function (params) {
 			return this.get(params).then(JSON.parse);
+		},
+
+		jsonp: function (params) {
+			//todo
+		},
+
+		script: function (params) {
+			//todo
 		}
 
 	});

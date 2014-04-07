@@ -2,16 +2,37 @@
 
 window.FormData || new function () {
 
-	var charset = "0123456789abcdefghijklmnopqrstuvwxyz";
+	/* <input type="file"> не поддерживается,
+	 * но если известно содержимое файла,
+	 * его можно добавить с помощью append
+	 *
+	 * (new FormData).append(name, fileValue[, fileName])
+	 *
+	 *    fileValue = {
+	 *        name: "readme.txt",
+	 *        type: "text/plain",
+	 *        content: "…"
+	 *    }
+	 */
 
-	function shuffle() {
-		return 0.5 - Math.random();
-	}
-
-	function getRndKey() {
+	var getBoundary = new function () {
 		//like IE11
-		return charset.split("").sort(shuffle).slice(0, 14).join("");
-	}
+		var charset = "0123456789abcdefghijklmnopqrstuvwxyz", uniqueKeys = {};
+		function shuffle() {
+			return 0.5 - Math.random();
+		}
+		function generateKey() {
+			var key = charset.split("").sort(shuffle).slice(0, 14).join("");
+			if (!uniqueKeys[key]) {
+				uniqueKeys[key] = 1;
+				return key;
+			}
+			return generateKey();
+		}
+		return function () {
+			return "---------------------------" + generateKey();
+		};
+	};
 
 	function serializeForm(form) {
 		//todo
@@ -26,21 +47,35 @@ window.FormData || new function () {
 		}
 		this.fake = true;
 		this.form = form;
-		this.boundary = "---------------------------" + getRndKey();
+		this.boundary = getBoundary();
 	}
 
 	Object.assign(FormData.prototype, {
 
-		append: function(key, value) {
-			Array.push(this, [key, value]);
+		append: function(name, value, fileName) {
+			Array.push(this, {
+				name: name,
+				value: value,
+				fileName: fileName
+			});
 		},
 
 		toString: function() {
-			var boundary = this.boundary, body = '';
+			//source by François de Metz
+			//https://github.com/francois2metz/html5-formdata
+			var boundary = this.boundary, body = "";
 			Array.forEach(this, function (field) {
-				body += "--" + boundary + "\r\n";
-				body += 'Content-Disposition: form-data; name="'+ encodeURIComponent(field[0]) + '"\r\n\r\n';
-				body += encodeURIComponent(field[1]) + "\r\n";
+				var name = field.name, value = field.value;
+				if (Object(value) === value) {
+					body += 'Content-Disposition: form-data; name="' + name + '"; filename="' + (field.fileName || value.name) + '"\r\n';
+					body += 'Content-Type: ' + value.type + '\r\n\r\n';
+					body += value.content + "\r\n";
+				}
+				else {
+					body += "--" + boundary + "\r\n";
+					body += 'Content-Disposition: form-data; name="'+ name + '"\r\n\r\n';
+					body += value + "\r\n";
+				}
 			});
 			body += "--" + boundary + "--";
 			return body;
