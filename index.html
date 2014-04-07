@@ -10,6 +10,19 @@
 <body>
 	<h1>jsCore</h1>
 
+	<form method="POST" action="/" enctype="multipart/form-data">
+		<fieldset>
+			<legend>FormData test</legend>
+			<input type="text" value="initial value">
+			<select name="test-select" multiple size="5">
+				<option value="123" selected="">1</option>
+				<option value="abc" selected="">2</option>
+				<option value="xyz">3</option>
+			</select>
+			<textarea name="editor">text<test>text</textarea>
+		</fieldset>
+	</form>
+
 	<!-- -->
 	<script src="src/header.js"></script>
 

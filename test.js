@@ -29,3 +29,26 @@ lib.request({
 	pre.append(reason.message);
 	document.body.append(pre);
 });
+
+1 && new function () {
+
+	var xhr = new XMLHttpRequest, fd = new FormData(document.querySelector("form"));
+
+	document.querySelector("input").value = "new value";
+
+	xhr.open("POST", "/");
+
+	if (fd.fake) {
+		xhr.setRequestHeader("Content-Type", fd.getContentType());
+		fd = fd.toString();
+	}
+	else {
+		xhr.setRequestHeader("Content-Type", "multipart/form-data");
+	}
+
+	xhr.send(fd);
+
+	console.log("send");
+
+};
+

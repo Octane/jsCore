@@ -55,10 +55,13 @@ lib.request = new function () {
 
 		if (Object(data) === data) {
 			if (data instanceof FormData) {
-				headers["Content-Type"] = "multipart/form-data";
 				if (data.fake) {
+					headers["Content-Type"] = data.getContentType();
 					data = data.toString();
-					headers["Content-Type"] += "; boundary=" + data.boundary;
+				}
+				else {
+					headers["Content-Type"] = "multipart/form-data";
+
 				}
 			}
 			else {
