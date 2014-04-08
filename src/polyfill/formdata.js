@@ -2,9 +2,8 @@
 
 window.FormData || new function () {
 
-	/* <input type="file"> не поддерживается,
-	 * но если известно содержимое файла,
-	 * его можно добавить с помощью append
+	/* <input type="file"> не поддерживается, но если известно
+	 * содержимое файла, его можно добавить с помощью append:
 	 *
 	 * (new FormData).append(name, fileValue[, fileName])
 	 *
@@ -16,38 +15,24 @@ window.FormData || new function () {
 	 */
 
 	var getBoundary = new function () {
-
-			//like IE11
-
-			var charset = "0123456789abcdefghijklmnopqrstuvwxyz", uniqueKeys = {};
-
-			function shuffle() {
-				return 0.5 - Math.random();
-			}
-
+			var uniqueKeys = {};
 			function generateKey() {
-				var key = charset.split("").sort(shuffle).slice(0, 14).join("");
+				var key = Math.random().toString().slice(2);
 				if (!uniqueKeys[key]) {
 					uniqueKeys[key] = 1;
 					return key;
 				}
 				return generateKey();
 			}
-
 			return function () {
-				return "---------------------------" + generateKey();
+				return "-------------------------" + generateKey();
 			};
-
 		},
 
 		serializeForm = new function () {
-
-			//todo HTML5 types
-
 			function isSelected(option) {
 				return option.selected;
 			}
-
 			function assertField(field) {
 				var type = field.type, tag = field.nodeName.toLowerCase();
 				if (!field.name) {
@@ -70,7 +55,6 @@ window.FormData || new function () {
 				}
 				return true;
 			}
-
 			function getValues(field) {
 				if (field.nodeName.toLowerCase() == "select" && field.multiple) {
 					return Array.reduce(field.options, function (values, option) {
@@ -83,14 +67,12 @@ window.FormData || new function () {
 				//todo CRLF
 				return [field.value];
 			}
-
 			return function (form) {
 				return Array.reduce(form.elements, function (result, field) {
-					var name = field.name;
 					if (assertField(field)) {
 						getValues(field).forEach(function (value) {
 							result.push({
-								name: name,
+								name: field.name,
 								value: value
 							});
 						});
@@ -98,12 +80,12 @@ window.FormData || new function () {
 					return result;
 				}, []);
 			};
-
 		};
 
 	function FormData(form) {
 		this.fake = true;
 		this.boundary = getBoundary();
+		this.contentType = "multipart/form-data; boundary=" + this.boundary;
 		if (form) {
 			this.form = form;
 			Array.prototype.push.apply(this, serializeForm(form));
@@ -111,10 +93,6 @@ window.FormData || new function () {
 	}
 
 	Object.assign(FormData.prototype, {
-
-		getContentType: function () {
-			return "multipart/form-data; boundary=" + this.boundary;
-		},
 
 		append: function(name, value, fileName) {
 			Array.push(this, {
@@ -130,13 +108,13 @@ window.FormData || new function () {
 			var boundary = this.boundary, body = "";
 			Array.forEach(this, function (field) {
 				var name = field.name, value = field.value;
+				body += "--" + boundary + "\r\n";
 				if (Object(value) === value) {
 					body += 'Content-Disposition: form-data; name="' + name + '"; filename="' + (field.fileName || value.name) + '"\r\n';
 					body += "Content-Type: " + value.type + "\r\n\r\n";
 					body += value.content + "\r\n";
 				}
 				else {
-					body += "--" + boundary + "\r\n";
 					body += 'Content-Disposition: form-data; name="'+ name + '"\r\n\r\n';
 					body += value + "\r\n";
 				}
@@ -146,6 +124,17 @@ window.FormData || new function () {
 		}
 
 	});
+
+	XMLHttpRequest.prototype.send = new function () {
+		var send = XMLHttpRequest.prototype.send;
+		return function (data) {
+			if (data instanceof FormData) {
+				this.setRequestHeader("Content-Type", data.contentType);
+				data = data.toString();
+			}
+			send.call(this, data);
+		};
+	};
 
 	window.FormData = FormData;
 

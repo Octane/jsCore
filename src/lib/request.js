@@ -2,7 +2,17 @@
 
 lib.request = new function () {
 
-	//todo refactoring
+	var getRndQueryVal = new function () {
+		var uniqueValues = {};
+		return function () {
+			var value = Math.random().toString().slice(2);
+			if (!uniqueValues[value]) {
+				uniqueValues[value] = 1;
+				return value;
+			}
+			return getRndQueryVal();
+		};
+	};
 
 	function toQueryParam(key, value) {
 		return encodeURIComponent(key) + "=" + encodeURIComponent(value);
@@ -15,20 +25,12 @@ lib.request = new function () {
 		}, []).join("&");
 	}
 
-	function getRndKey() {
-		return Math.random().toString(36).replace(/^[\d\.]+/, "") || getRndKey();
-	}
-
-	function getRndQueryParam() {
-		return toQueryParam(getRndKey(), getRndKey());
-	}
-
 	function request(params) {
 		/*
 			params = {
 				method:   String,
 				url:      String,
-				data:     String|StringMap|FormData,
+				data:     String|Object|FormData,
 				userName: String,
 				password: String,
 				timeout:  Number,
@@ -36,7 +38,7 @@ lib.request = new function () {
 				caching:  Boolean,
 				credentials: Boolean,
 				mimeType: String,
-				headers: StringMap
+				headers: Object
 			}
 		*/
 		var method = (params.method || "GET").toUpperCase(),
@@ -55,25 +57,22 @@ lib.request = new function () {
 
 		if (Object(data) === data) {
 			if (data instanceof FormData) {
-				if (data.fake) {
-					headers["Content-Type"] = data.getContentType();
-					data = data.toString();
-				}
-				else {
-					headers["Content-Type"] = "multipart/form-data";
-
-				}
+				headers["Content-Type"] = "multipart/form-data";
 			}
 			else {
 				data = toQueryString(data);
 			}
 		}
-
 		if (method == "POST") {
 			headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded; charset=UTF-8";
 		}
-		else if (typeof data == "string") {
-			url += "?" + (caching ? data : getRndQueryParam() + "&" + data);
+		else {
+			if (!caching) {
+				url += "?no-cache=" + getRndQueryVal();
+			}
+			if (typeof data == "string") {
+				url += (caching ? "?" : "&") + data;
+			}
 			data = null;
 		}
 		if (params.headers) {
@@ -124,8 +123,6 @@ lib.request = new function () {
 
 		toQueryParam: toQueryParam,
 		toQueryString: toQueryString,
-		getRndKey: getRndKey,
-		getRndQueryParam: getRndQueryParam,
 
 		get: function (params) {
 			if (typeof params == "string") {

@@ -34,21 +34,16 @@ lib.request({
 
 	var xhr = new XMLHttpRequest, fd = new FormData(document.querySelector("form"));
 
-	document.querySelector("input").value = "new value";
-
 	xhr.open("POST", "/");
-
-	if (fd.fake) {
-		xhr.setRequestHeader("Content-Type", fd.getContentType());
-		fd = fd.toString();
-	}
-	else {
-		xhr.setRequestHeader("Content-Type", "multipart/form-data");
-	}
-
+	xhr.setRequestHeader("Content-Type", "multipart/form-data");
 	xhr.send(fd);
 
-	console.log("send");
+	//console.log("send");
 
 };
 
+1 && new function () {
+
+	lib.request.post({data: new FormData});
+
+};
