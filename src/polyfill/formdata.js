@@ -47,7 +47,7 @@ window.FormData || new function () {
 				if (tag == "select" && field.multiple) {
 					return Array.some(field.options, isSelected);
 				}
-				if (type == "submit" || type == "reset" || type == "button") {
+				if (type == "submit" || type == "reset" || type == "button" || type == "file") {
 					return false;
 				}
 				if ((type == "radio" || type == "checkbox") && field.checked) {

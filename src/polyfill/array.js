@@ -1,12 +1,14 @@
 "use strict";
 
 if (!Array.from) {
-	Array.from = function (iterable) {
-		if (arguments.length > 1) {
-			//todo map
-			throw new Error("Array.from implementation only accepts the first parameter");
+	Array.from = function (iterable, func, boundThis) {
+		if (!Object(iterable).length) {
+			return [];
 		}
-		return Object(iterable).length ? Array.slice(iterable, 0) : [];
+		if (func) {
+			return Array.map(iterable, func, boundThis);
+		}
+		return  Array.slice(iterable, 0);
 	};
 }
 

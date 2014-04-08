@@ -319,12 +319,14 @@ if (!Object.is) {
 
 
 if (!Array.from) {
-	Array.from = function (iterable) {
-		if (arguments.length > 1) {
-			//todo map
-			throw new Error("Array.from implementation only accepts the first parameter");
+	Array.from = function (iterable, func, boundThis) {
+		if (!Object(iterable).length) {
+			return [];
 		}
-		return Object(iterable).length ? Array.slice(iterable, 0) : [];
+		if (func) {
+			return Array.map(iterable, func, boundThis);
+		}
+		return  Array.slice(iterable, 0);
 	};
 }
 
@@ -1258,7 +1260,7 @@ window.FormData || new function () {
 				if (tag == "select" && field.multiple) {
 					return Array.some(field.options, isSelected);
 				}
-				if (type == "submit" || type == "reset" || type == "button") {
+				if (type == "submit" || type == "reset" || type == "button" || type == "file") {
 					return false;
 				}
 				if ((type == "radio" || type == "checkbox") && field.checked) {
@@ -2156,6 +2158,7 @@ lib.request = new function () {
 					xhr.ontimeout = onTimeout;
 				}
 				xhr.send(data);
+				xhr = null;
 			}, reject);
 
 		}));
@@ -2196,7 +2199,7 @@ lib.request = new function () {
 					caching: Boolean
 				}
 			*/
-			var url, data, caching; //todo timeout
+			var url, data, caching;
 			if (typeof params == "string") {
 				params = {url: params};
 			}

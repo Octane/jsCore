@@ -128,6 +128,7 @@ lib.request = new function () {
 					xhr.ontimeout = onTimeout;
 				}
 				xhr.send(data);
+				xhr = null;
 			}, reject);
 
 		}));
@@ -168,7 +169,7 @@ lib.request = new function () {
 					caching: Boolean
 				}
 			*/
-			var url, data, caching; //todo timeout
+			var url, data, caching;
 			if (typeof params == "string") {
 				params = {url: params};
 			}
