@@ -85,7 +85,6 @@ window.FormData || new function () {
 	function FormData(form) {
 		this.fake = true;
 		this.boundary = getBoundary();
-		this.contentType = "multipart/form-data; boundary=" + this.boundary;
 		if (form) {
 			this.form = form;
 			Array.prototype.push.apply(this, serializeForm(form));
@@ -129,7 +128,7 @@ window.FormData || new function () {
 		var send = XMLHttpRequest.prototype.send;
 		return function (data) {
 			if (data instanceof FormData) {
-				this.setRequestHeader("Content-Type", data.contentType);
+				this.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + data.boundary);
 				data = data.toString();
 			}
 			send.call(this, data);
