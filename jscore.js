@@ -1716,6 +1716,8 @@ document.addEventListener || new function () {
 
 "onload" in document.createElement("script") || Object.defineProperty(HTMLScriptElement.prototype, "onload", {
 
+	//Warning: don't use onreadystatechange with onload and onerror!
+
 	set: function (callback) {
 		if (typeof callback == "function") {
 			this.onreadystatechange = function () {
@@ -1723,8 +1725,15 @@ document.addEventListener || new function () {
 				if (this.readyState == "loaded") {
 					this.onreadystatechange = null;
 					event = document.createEvent("Event");
-					event.initEvent("load", false, false);
-					callback.call(this, event);
+					if (this.text) {
+						event.initEvent("load", false, false);
+						callback.call(this, event);
+					}
+					else if (this.onerror) {
+						event.initEvent("error", false, false);
+						this.onerror(event);
+					}
+					this.onerror = null;
 				}
 			};
 		}
