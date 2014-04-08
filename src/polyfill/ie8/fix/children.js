@@ -3,7 +3,7 @@
 (function () {
 
 	var node = document.createElement("div");
-	node.appendChild(document.createComment("test"));
+	node.append(document.createComment("test"));
 	return node.children.length;
 
 }()) && Object.defineProperty(HTMLElement.prototype, "children", {

@@ -31,6 +31,12 @@ if (!window.HTMLElement) {
 	}
 });
 
+"head" in document || Object.defineProperty(document.constructor.prototype, "head", {
+	get: function () {
+		return this.query("head");
+	}
+});
+
 //IE8 Object.keys polyfill
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
@@ -295,6 +301,7 @@ if (!Object.assign) {
 		Object.keys(properties).forEach(function (key) {
 			object[key] = properties[key];
 		});
+		return object;
 	};
 }
 
@@ -1393,7 +1400,7 @@ catch (error) {
 (function () {
 
 	var node = document.createElement("div");
-	node.appendChild(document.createComment("test"));
+	node.append(document.createComment("test"));
 	return node.children.length;
 
 }()) && Object.defineProperty(HTMLElement.prototype, "children", {
@@ -1402,9 +1409,6 @@ catch (error) {
 
 //IE8 setImmediate polyfill
 document instanceof Object || new function () {
-
-	var fakeScript = document.createElement("script"),
-		root = document.documentElement;
 
 	//todo code reuse
 	function fastApply(args) {
@@ -1417,22 +1421,22 @@ document instanceof Object || new function () {
 		return func.apply(window, Array.slice(args, 1));
 	}
 
-	function setImmediate () {
-		var args = arguments, tmpScript = fakeScript.cloneNode(false);
-		tmpScript.onreadystatechange = function () {
+	window.setImmediate = function () {
+		var args = arguments;
+		function onReadyStateChange() {
+			this.onreadystatechange = null;
+			this.remove();
 			fastApply(args);
-			tmpScript.onreadystatechange = null;
-			root.removeChild(tmpScript);
-			tmpScript = null;
-		};
-		root.appendChild(tmpScript);
+		}
+		new function () {//avoid closure
+			var script = document.createElement("script");
+			script.onreadystatechange = onReadyStateChange;
+			document.head.append(script);
+		}
 		return 0;
-	}
+	};
 
-	function clearImmediate() {}
-
-	window.setImmediate = setImmediate;
-	window.clearImmediate = setImmediate;
+	window.clearImmediate = function () {};
 
 };
 
@@ -1709,6 +1713,27 @@ document.addEventListener || new function () {
 	});
 
 };
+
+"onload" in document.createElement("script") || Object.defineProperty(HTMLScriptElement.prototype, "onload", {
+
+	set: function (callback) {
+		if (typeof callback == "function") {
+			this.onreadystatechange = function () {
+				var event;
+				if (this.readyState == "loaded") {
+					this.onreadystatechange = null;
+					event = document.createEvent("Event");
+					event.initEvent("load", false, false);
+					callback.call(this, event);
+				}
+			};
+		}
+		else {
+			this.onreadystatechange = null;
+		}
+	}
+
+});
 
 window.getComputedStyle || new function () {
 
@@ -2019,6 +2044,12 @@ lib.request = new function () {
 		}, []).join("&");
 	}
 
+	function unbind(xhr) {
+		xhr.onload = null;
+		xhr.onerror = null;
+		xhr.ontimeout = null;
+	}
+
 	function request(params) {
 		/*
 			params = {
@@ -2037,7 +2068,7 @@ lib.request = new function () {
 		*/
 		var method = (params.method || "GET").toUpperCase(),
 			url = params.url || location.href,
-			data = params.data || null,
+			data = params.data,
 			userName = params.userName || "",
 			password = params.password || "",
 			timeout = params.timeout || 0,
@@ -2075,6 +2106,24 @@ lib.request = new function () {
 
 		return Promise.resolve(new Promise(function (resolve, reject) {
 
+			function onLoad() {
+				unbind(this);
+				if (this.status >= 200 && this.status < 400) {
+					resolve(this.responseText);
+				}
+				else {
+					reject(new Error(this.statusText));
+				}
+			}
+			function onError() {
+				unbind(this);
+				reject(new Error(this.statusText));
+			}
+			function onTimeout() {
+				unbind(this);
+				reject(new Error("time is out"));
+			}
+
 			new Promise(function (resolve) {
 				var xhr = new XMLHttpRequest;
 				xhr.open(method, url, async, userName, password);
@@ -2084,28 +2133,19 @@ lib.request = new function () {
 				if (credentials) {
 					xhr.withCredentials = true;
 				}
-				Object.keys(headers).forEach(function (key) {
-					xhr.setRequestHeader(key, headers[key]);
-				});
 				if (mimeType) {
 					xhr.overrideMimeType(mimeType);
 				}
+				Object.keys(headers).forEach(function (key) {
+					xhr.setRequestHeader(key, headers[key]);
+				});
 				resolve(xhr);
 			}).then(function (xhr) {
-				xhr.onload = function () {
-					if (this.status >= 200 && this.status < 400) {
-						resolve(xhr.responseText);
-					}
-					else {
-						reject(new Error(xhr.statusText));
-					}
-				};
-				xhr.onerror = function () {
-					reject(new Error(xhr.statusText));
-				};
-				xhr.ontimeout = function () {
-					reject(new Error("time is out"));
-				};
+				xhr.onload = onLoad;
+				xhr.onerror = onError;
+				if (timeout) {
+					xhr.ontimeout = onTimeout;
+				}
 				xhr.send(data);
 			}, reject);
 
@@ -2136,11 +2176,50 @@ lib.request = new function () {
 		},
 
 		jsonp: function (params) {
-			//todo
+			return this.script(params);
 		},
 
 		script: function (params) {
-			//todo
+			/*
+				params = {
+					url:     String,
+					data:    String|Object,
+					caching: Boolean
+				}
+			*/
+			var url, data, caching; //todo timeout
+			if (typeof params == "string") {
+				params = {url: params};
+			}
+			url = params.url || location.href;
+			data = params.data;
+			caching = params.caching !== false;
+			if (Object(data) === data) {
+				data = toQueryString(data);
+			}
+			if (!caching) {
+				url += "?no-cache=" + getRndQueryVal();
+			}
+			if (typeof data == "string") {
+				url += (caching ? "?" : "&") + data;
+			}
+			return Promise.resolve(new Promise(function (resolve, reject) {
+				document.head.append(Object.assign(document.createElement("script"), {
+					onload: function () {
+						unbind(this);
+						this.remove();
+						resolve();
+					},
+					onerror: function () {
+						unbind(this);
+						this.remove();
+						reject(new Error("Could not load script"));
+					},
+					async: true,
+					defer: true,
+					src: url
+				}));
+			}));
 		}
 
 	});

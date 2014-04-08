@@ -25,6 +25,12 @@ lib.request = new function () {
 		}, []).join("&");
 	}
 
+	function unbind(xhr) {
+		xhr.onload = null;
+		xhr.onerror = null;
+		xhr.ontimeout = null;
+	}
+
 	function request(params) {
 		/*
 			params = {
@@ -43,7 +49,7 @@ lib.request = new function () {
 		*/
 		var method = (params.method || "GET").toUpperCase(),
 			url = params.url || location.href,
-			data = params.data || null,
+			data = params.data,
 			userName = params.userName || "",
 			password = params.password || "",
 			timeout = params.timeout || 0,
@@ -81,6 +87,24 @@ lib.request = new function () {
 
 		return Promise.resolve(new Promise(function (resolve, reject) {
 
+			function onLoad() {
+				unbind(this);
+				if (this.status >= 200 && this.status < 400) {
+					resolve(this.responseText);
+				}
+				else {
+					reject(new Error(this.statusText));
+				}
+			}
+			function onError() {
+				unbind(this);
+				reject(new Error(this.statusText));
+			}
+			function onTimeout() {
+				unbind(this);
+				reject(new Error("time is out"));
+			}
+
 			new Promise(function (resolve) {
 				var xhr = new XMLHttpRequest;
 				xhr.open(method, url, async, userName, password);
@@ -90,28 +114,19 @@ lib.request = new function () {
 				if (credentials) {
 					xhr.withCredentials = true;
 				}
-				Object.keys(headers).forEach(function (key) {
-					xhr.setRequestHeader(key, headers[key]);
-				});
 				if (mimeType) {
 					xhr.overrideMimeType(mimeType);
 				}
+				Object.keys(headers).forEach(function (key) {
+					xhr.setRequestHeader(key, headers[key]);
+				});
 				resolve(xhr);
 			}).then(function (xhr) {
-				xhr.onload = function () {
-					if (this.status >= 200 && this.status < 400) {
-						resolve(xhr.responseText);
-					}
-					else {
-						reject(new Error(xhr.statusText));
-					}
-				};
-				xhr.onerror = function () {
-					reject(new Error(xhr.statusText));
-				};
-				xhr.ontimeout = function () {
-					reject(new Error("time is out"));
-				};
+				xhr.onload = onLoad;
+				xhr.onerror = onError;
+				if (timeout) {
+					xhr.ontimeout = onTimeout;
+				}
 				xhr.send(data);
 			}, reject);
 
@@ -142,11 +157,50 @@ lib.request = new function () {
 		},
 
 		jsonp: function (params) {
-			//todo
+			return this.script(params);
 		},
 
 		script: function (params) {
-			//todo
+			/*
+				params = {
+					url:     String,
+					data:    String|Object,
+					caching: Boolean
+				}
+			*/
+			var url, data, caching; //todo timeout
+			if (typeof params == "string") {
+				params = {url: params};
+			}
+			url = params.url || location.href;
+			data = params.data;
+			caching = params.caching !== false;
+			if (Object(data) === data) {
+				data = toQueryString(data);
+			}
+			if (!caching) {
+				url += "?no-cache=" + getRndQueryVal();
+			}
+			if (typeof data == "string") {
+				url += (caching ? "?" : "&") + data;
+			}
+			return Promise.resolve(new Promise(function (resolve, reject) {
+				document.head.append(Object.assign(document.createElement("script"), {
+					onload: function () {
+						unbind(this);
+						this.remove();
+						resolve();
+					},
+					onerror: function () {
+						unbind(this);
+						this.remove();
+						reject(new Error("Could not load script"));
+					},
+					async: true,
+					defer: true,
+					src: url
+				}));
+			}));
 		}
 
 	});

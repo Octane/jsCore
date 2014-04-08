@@ -6,6 +6,7 @@ if (!Object.assign) {
 		Object.keys(properties).forEach(function (key) {
 			object[key] = properties[key];
 		});
+		return object;
 	};
 }
 

@@ -272,3 +272,24 @@ document.addEventListener || new function () {
 	});
 
 };
+
+"onload" in document.createElement("script") || Object.defineProperty(HTMLScriptElement.prototype, "onload", {
+
+	set: function (callback) {
+		if (typeof callback == "function") {
+			this.onreadystatechange = function () {
+				var event;
+				if (this.readyState == "loaded") {
+					this.onreadystatechange = null;
+					event = document.createEvent("Event");
+					event.initEvent("load", false, false);
+					callback.call(this, event);
+				}
+			};
+		}
+		else {
+			this.onreadystatechange = null;
+		}
+	}
+
+});

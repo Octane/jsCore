@@ -8,6 +8,7 @@ try {
 
 		"polyfill/ie8/node.js",
 		"polyfill/ie8/htmlelement.js",
+		"polyfill/ie8/head.js",
 		"polyfill/ie8/object.js",
 		"polyfill/ie8/array.js",
 		"polyfill/ie8/function.js",
