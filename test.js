@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 lib.request.get("MIT-LICENSE.txt").then(function (text) {
 

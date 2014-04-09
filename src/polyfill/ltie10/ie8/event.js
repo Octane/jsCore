@@ -1,6 +1,8 @@
 
 document.addEventListener || new function () {
 
+	//todo handleEvent support
+
 	function preventDefault() {
 		this.returnValue = false;
 	}

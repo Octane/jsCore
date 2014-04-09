@@ -469,7 +469,7 @@ if (!Number.parseInt) {
 if (!Number.parseFloat) {
 	Number.parseFloat = parseFloat;
 }
-﻿
+
 
 //Array and String generic methods polyfill
 new function () {
@@ -1442,6 +1442,8 @@ document instanceof Object || new function () {
 };
 
 document.addEventListener || new function () {
+
+	//todo handleEvent support
 
 	function preventDefault() {
 		this.returnValue = false;

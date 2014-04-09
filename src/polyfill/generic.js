@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 //Array and String generic methods polyfill
 new function () {
