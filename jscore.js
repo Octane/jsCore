@@ -66,12 +66,12 @@ if (!window.HTMLElement) {
 
 if (!Object.create) {
 	Object.create = function (prototype) {
-		if (arguments.length > 1) {
+		if (1 in arguments) {
 			throw new Error("Object.create implementation only accepts the first parameter");
 		}
 		function NOP() {}
 		NOP.prototype = prototype;
-		return new NOP();
+		return new NOP;
 	};
 }
 
@@ -371,10 +371,10 @@ if (!Array.prototype.findIndex) {
 if (!Array.prototype.fill) {
 	Array.prototype.fill = function (value, startIndex, endIndex) {
 		var i, length = this.length;
-		if (typeof startIndex == "undefined") {
+		if (!(1 in arguments)) {
 			startIndex = 0;
 		}
-		if (typeof endIndex == "undefined") {
+		if (!(2 in arguments)) {
 			endIndex = length;
 		}
 		if (startIndex < 0) {
@@ -394,7 +394,7 @@ if (!Array.prototype.fill) {
 
 if (!String.prototype.startsWith) {
 	String.prototype.startsWith = function (string, position) {
-		if (typeof position == "undefined") {
+		if (!(1 in arguments)) {
 			position = 0;
 		}
 		return this.indexOf(string, position) == position;
@@ -413,7 +413,7 @@ if (!String.prototype.endsWith) {
 
 if (!String.prototype.contains) {
 	String.prototype.contains = function (string, position) {
-		if (typeof position == "undefined") {
+		if (!(1 in arguments)) {
 			position = 0;
 		}
 		return this.indexOf(string, position) != -1;
@@ -1893,6 +1893,30 @@ lib.array = {
 			array.push(anything);
 			return array;
 		}, []);
+	},
+
+	range: function (i, end) {
+		var array = [];
+		if (!(1 in arguments)) {
+			end = i;
+			i = 0;
+		}
+		while (i < end) {
+			array.push(i);
+			i++;
+		}
+		return array;
+	},
+
+	shuffle: function (iterable) {
+		var array = Array.from(iterable), i = array.length, j, tmp;
+		while (i--) {
+			j = Math.floor(Math.random() * (i + 1));
+			tmp = array[j];
+			array[j] = array[i];
+			array[i] = tmp;
+		}
+		return array;
 	}
 
 };
@@ -1974,6 +1998,18 @@ lib.html = {
 			frag.appendChild(node.firstChild);
 		}
 		return frag;
+	},
+
+	escape: function (string) {
+		var node = document.createElement("div");
+		node.appendChild(document.createTextNode(string));
+		return node.innerHTML;
+	},
+
+	unescape: function (string) {
+		var node = document.createElement("div");
+		node.innerHTML = string;
+		return node.textContent;
 	}
 
 };

@@ -28,11 +28,11 @@
 
 if (!Object.create) {
 	Object.create = function (prototype) {
-		if (arguments.length > 1) {
+		if (1 in arguments) {
 			throw new Error("Object.create implementation only accepts the first parameter");
 		}
 		function NOP() {}
 		NOP.prototype = prototype;
-		return new NOP();
+		return new NOP;
 	};
 }

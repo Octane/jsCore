@@ -2,7 +2,7 @@
 
 if (!String.prototype.startsWith) {
 	String.prototype.startsWith = function (string, position) {
-		if (typeof position == "undefined") {
+		if (!(1 in arguments)) {
 			position = 0;
 		}
 		return this.indexOf(string, position) == position;
@@ -21,7 +21,7 @@ if (!String.prototype.endsWith) {
 
 if (!String.prototype.contains) {
 	String.prototype.contains = function (string, position) {
-		if (typeof position == "undefined") {
+		if (!(1 in arguments)) {
 			position = 0;
 		}
 		return this.indexOf(string, position) != -1;

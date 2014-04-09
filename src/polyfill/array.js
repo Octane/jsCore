@@ -53,10 +53,10 @@ if (!Array.prototype.findIndex) {
 if (!Array.prototype.fill) {
 	Array.prototype.fill = function (value, startIndex, endIndex) {
 		var i, length = this.length;
-		if (typeof startIndex == "undefined") {
+		if (!(1 in arguments)) {
 			startIndex = 0;
 		}
-		if (typeof endIndex == "undefined") {
+		if (!(2 in arguments)) {
 			endIndex = length;
 		}
 		if (startIndex < 0) {

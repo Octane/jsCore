@@ -52,6 +52,30 @@ lib.array = {
 			array.push(anything);
 			return array;
 		}, []);
+	},
+
+	range: function (i, end) {
+		var array = [];
+		if (!(1 in arguments)) {
+			end = i;
+			i = 0;
+		}
+		while (i < end) {
+			array.push(i);
+			i++;
+		}
+		return array;
+	},
+
+	shuffle: function (iterable) {
+		var array = Array.from(iterable), i = array.length, j, tmp;
+		while (i--) {
+			j = Math.floor(Math.random() * (i + 1));
+			tmp = array[j];
+			array[j] = array[i];
+			array[i] = tmp;
+		}
+		return array;
 	}
 
 };
