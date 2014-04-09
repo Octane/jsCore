@@ -4,16 +4,19 @@ try {
 
 	fs.writeFileSync("jscore.js", [
 
+
 		"header.js",
 
-		"polyfill/ie8/node.js",
-		"polyfill/ie8/htmlelement.js",
-		"polyfill/ie8/head.js",
-		"polyfill/ie8/object.js",
-		"polyfill/ie8/array.js",
-		"polyfill/ie8/function.js",
-		"polyfill/ie8/string.js",
-		"polyfill/ie8/date.js",
+
+		"polyfill/ltie10/ie8/node.js",
+		"polyfill/ltie10/ie8/htmlelement.js",
+		"polyfill/ltie10/ie8/head.js",
+		"polyfill/ltie10/ie8/object.js",
+		"polyfill/ltie10/ie8/array.js",
+		"polyfill/ltie10/ie8/function.js",
+		"polyfill/ltie10/ie8/string.js",
+		"polyfill/ltie10/ie8/date.js",
+
 
 		"polyfill/object.js",
 		"polyfill/array.js",
@@ -24,14 +27,19 @@ try {
 		"polyfill/promise.js",
 		"polyfill/requestanimationframe.js",
 		"polyfill/htmlelement.js",
-		"polyfill/formdata.js",
 
-		"polyfill/ie8/fix/slice.js",
-		"polyfill/ie8/fix/dataset.js",
-		"polyfill/ie8/fix/children.js",
-		"polyfill/ie8/setimmediate.js",
-		"polyfill/ie8/event.js",
-		"polyfill/ie8/getcomputedstyle.js",
+
+		"polyfill/ltie10/htmlelement.js",
+		"polyfill/ltie10/formdata.js",
+
+
+		"polyfill/ltie10/ie8/fix/slice.js",
+		"polyfill/ltie10/ie8/fix/dataset.js",
+		"polyfill/ltie10/ie8/fix/children.js",
+		"polyfill/ltie10/ie8/setimmediate.js",
+		"polyfill/ltie10/ie8/event.js",
+		"polyfill/ltie10/ie8/getcomputedstyle.js",
+
 
 		"lib/namespace.js",
 		"lib/is.js",
@@ -44,6 +52,7 @@ try {
 		"lib/request.js",
 		"lib/dom.js",
 		"lib/date.js"
+
 
 	].reduce(function (result, fileName) {
 		return result + fs.readFileSync("src/" + fileName, "utf8").replace(strict, "");
