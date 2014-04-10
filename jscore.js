@@ -308,10 +308,22 @@ if (!Date.now) {
 }()) || new function () {
 	var create = Object.create;
 	Object.create = function (prototype, properties) {
+		if (prototype === null || properties) {
+			//Object.defineProperties fixes a bug
+			if (properties) {
+				return create(prototype, properties);
+			}
+			//https://twitter.com/WebReflection/status/454342010288078848
+			return create(null, {
+				"": {
+					configurable: true,
+					writable: true
+				}
+			});
+		}
 		function NOP() {}
 		NOP.prototype = prototype;
-		//Object.defineProperties fixes a bug
-		return properties ? create(prototype, properties) : new NOP;
+		return new NOP;
 	};
 };
 
