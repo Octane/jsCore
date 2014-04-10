@@ -9,7 +9,7 @@
 
 **Object generic methods**
 
-`is`, `keys`, `create` (в IE8 только 1 аргумент, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354)), `assign` (в IE8 неперечислимые свойства не копируются)
+`is`, `keys`, `assign`, `create` (в IE8 только 1 аргумент, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354))
 
 **Array generic methods**
 
