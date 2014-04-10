@@ -9,7 +9,7 @@
 
 **Object generic methods**
 
-`is`, `assign`, `keys`, `create` (только 1 аргумент)
+`is`, `keys`, `create` (только 1 аргумент), `assign` (в IE8 неперечислимые свойства не копируются)
 
 **Array generic methods**
 

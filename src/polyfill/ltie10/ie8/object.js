@@ -26,6 +26,11 @@
 
 };
 
+if (!Object.getOwnPropertyNames) {
+	//Warning: don't use this in IE8, it's fallback for Object.assign!
+	Object.getOwnPropertyNames = Object.keys;
+}
+
 if (!Object.create) {
 	Object.create = function (prototype) {
 		if (1 in arguments) {
