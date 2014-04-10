@@ -8,12 +8,12 @@
 }()) || new function () {
 	var create = Object.create;
 	Object.create = function (prototype, properties) {
-		if (prototype === null || properties) {
-			//Object.defineProperties fixes a bug
-			if (properties) {
-				return create(prototype, properties);
-			}
-			//https://twitter.com/WebReflection/status/454342010288078848
+		//Object.defineProperties fixes a bug
+		if (properties) {
+			return create(prototype, properties);
+		}
+		//https://twitter.com/WebReflection/status/454342010288078848
+		if (prototype === null) {
 			return create(null, {
 				"": {
 					configurable: true,
