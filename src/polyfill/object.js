@@ -1,5 +1,20 @@
 "use strict";
 
+//IE9-11 Object.create bug fix
+(function () {
+	var object = Object.create({});
+	object[0] = null;
+	return object.hasOwnProperty(0); //→ false in IE9-11
+}()) || new function () {
+	var create = Object.create;
+	Object.create = function (prototype, properties) {
+		function NOP() {}
+		NOP.prototype = prototype;
+		//Object.defineProperties fixes a bug
+		return properties ? create(prototype, properties) : new NOP;
+	};
+};
+
 if (!Object.assign) {
 	//Warning: non-enumerable properties not copied in IE8,
 	//because Object.getOwnPropertyNames = Object.keys!

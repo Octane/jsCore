@@ -105,10 +105,7 @@
 				);
 			}
 /*
-			//Убрал обновление DOMTokenList по следующим причинам:
-			//1. IE11 не обновляет его, когда изменяется свойство className.
-			//2. Применение Mutation Events является устаревшим.
-			//3. Во избежание утечек памяти.
+			//обновление DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
 				if (event.attrName.toLowerCase() == "class") {
 					element._classList.update();
