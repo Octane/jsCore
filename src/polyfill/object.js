@@ -12,6 +12,9 @@
 		if (properties) {
 			return create(prototype, properties);
 		}
+		//if Object.create works via new NOP, then
+		//Object.create(null) instanceof Object → true,
+		//but it's wrong.
 		//https://twitter.com/WebReflection/status/454342010288078848
 		if (prototype === null) {
 			return create(null, {
