@@ -7,3 +7,5 @@ lib.request.get("MIT-LICENSE.txt").then(function (text) {
 	document.body.append(node);
 
 });
+
+//console.log(JSON.stringify(Object.assign({a:1}, {b:2}, {c: 3})));

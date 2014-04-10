@@ -2,11 +2,14 @@
 
 if (!Object.assign) {
 	//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
-	Object.assign = function (object, properties) {
-		Object.keys(properties).forEach(function (key) {
-			object[key] = properties[key];
+	//https://twitter.com/rwaldron/status/454114058640183296
+	Object.assign = function (target) {
+		Array.prototype.slice.call(arguments, 1).forEach(function (source) {
+			Object.keys(source).forEach(function (key) {
+				target[key] = source[key];
+			});
 		});
-		return object;
+		return target;
 	};
 }
 
