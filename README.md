@@ -9,11 +9,21 @@
 
 **Object generic methods**
 
-`is`, `keys`, `assign`, `create` (в IE8 только 1 аргумент, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354))
+`is`, `keys`, `assign`, `create`
+
+метод create в IE8 принимает только 1 аргумент, а так же Object.create(null) instanceof Object возвращает true, что неверно, но исправить невозможно, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354)
 
 **Array generic methods**
 
 `isArray`, `from`, `of`, `concat`, `every`, `fill`, `filter`, `find`, `findIndex`, `forEach`, `indexOf`, `join`, `lastIndexOf`, `map`, `pop`, `push`, `reduce`, `reduceRight`, `reverse`, `shift`, `slice`, `some`, `sort`, `splice`, `unshift`
+
+некоторые из этих методов отсутствуют в стандарте или в черновиках будущих стандартов, но встроены в Firefox
+```javascript
+< Array.slice.toString()
+> "function slice() {
+     [native code]
+  }"
+```
 
 **Array.prototype**
 
@@ -61,6 +71,8 @@
 
 `initEvent`, `initUIEvent`, `initMouseEvent`, `initMutationEvent`, `initKeyEvent`, `initCustomEvent`
 
+методы просто копируют все указанные аргументы в инстанс Event, главное предназначение – установить тип события без дополнителных проверок для IE<9
+
 **XMLHttpRequest**
 
 позволяет отправлять FormData
@@ -77,13 +89,19 @@
 
 `resolve`, `reject`, `all`, `race`
 
+thenable-объекты не поддерживаются, используйте new Promise
+
 **Promise.prototype**
 
 `then`, `catch`
 
+IE8 не позволяет использовать метод с именем catch, используйте catch_
+
 **Глобальные функции**
 
 `setImmediate`, `clearImmediate`, `requestAnimationFrame`, `cancelAnimationFrame`, `getComputedStyle`
+
+в IE8 функция cancelAnimationFrame бесполезна
 
 ##lib.Template
 
