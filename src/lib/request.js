@@ -90,7 +90,7 @@ lib.request = new function () {
 			function onLoad() {
 				unbind(this);
 				if (this.status >= 200 && this.status < 400) {
-					resolve(this.responseText);
+					resolve(this);
 				}
 				else {
 					reject(new Error(this.statusText));

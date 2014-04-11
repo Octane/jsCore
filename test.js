@@ -1,11 +1,9 @@
 "use strict";
 
-lib.request.get("MIT-LICENSE.txt").then(function (text) {
+lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
 
 	var node = document.createElement("blockquote");
-	node.append(text);
+	node.append(xhr.responseText);
 	document.body.append(node);
 
 });
-
-//console.log(JSON.stringify(Object.assign({a:1}, {b:2}, {c: 3})));
