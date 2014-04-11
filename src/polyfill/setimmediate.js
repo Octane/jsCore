@@ -43,6 +43,6 @@ window.setImmediate || new function () {
 	}
 
 	window.setImmediate = setImmediate;
-	window.clearImmediate = setImmediate;
+	window.clearImmediate = clearImmediate;
 
 };

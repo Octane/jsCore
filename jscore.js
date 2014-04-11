@@ -601,7 +601,7 @@ window.setImmediate || new function () {
 	}
 
 	window.setImmediate = setImmediate;
-	window.clearImmediate = setImmediate;
+	window.clearImmediate = clearImmediate;
 
 };
 
@@ -664,7 +664,7 @@ window.Promise || new function () {
 			if (isPromise(value)) {
 				return value.then(defaultOnFulfilled, defaultOnRejected);
 			}
-			return new Promise(function (resolve, reject) {
+			return new Promise(function (resolve) {
 				resolve(value);
 			});
 		},
@@ -1501,7 +1501,7 @@ document.addEventListener || new function () {
 
 	function createEventListener(callbacks, element) {
 		return function (event) {
-			var i = 0, length = callbacks.length, type;
+			var i = 0, length = callbacks.length;
 			if (event instanceof CustomEvent) {
 				event.target = element;
 			}

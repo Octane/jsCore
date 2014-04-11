@@ -58,7 +58,7 @@ window.Promise || new function () {
 			if (isPromise(value)) {
 				return value.then(defaultOnFulfilled, defaultOnRejected);
 			}
-			return new Promise(function (resolve, reject) {
+			return new Promise(function (resolve) {
 				resolve(value);
 			});
 		},

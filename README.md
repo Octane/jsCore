@@ -48,7 +48,7 @@ Array.slice может работать с DOM-объектам в IE8, в от�
 
 **HTMLElement.prototype**
 
-`append`, `prepend`, `after`, `before`, `replace`, `remove`, `query`, `queryAll`, `matches`, `children`, `firstElementChild`, `lastElementChild`, `childElementCount`, `nextElementSibling`, `previousElementSibling`, `addEventListener`, `removeEventListner`, `dispatchEvent`, `textContent`, `classList`, `dataset` (не добавляет новые атрибуты),
+`append`, `prepend`, `after`, `before`, `replace`, `remove`, `query`, `queryAll`, `matches`, `children`, `firstElementChild`, `lastElementChild`, `childElementCount`, `nextElementSibling`, `previousElementSibling`, `addEventListener`, `removeEventListner`, `dispatchEvent`, `textContent`, `classList`, `dataset` (не добавляет новые атрибуты)
 
 **HTMLScriptElement.prototype**
 

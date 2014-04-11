@@ -29,7 +29,7 @@ document.addEventListener || new function () {
 
 	function createEventListener(callbacks, element) {
 		return function (event) {
-			var i = 0, length = callbacks.length, type;
+			var i = 0, length = callbacks.length;
 			if (event instanceof CustomEvent) {
 				event.target = element;
 			}
