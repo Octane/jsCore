@@ -11,7 +11,7 @@
 
 `is`, `keys`, `assign`, `create`
 
-метод create в IE8 принимает только 1 аргумент, а так же Object.create(null) instanceof Object возвращает true, что неверно, но исправить невозможно, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354)
+метод create в IE8 принимает только 1 аргумент, а так же Object.create(null) instanceof Object возвращает true, что неверно, но исправить невозможно, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354)
 
 **Array generic methods**
 
@@ -24,6 +24,7 @@
      [native code]
   }"
 ```
+Array.slice может работать с DOM-объектам в IE8, в отличие от Array.prototype.slice
 
 **Array.prototype**
 
