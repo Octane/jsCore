@@ -154,7 +154,9 @@ lib.request = new function () {
 		},
 
 		json: function (params) {
-			return this.get(params).then(JSON.parse);
+			return this.get(params).then(function (xhr) {
+				return JSON.parse(xhr.responseText);
+			});
 		},
 
 		jsonp: function (params) {

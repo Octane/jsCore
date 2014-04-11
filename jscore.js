@@ -427,7 +427,7 @@ if (!Array.prototype.fill) {
 
 if (!String.prototype.startsWith) {
 	String.prototype.startsWith = function (string, position) {
-		if (!(1 in arguments)) {
+		if (!position) {
 			position = 0;
 		}
 		return this.indexOf(string, position) == position;
@@ -436,20 +436,16 @@ if (!String.prototype.startsWith) {
 
 if (!String.prototype.endsWith) {
 	String.prototype.endsWith = function (string, position) {
-		var lastIndex;
 		position = position || this.length;
 		position = position - string.length;
-		lastIndex = this.lastIndexOf(string);
+		var lastIndex = this.lastIndexOf(string);
 		return lastIndex != -1 && lastIndex == position;
 	};
 }
 
 if (!String.prototype.contains) {
 	String.prototype.contains = function (string, position) {
-		if (!(1 in arguments)) {
-			position = 0;
-		}
-		return this.indexOf(string, position) != -1;
+		return this.indexOf(string, position || 0) != -1;
 	};
 }
 
@@ -1429,11 +1425,9 @@ catch (error) {
 
 //IE8 children.length fix (exclude COMMENT_NODE)
 (function () {
-
 	var node = document.createElement("div");
 	node.append(document.createComment("test"));
-	return node.children.length;
-
+	return node.children.length; //→ 1 in IE8
 }()) && Object.defineProperty(HTMLElement.prototype, "children", {
 	get: Object.getOwnPropertyDescriptor(document.constructor.prototype, "children").get
 });
@@ -2251,7 +2245,9 @@ lib.request = new function () {
 		},
 
 		json: function (params) {
-			return this.get(params).then(JSON.parse);
+			return this.get(params).then(function (xhr) {
+				return JSON.parse(xhr.responseText);
+			});
 		},
 
 		jsonp: function (params) {

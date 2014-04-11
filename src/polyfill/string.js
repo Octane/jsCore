@@ -2,7 +2,7 @@
 
 if (!String.prototype.startsWith) {
 	String.prototype.startsWith = function (string, position) {
-		if (!(1 in arguments)) {
+		if (!position) {
 			position = 0;
 		}
 		return this.indexOf(string, position) == position;
@@ -11,20 +11,16 @@ if (!String.prototype.startsWith) {
 
 if (!String.prototype.endsWith) {
 	String.prototype.endsWith = function (string, position) {
-		var lastIndex;
 		position = position || this.length;
 		position = position - string.length;
-		lastIndex = this.lastIndexOf(string);
+		var lastIndex = this.lastIndexOf(string);
 		return lastIndex != -1 && lastIndex == position;
 	};
 }
 
 if (!String.prototype.contains) {
 	String.prototype.contains = function (string, position) {
-		if (!(1 in arguments)) {
-			position = 0;
-		}
-		return this.indexOf(string, position) != -1;
+		return this.indexOf(string, position || 0) != -1;
 	};
 }
 
