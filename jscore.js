@@ -1029,27 +1029,38 @@ function StaticDOMStringMap() {}
 
 		before: function (/* ...nodes */) {
 			//todo IE8 removedNode.parentNode != null
-			this.parentNode.insertBefore(mutationMacro(arguments), this);
+			var parentNode = this.parentNode;
+			if (parentNode) {
+				parentNode.insertBefore(mutationMacro(arguments), this);
+			}
 		},
 
 		after: function (/* ...nodes */) {
-			var parentNode = this.parentNode,
-				nextSibling = this.nextSibling,
+			var parentNode = this.parentNode, nextSibling, nodes;
+			if (parentNode) {
 				nodes = mutationMacro(arguments);
-			if (nextSibling) {
-				parentNode.insertBefore(nodes, nextSibling);
-			}
-			else {
-				parentNode.appendChild(nodes);
+				nextSibling = this.nextSibling;
+				if (nextSibling) {
+					parentNode.insertBefore(nodes, nextSibling);
+				}
+				else {
+					parentNode.appendChild(nodes);
+				}
 			}
 		},
 
 		replace: function (/* ...nodes */) {
-			this.parentNode.replaceChild(mutationMacro(arguments), this);
+			var parentNode = this.parentNode;
+			if (parentNode) {
+				parentNode.replaceChild(mutationMacro(arguments), this);
+			}
 		},
 
 		remove: function () {
-			this.parentNode.removeChild(this);
+			var parentNode = this.parentNode;
+			if (parentNode) {
+				parentNode.removeChild(this);
+			}
 		},
 
 		append: function (/* ...nodes */) {
