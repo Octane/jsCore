@@ -8,34 +8,17 @@
 	return object.hasOwnProperty(0); //→ false in IE9-11
 }()) || new function () {
 	var create = Object.create;
-	function findUndefNumKey(object) {
-		var key = 0;
-		while (Object.getOwnPropertyDescriptor(object, key)) {
-			key++;
-		}
-		return key;
-	}
 	Object.create = function (prototype, properties) {
-		var object, fixKey;
-		if (Object(properties) === properties) {
-			fixKey = findUndefNumKey(properties);
-			if (!Object.isExtensible(properties)) {
-				properties = Object.assign({}, properties);
-			}
+		var object = create(prototype, properties);
+		if (!Object.hasOwnProperty.call(object, 0)) {
+			//numeric key fixes a bug,
+			//it can be removed after,
+			//unlike alphabetic key
+			Object.defineProperty(object, 0, {
+				configurable: true
+			});
+			delete object[0];
 		}
-		else {
-			properties = {};
-			fixKey = 0;
-		}
-		//numeric key fixes a bug,
-		//it can be removed after,
-		//unlike alphabetic key
-		properties[fixKey] = {
-			configurable: true
-		};
-		object = create(prototype, properties);
-		delete object[fixKey];
-		delete properties[fixKey];
 		return object;
 	};
 };
