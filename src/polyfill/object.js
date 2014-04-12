@@ -1,6 +1,7 @@
 "use strict";
 
 //IE9-11 Object.create bug fix
+//http://webreflection.blogspot.ru/2014/04/all-ie-objects-are-broken.html
 (function () {
 	var object = Object.create({});
 	object[0] = null;
@@ -15,32 +16,23 @@
 		return key;
 	}
 	Object.create = function (prototype, properties) {
-		var object, fixKey, needFix = true;
+		var object, fixKey;
 		if (Object(properties) === properties) {
-			if (Object.propertyIsEnumerable.call(properties, 0)) {
-				needFix = false;
-			}
-			else {
-				fixKey = findUndefNumKey(properties);
-			}
+			fixKey = findUndefNumKey(properties);
 		}
 		else {
 			properties = {};
 			fixKey = 0;
 		}
-		if (needFix) {
-			//numeric key fixes a bug,
-			//it can be removed after,
-			//unlike alphabetic key
-			properties[fixKey] = {
-				configurable: true
-			};
-		}
+		//numeric key fixes a bug,
+		//it can be removed after,
+		//unlike alphabetic key
+		properties[fixKey] = {
+			configurable: true
+		};
 		object = create(prototype, properties);
-		if (needFix) {
-			delete object[fixKey];
-			delete properties[fixKey];
-		}
+		delete object[fixKey];
+		delete properties[fixKey];
 		return object;
 	};
 };
