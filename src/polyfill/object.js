@@ -7,22 +7,39 @@
 	return object.hasOwnProperty(0); //→ false in IE9-11
 }()) || new function () {
 	var create = Object.create;
+	function findUndefNumKey(object) {
+		var key = 0;
+		while (Object.getOwnPropertyDescriptor(object, key)) {
+			key++;
+		}
+		return key;
+	}
 	Object.create = function (prototype, properties) {
-		var object;
-		if (properties) {
-			//Object.defineProperties fixes a bug
-			object = create(prototype, properties);
+		var object, fixKey, needFix = true;
+		if (Object(properties) === properties) {
+			if (Object.propertyIsEnumerable.call(properties, 0)) {
+				needFix = false;
+			}
+			else {
+				fixKey = findUndefNumKey(properties);
+			}
 		}
 		else {
+			properties = {};
+			fixKey = 0;
+		}
+		if (needFix) {
 			//numeric key fixes a bug,
 			//it can be removed after,
 			//unlike alphabetic key
-			object = create(prototype, {
-				"0": {
-					configurable: true
-				}
-			});
-			delete object[0];
+			properties[fixKey] = {
+				configurable: true
+			};
+		}
+		object = create(prototype, properties);
+		if (needFix) {
+			delete object[fixKey];
+			delete properties[fixKey];
 		}
 		return object;
 	};
@@ -31,6 +48,7 @@
 if (!Object.assign) {
 	//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
 	//https://twitter.com/rwaldron/status/454114058640183296
+	//getify http://goo.gl/0QNMDz
 	Object.assign = function (target) {
 		Array.prototype.slice.call(arguments, 1).forEach(function (source) {
 			Object.keys(source).forEach(function (key) {
