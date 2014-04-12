@@ -17,12 +17,11 @@
 			//numeric key fixes a bug,
 			//it can be removed after,
 			//unlike alphabetic key
-			properties = {
+			object = create(prototype, {
 				"0": {
 					configurable: true
 				}
-			}
-			object = create(prototype, properties);
+			});
 			delete object[0];
 		}
 		return object;

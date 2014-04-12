@@ -11,7 +11,7 @@
 
 `is`, `keys`, `assign`, `create`
 
-метод create в IE8 принимает только 1 аргумент, а так же Object.create(null) instanceof Object возвращает true, что неверно, но исправить невозможно, в IE9-11 исправляет [баг](https://twitter.com/DmitryKorobkin/status/454281153034596354)
+метод create в IE8 принимает только 1 аргумент, а так же Object.create(null) instanceof Object возвращает true, что неверно, но исправить невозможно, в IE9-11 исправляет [баг](http://webreflection.blogspot.ru/2014/04/all-ie-objects-are-broken.html)
 
 **Array generic methods**
 
