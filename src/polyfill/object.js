@@ -8,25 +8,24 @@
 }()) || new function () {
 	var create = Object.create;
 	Object.create = function (prototype, properties) {
-		//Object.defineProperties fixes a bug
+		var object;
 		if (properties) {
-			return create(prototype, properties);
+			//Object.defineProperties fixes a bug
+			object = create(prototype, properties);
 		}
-		//If Object.create works via new NOP, then
-		//Object.create(null) instanceof Object → true,
-		//but it's wrong.
-		//https://twitter.com/WebReflection/status/454342010288078848
-		if (prototype === null) {
-			return create(null, {
-				"": {
-					configurable: true,
-					writable: true
+		else {
+			//numeric key fixes a bug,
+			//it can be removed after,
+			//unlike alphabetic key
+			properties = {
+				"0": {
+					configurable: true
 				}
-			});
+			}
+			object = create(prototype, properties);
+			delete object[0];
 		}
-		function NOP() {}
-		NOP.prototype = prototype;
-		return new NOP;
+		return object;
 	};
 };
 
