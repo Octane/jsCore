@@ -19,6 +19,9 @@
 		var object, fixKey;
 		if (Object(properties) === properties) {
 			fixKey = findUndefNumKey(properties);
+			if (!Object.isExtensible(properties)) {
+				properties = Object.assign({}, properties);
+			}
 		}
 		else {
 			properties = {};
