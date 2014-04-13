@@ -4,11 +4,11 @@ Object.assign(lib, {
 
 	//example: if (tests.every(lib.isTrue))
 	isTrue: function (bool) {
-		return bool === true;
+		return true === bool;
 	},
 
 	isFalse: function (bool) {
-		return bool === false;
+		return false === bool;
 	},
 
 	isHTML: function (string) {

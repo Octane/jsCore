@@ -1,6 +1,6 @@
 
 if (!window.HTMLElement) {
-	window.HTMLElement = window.Element;
+	window.HTMLElement = Element;
 }
 
 "textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {

@@ -1,7 +1,7 @@
 
 if (!Array.isArray) {
 	Array.isArray = function (anything) {
-		return Object.prototype.toString.call(anything) == "[object Array]";
+		return "[object Array]" == Object.prototype.toString.call(anything);
 	};
 }
 

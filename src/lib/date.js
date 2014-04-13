@@ -22,7 +22,7 @@ lib.date = {
 			year = monthIndex.getFullYear();
 			monthIndex = monthIndex.getMonth();
 		}
-		if (monthIndex == 1 && this.isLeapYear(year)) {
+		if (1 == monthIndex && this.isLeapYear(year)) {
 			return 29;
 		}
 		return this._monthLengths[monthIndex];

@@ -37,7 +37,7 @@
 			this.update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
-				if (Array.indexOf(this, token) == -1) {
+				if (-1 == Array.indexOf(this, token)) {
 					Array.push(this, token);
 				}
 			}, this);
@@ -52,7 +52,7 @@
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				var index = Array.indexOf(this, token);
-				if (index != -1) {
+				if (-1 != index) {
 					Array.splice(this, index, 1);
 				}
 			}, this);
@@ -73,7 +73,7 @@
 
 		contains: function (token) {
 			this.update();
-			return Array.indexOf(this, token) != -1;
+			return -1 != Array.indexOf(this, token);
 		},
 
 		toString: function () {
@@ -107,7 +107,7 @@
 /*
 			//обновление DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
-				if (event.attrName.toLowerCase() == "class") {
+				if ("class" == event.attrName.toLowerCase()) {
 					element._classList.update();
 				}
 			}, false);

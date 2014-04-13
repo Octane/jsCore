@@ -14,13 +14,13 @@ if (!String.prototype.endsWith) {
 		position = position || this.length;
 		position = position - string.length;
 		var lastIndex = this.lastIndexOf(string);
-		return lastIndex != -1 && lastIndex == position;
+		return -1 != lastIndex && lastIndex == position;
 	};
 }
 
 if (!String.prototype.contains) {
 	String.prototype.contains = function (string, position) {
-		return this.indexOf(string, position || 0) != -1;
+		return -1 != this.indexOf(string, position || 0);
 	};
 }
 

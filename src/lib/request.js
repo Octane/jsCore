@@ -53,9 +53,9 @@ lib.request = new function () {
 			userName = params.userName || "",
 			password = params.password || "",
 			timeout = params.timeout || 0,
-			async = params.async !== false,
-			caching = params.caching !== false,
-			credentials = params.credentials === true,
+			async = false !== params.async,
+			caching = false !== params.caching,
+			credentials = true === params.credentials,
 			mimeType = params.mimeType,
 			headers = {
 				"X-Requested-With": "XMLHttpRequest"
@@ -69,14 +69,14 @@ lib.request = new function () {
 				data = toQueryString(data);
 			}
 		}
-		if (method == "POST") {
+		if ("POST" == method) {
 			headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded; charset=UTF-8";
 		}
 		else {
 			if (!caching) {
 				url += "?no-cache=" + getRndQueryVal();
 			}
-			if (typeof data == "string") {
+			if ("string" == typeof data) {
 				url += (caching ? "?" : "&") + data;
 			}
 			data = null;
@@ -141,7 +141,7 @@ lib.request = new function () {
 		toQueryString: toQueryString,
 
 		get: function (params) {
-			if (typeof params == "string") {
+			if ("string" == typeof params) {
 				params = {url: params};
 			}
 			params.method = "GET";
@@ -172,7 +172,7 @@ lib.request = new function () {
 				}
 			*/
 			var url, data, caching;
-			if (typeof params == "string") {
+			if ("string" == typeof params) {
 				params = {url: params};
 			}
 			url = params.url || location.href;
@@ -184,11 +184,11 @@ lib.request = new function () {
 			if (!caching) {
 				url += "?no-cache=" + getRndQueryVal();
 			}
-			if (typeof data == "string") {
+			if ("string" == typeof data) {
 				url += (caching ? "?" : "&") + data;
 			}
 			return Promise.resolve(new Promise(function (resolve, reject) {
-				document.head.append(Object.assign(document.createElement("script"), {
+				document.head.appendChild(Object.assign(document.createElement("script"), {
 					onload: function () {
 						unbind(this);
 						this.remove();

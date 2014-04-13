@@ -18,7 +18,7 @@ window.setImmediate || new function () {
 	function callback(event) {
 		var key, data;
 		key = event.data;
-		if (typeof key == "string" && key.startsWith(message)) {
+		if ("string" == typeof key && key.startsWith(message)) {
 			data = storage[key];
 			if (data) {
 				fastApply(data);

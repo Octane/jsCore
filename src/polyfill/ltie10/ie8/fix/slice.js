@@ -23,10 +23,10 @@ new function () {
 			//IE8: NodeList instanceof Object → false
 			var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
 			//IE8: [1].slice(0, undefined) → []
-			if (length == 1 || (length == 2 && start == 0)) {
+			if (1 == length || 2 == length && 0 == start) {
 				return array == iterable ? slice.call(array, 0) : array;
 			}
-			if (length == 2) {
+			if (2 == length) {
 				return slice.call(array, start);
 			}
 			return slice.call(array, start, end);

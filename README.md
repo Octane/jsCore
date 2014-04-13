@@ -40,7 +40,11 @@ Array.slice может работать с DOM-объектам в IE8, в от�
 
 **Number generic methods**
 
-`isInteger`, `isFinite`, `isNaN`, `toInteger`, `parseInt`, `parseFloat`
+`isInteger`, `isFinite`, `isNaN`, `parseInt`, `parseFloat`
+
+**Math generic methods**
+
+`trunc`, `sign`
 
 **Function.prototype**
 

@@ -29,11 +29,11 @@ lib.event = {
 	//returns event details
 	on: function (eventType, selector, root, callback) {
 		var listener;
-		if (typeof root == "function") {
+		if ("function" == typeof root) {
 			callback = root;
 			root = document;
 		}
-		if (typeof selector != "string") {
+		if ("string" != typeof selector) {
 			root = selector;
 			selector = "";
 		}

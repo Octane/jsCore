@@ -8,7 +8,7 @@ if (!Array.from) {
 		if (func) {
 			return Array.map(iterable, func, boundThis);
 		}
-		return  Array.slice(iterable, 0);
+		return Array.slice(iterable, 0);
 	};
 }
 

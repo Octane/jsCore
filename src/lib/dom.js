@@ -29,7 +29,7 @@ lib.dom = {
 	ready: function () {
 		//todo img, iframe support
 		return new Promise(function (resolve) {
-			if (document.readyState == "complete") {
+			if ("complete" == document.readyState) {
 				resolve();
 			}
 			else {

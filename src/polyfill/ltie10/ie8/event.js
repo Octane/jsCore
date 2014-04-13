@@ -30,10 +30,7 @@ document.addEventListener || new function () {
 	function createEventListener(callbacks, element) {
 		return function (event) {
 			var i = 0, length = callbacks.length;
-			if (event instanceof CustomEvent) {
-				event.target = element;
-			}
-			else {
+			if (!(event instanceof CustomEvent)) {
 				event = fixEvent(event);
 			}
 			while (i < length) {
@@ -62,7 +59,7 @@ document.addEventListener || new function () {
 			//todo exclude custom event
 			this.attachEvent("on" + eventType, event.listener);
 		}
-		if (event.callbacks.indexOf(callback) == -1) {
+		if (-1 == event.callbacks.indexOf(callback)) {
 			event.callbacks.push(callback);
 		}
 	}
@@ -82,7 +79,7 @@ document.addEventListener || new function () {
 		event = events[eventType];
 		callbacks = event.callbacks;
 		index = callbacks.indexOf(callback);
-		if (index == -1) {
+		if (-1 == index) {
 			return;
 		}
 		callbacks.splice(index, 1);
@@ -162,18 +159,23 @@ document.addEventListener || new function () {
 
 	function CustomEvent() {}
 
-	CustomEvent.prototype.initCustomEvent = function (type, bubbles, cancelable, detail) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			detail: detail
-		});
-	}
+	Object.assign(CustomEvent.prototype, {
+		initCustomEvent: function (type, bubbles, cancelable, detail) {
+			Object.assign(this, {
+				type: type,
+				bubbles: bubbles,
+				cancelable: cancelable,
+				detail: detail
+			});
+		},
+		stopPropagation: stopPropagation,
+		preventDefault: preventDefault
+	});
 
 	function dispatchEvent(event) {
 		var events;
 		if (event instanceof CustomEvent) {
+			event.target = this;
 			events = this._events;
 			if (events && events[event.type]) {
 				events[event.type].listener(event);
@@ -192,7 +194,7 @@ document.addEventListener || new function () {
 	});
 
 	HTMLDocument.prototype.createEvent = function (group) {
-		if (group == "CustomEvent") {
+		if ("CustomEvent" == group) {
 			return new CustomEvent;
 		}
 		return Object.assign(document.createEventObject(), {
@@ -229,7 +231,6 @@ document.addEventListener || new function () {
 			var event = document.createEvent("CustomEvent");
 			event.initCustomEvent(eventType, false, false, null);
 			this.dispatchEvent(event);
-			event.target = this;
 			eventType = "on" + eventType;
 			if (this[eventType]) {
 				setImmediate(function () {
@@ -280,10 +281,10 @@ document.addEventListener || new function () {
 	//Warning: don't use onreadystatechange with onload and onerror!
 
 	set: function (callback) {
-		if (typeof callback == "function") {
+		if ("function" == typeof callback) {
 			this.onreadystatechange = function () {
 				var event;
-				if (this.readyState == "loaded") {
+				if ("loaded" == this.readyState) {
 					this.onreadystatechange = null;
 					event = document.createEvent("Event");
 					if (this.text) {

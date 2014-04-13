@@ -11,14 +11,14 @@ lib.array = {
 	},
 
 	contains: function (iterable, anything, position) {
-		return Array.indexOf(iterable, anything, position) != -1;
+		return -1 != Array.indexOf(iterable, anything, position);
 	},
 
 	unique: function (iterable) {
 		var anything, array = [], i = 0, j = 0, length = iterable.length;
 		while (i < length) {
 			anything = iterable[i];
-			if (array.indexOf(anything) == -1) {
+			if (-1 == array.indexOf(anything)) {
 				array[j++] = anything;
 			}
 			i++;

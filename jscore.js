@@ -19,7 +19,7 @@ if (!window.Node) {
 }
 
 if (!window.HTMLElement) {
-	window.HTMLElement = window.Element;
+	window.HTMLElement = Element;
 }
 
 "textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {
@@ -77,7 +77,7 @@ if (!Object.create) {
 
 if (!Array.isArray) {
 	Array.isArray = function (anything) {
-		return Object.prototype.toString.call(anything) == "[object Array]";
+		return "[object Array]" == Object.prototype.toString.call(anything);
 	};
 }
 
@@ -296,7 +296,7 @@ if (!Date.now) {
 
 
 //IE9-11 Object.create bug fix
-//http://webreflection.blogspot.ru/2014/04/all-ie-objects-are-broken.html
+//http://webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
 (function () {
 	var object = Object.create({});
 	object[0] = null;
@@ -334,7 +334,7 @@ if (!Object.assign) {
 
 if (!Object.is) {
 	Object.is = function (value1, value2) {
-		if (value1 === 0 && value2 === 0) {
+		if (0 === value1 && 0 === value2) {
 			return 1 / value1 === 1 / value2;
 		}
 		if (value1 !== value1) {
@@ -353,7 +353,7 @@ if (!Array.from) {
 		if (func) {
 			return Array.map(iterable, func, boundThis);
 		}
-		return  Array.slice(iterable, 0);
+		return Array.slice(iterable, 0);
 	};
 }
 
@@ -433,13 +433,13 @@ if (!String.prototype.endsWith) {
 		position = position || this.length;
 		position = position - string.length;
 		var lastIndex = this.lastIndexOf(string);
-		return lastIndex != -1 && lastIndex == position;
+		return -1 != lastIndex && lastIndex == position;
 	};
 }
 
 if (!String.prototype.contains) {
 	String.prototype.contains = function (string, position) {
-		return this.indexOf(string, position || 0) != -1;
+		return -1 != this.indexOf(string, position || 0);
 	};
 }
 
@@ -456,32 +456,19 @@ if (!Number.MAX_SAFE_INTEGER) {
 
 if (!Number.isFinite) {
 	Number.isFinite = function (value) {
-		return typeof value == "number" && isFinite(value);
+		return "number" == typeof value && isFinite(value);
 	};
 }
 
 if (!Number.isInteger) {
 	Number.isInteger = function (value) {
-		return typeof value == "number" && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) == value;
+		return "number" == typeof value && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) == value;
 	};
 }
 
 if (!Number.isNaN) {
 	Number.isNaN = function (value) {
-		return typeof value == "number" && isNaN(value);
-	};
-}
-
-if (!Number.toInteger) {
-	Number.toInteger = function (value) {
-		var number = +value;
-		if (isNaN(number)) {
-			return +0;
-		}
-		if (number === 0 || !isFinite(number)) {
-			return number;
-		}
-		return (number < 0 ? -1 : 1) * Math.floor(Math.abs(number));
+		return "number" == typeof value && isNaN(value);
 	};
 }
 
@@ -491,6 +478,26 @@ if (!Number.parseInt) {
 
 if (!Number.parseFloat) {
 	Number.parseFloat = parseFloat;
+}
+
+
+if (!Math.trunc) {
+	Math.trunc = function (value) {
+		value = Number(value);
+		if (isNaN(value) || 0 === value || !Number.isFinite(value)) {
+			return value;
+		}
+		return Math.sign(value) * Math.floor(Math.abs(value));
+	};
+}
+
+if (!Math.sign) {
+	Math.sign = function (value) {
+		if (0 === value || isNaN(value)) {
+			return value;
+		}
+		return (value > 0) - (value < 0);
+	};
 }
 
 
@@ -566,7 +573,7 @@ window.setImmediate || new function () {
 	function callback(event) {
 		var key, data;
 		key = event.data;
-		if (typeof key == "string" && key.startsWith(message)) {
+		if ("string" == typeof key && key.startsWith(message)) {
 			data = storage[key];
 			if (data) {
 				fastApply(data);
@@ -954,7 +961,7 @@ function StaticDOMStringMap() {}
 					j = 0, elements = new StaticHTMLCollection;
 				while (i < length) {
 					node = nodes[i];
-					if (node.nodeType == Node.ELEMENT_NODE) {
+					if (Node.ELEMENT_NODE == node.nodeType) {
 						elements[j++] = node;
 					}
 					i++;
@@ -999,14 +1006,14 @@ function StaticDOMStringMap() {}
 	var api, proto = HTMLElement.prototype;
 
 	function isContains(root, element, selector) {
-		return Array.indexOf(root.querySelectorAll(selector), element) != -1;
+		return -1 != Array.indexOf(root.querySelectorAll(selector), element);
 	}
 
 	function mutationMacro(nodes) {
 		var length = nodes.length, i, node, fragment;
-		if (length == 1) {
+		if (1 == length) {
 			node = nodes[0];
-			if (typeof node == "string") {
+			if ("string" == typeof node) {
 				return document.createTextNode(node);
 			}
 			return node;
@@ -1016,7 +1023,7 @@ function StaticDOMStringMap() {}
 		i = 0;
 		while (i < length) {
 			node = nodes[i];
-			if (typeof node == "string") {
+			if ("string" == typeof node) {
 				node = document.createTextNode(node);
 			}
 			fragment.appendChild(node);
@@ -1093,7 +1100,7 @@ function StaticDOMStringMap() {}
 				}
 				root = this.parentNode;
 				if (root) {
-					if (root.nodeType == Node.ELEMENT_NODE) {
+					if (Node.ELEMENT_NODE == root.nodeType) {
 						root = root.ownerDocument;
 					}
 					return isContains(root, this, selector);
@@ -1161,7 +1168,7 @@ function StaticDOMStringMap() {}
 			this.update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
-				if (Array.indexOf(this, token) == -1) {
+				if (-1 == Array.indexOf(this, token)) {
 					Array.push(this, token);
 				}
 			}, this);
@@ -1176,7 +1183,7 @@ function StaticDOMStringMap() {}
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				var index = Array.indexOf(this, token);
-				if (index != -1) {
+				if (-1 != index) {
 					Array.splice(this, index, 1);
 				}
 			}, this);
@@ -1197,7 +1204,7 @@ function StaticDOMStringMap() {}
 
 		contains: function (token) {
 			this.update();
-			return Array.indexOf(this, token) != -1;
+			return -1 != Array.indexOf(this, token);
 		},
 
 		toString: function () {
@@ -1231,7 +1238,7 @@ function StaticDOMStringMap() {}
 /*
 			//обновление DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
-				if (event.attrName.toLowerCase() == "class") {
+				if ("class" == event.attrName.toLowerCase()) {
 					element._classList.update();
 				}
 			}, false);
@@ -1284,22 +1291,22 @@ window.FormData || new function () {
 				if (field.disabled) {
 					return false;
 				}
-				if (tag == "fieldset") {
+				if ("fieldset" == tag) {
 					return false;
 				}
-				if (tag == "select" && field.multiple) {
+				if ("select" == tag && field.multiple) {
 					return Array.some(field.options, isSelected);
 				}
-				if (type == "submit" || type == "reset" || type == "button" || type == "file") {
+				if ("submit" == type || "reset" == type || "button" == type || "file" == type) {
 					return false;
 				}
-				if ((type == "radio" || type == "checkbox") && field.checked) {
+				if (("radio" == type || "checkbox" == type) && field.checked) {
 					return false;
 				}
 				return true;
 			}
 			function getValues(field) {
-				if (field.nodeName.toLowerCase() == "select" && field.multiple) {
+				if ("select" == field.nodeName.toLowerCase() && field.multiple) {
 					return Array.reduce(field.options, function (values, option) {
 						if (isSelected(option)) {
 							values.push(option.value);
@@ -1406,10 +1413,10 @@ new function () {
 			//IE8: NodeList instanceof Object → false
 			var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
 			//IE8: [1].slice(0, undefined) → []
-			if (length == 1 || (length == 2 && start == 0)) {
+			if (1 == length || 2 == length && 0 == start) {
 				return array == iterable ? slice.call(array, 0) : array;
 			}
-			if (length == 2) {
+			if (2 == length) {
 				return slice.call(array, start);
 			}
 			return slice.call(array, start, end);
@@ -1431,7 +1438,7 @@ catch (error) {
 //IE8 children.length fix (exclude COMMENT_NODE)
 (function () {
 	var node = document.createElement("div");
-	node.append(document.createComment("test"));
+	node.appendChild(document.createComment("test"));
 	return node.children.length; //→ 1 in IE8
 }()) && Object.defineProperty(HTMLElement.prototype, "children", {
 	get: Object.getOwnPropertyDescriptor(document.constructor.prototype, "children").get
@@ -1461,7 +1468,7 @@ document instanceof Object || new function () {
 		new function () {//avoid closure
 			var script = document.createElement("script");
 			script.onreadystatechange = onReadyStateChange;
-			document.head.append(script);
+			document.head.appendChild(script);
 		}
 		return 0;
 	};
@@ -1501,10 +1508,7 @@ document.addEventListener || new function () {
 	function createEventListener(callbacks, element) {
 		return function (event) {
 			var i = 0, length = callbacks.length;
-			if (event instanceof CustomEvent) {
-				event.target = element;
-			}
-			else {
+			if (!(event instanceof CustomEvent)) {
 				event = fixEvent(event);
 			}
 			while (i < length) {
@@ -1533,7 +1537,7 @@ document.addEventListener || new function () {
 			//todo exclude custom event
 			this.attachEvent("on" + eventType, event.listener);
 		}
-		if (event.callbacks.indexOf(callback) == -1) {
+		if (-1 == event.callbacks.indexOf(callback)) {
 			event.callbacks.push(callback);
 		}
 	}
@@ -1553,7 +1557,7 @@ document.addEventListener || new function () {
 		event = events[eventType];
 		callbacks = event.callbacks;
 		index = callbacks.indexOf(callback);
-		if (index == -1) {
+		if (-1 == index) {
 			return;
 		}
 		callbacks.splice(index, 1);
@@ -1633,18 +1637,23 @@ document.addEventListener || new function () {
 
 	function CustomEvent() {}
 
-	CustomEvent.prototype.initCustomEvent = function (type, bubbles, cancelable, detail) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			detail: detail
-		});
-	}
+	Object.assign(CustomEvent.prototype, {
+		initCustomEvent: function (type, bubbles, cancelable, detail) {
+			Object.assign(this, {
+				type: type,
+				bubbles: bubbles,
+				cancelable: cancelable,
+				detail: detail
+			});
+		},
+		stopPropagation: stopPropagation,
+		preventDefault: preventDefault
+	});
 
 	function dispatchEvent(event) {
 		var events;
 		if (event instanceof CustomEvent) {
+			event.target = this;
 			events = this._events;
 			if (events && events[event.type]) {
 				events[event.type].listener(event);
@@ -1663,7 +1672,7 @@ document.addEventListener || new function () {
 	});
 
 	HTMLDocument.prototype.createEvent = function (group) {
-		if (group == "CustomEvent") {
+		if ("CustomEvent" == group) {
 			return new CustomEvent;
 		}
 		return Object.assign(document.createEventObject(), {
@@ -1700,7 +1709,6 @@ document.addEventListener || new function () {
 			var event = document.createEvent("CustomEvent");
 			event.initCustomEvent(eventType, false, false, null);
 			this.dispatchEvent(event);
-			event.target = this;
 			eventType = "on" + eventType;
 			if (this[eventType]) {
 				setImmediate(function () {
@@ -1751,10 +1759,10 @@ document.addEventListener || new function () {
 	//Warning: don't use onreadystatechange with onload and onerror!
 
 	set: function (callback) {
-		if (typeof callback == "function") {
+		if ("function" == typeof callback) {
 			this.onreadystatechange = function () {
 				var event;
-				if (this.readyState == "loaded") {
+				if ("loaded" == this.readyState) {
 					this.onreadystatechange = null;
 					event = document.createEvent("Event");
 					if (this.text) {
@@ -1792,7 +1800,7 @@ window.getComputedStyle || new function () {
 
 	function getPropertyValue(propName) {
 		propName = propName.toLowerCase();
-		return this[propName == "float" ? "cssFloat" : toCamelCase(propName)];
+		return this["float" == propName ? "cssFloat" : toCamelCase(propName)];
 	}
 
 	function createPropDesc(obj, propName) {
@@ -1837,11 +1845,11 @@ Object.assign(lib, {
 
 	//example: if (tests.every(lib.isTrue))
 	isTrue: function (bool) {
-		return bool === true;
+		return true === bool;
 	},
 
 	isFalse: function (bool) {
-		return bool === false;
+		return false === bool;
 	},
 
 	isHTML: function (string) {
@@ -1882,14 +1890,14 @@ lib.array = {
 	},
 
 	contains: function (iterable, anything, position) {
-		return Array.indexOf(iterable, anything, position) != -1;
+		return -1 != Array.indexOf(iterable, anything, position);
 	},
 
 	unique: function (iterable) {
 		var anything, array = [], i = 0, j = 0, length = iterable.length;
 		while (i < length) {
 			anything = iterable[i];
-			if (array.indexOf(anything) == -1) {
+			if (-1 == array.indexOf(anything)) {
 				array[j++] = anything;
 			}
 			i++;
@@ -1981,11 +1989,11 @@ lib.event = {
 	//returns event details
 	on: function (eventType, selector, root, callback) {
 		var listener;
-		if (typeof root == "function") {
+		if ("function" == typeof root) {
 			callback = root;
 			root = document;
 		}
-		if (typeof selector != "string") {
+		if ("string" != typeof selector) {
 			root = selector;
 			selector = "";
 		}
@@ -2149,9 +2157,9 @@ lib.request = new function () {
 			userName = params.userName || "",
 			password = params.password || "",
 			timeout = params.timeout || 0,
-			async = params.async !== false,
-			caching = params.caching !== false,
-			credentials = params.credentials === true,
+			async = false !== params.async,
+			caching = false !== params.caching,
+			credentials = true === params.credentials,
 			mimeType = params.mimeType,
 			headers = {
 				"X-Requested-With": "XMLHttpRequest"
@@ -2165,14 +2173,14 @@ lib.request = new function () {
 				data = toQueryString(data);
 			}
 		}
-		if (method == "POST") {
+		if ("POST" == method) {
 			headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded; charset=UTF-8";
 		}
 		else {
 			if (!caching) {
 				url += "?no-cache=" + getRndQueryVal();
 			}
-			if (typeof data == "string") {
+			if ("string" == typeof data) {
 				url += (caching ? "?" : "&") + data;
 			}
 			data = null;
@@ -2237,7 +2245,7 @@ lib.request = new function () {
 		toQueryString: toQueryString,
 
 		get: function (params) {
-			if (typeof params == "string") {
+			if ("string" == typeof params) {
 				params = {url: params};
 			}
 			params.method = "GET";
@@ -2268,7 +2276,7 @@ lib.request = new function () {
 				}
 			*/
 			var url, data, caching;
-			if (typeof params == "string") {
+			if ("string" == typeof params) {
 				params = {url: params};
 			}
 			url = params.url || location.href;
@@ -2280,11 +2288,11 @@ lib.request = new function () {
 			if (!caching) {
 				url += "?no-cache=" + getRndQueryVal();
 			}
-			if (typeof data == "string") {
+			if ("string" == typeof data) {
 				url += (caching ? "?" : "&") + data;
 			}
 			return Promise.resolve(new Promise(function (resolve, reject) {
-				document.head.append(Object.assign(document.createElement("script"), {
+				document.head.appendChild(Object.assign(document.createElement("script"), {
 					onload: function () {
 						unbind(this);
 						this.remove();
@@ -2338,7 +2346,7 @@ lib.dom = {
 	ready: function () {
 		//todo img, iframe support
 		return new Promise(function (resolve) {
-			if (document.readyState == "complete") {
+			if ("complete" == document.readyState) {
 				resolve();
 			}
 			else {
@@ -2372,7 +2380,7 @@ lib.date = {
 			year = monthIndex.getFullYear();
 			monthIndex = monthIndex.getMonth();
 		}
-		if (monthIndex == 1 && this.isLeapYear(year)) {
+		if (1 == monthIndex && this.isLeapYear(year)) {
 			return 29;
 		}
 		return this._monthLengths[monthIndex];

@@ -23,7 +23,7 @@ document instanceof Object || new function () {
 		new function () {//avoid closure
 			var script = document.createElement("script");
 			script.onreadystatechange = onReadyStateChange;
-			document.head.append(script);
+			document.head.appendChild(script);
 		}
 		return 0;
 	};

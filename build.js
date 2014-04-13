@@ -22,6 +22,7 @@ try {
 		"polyfill/array.js",
 		"polyfill/string.js",
 		"polyfill/number.js",
+		"polyfill/math.js",
 		"polyfill/generic.js",
 		"polyfill/setimmediate.js",
 		"polyfill/promise.js",

@@ -1,7 +1,7 @@
 "use strict";
 
 //IE9-11 Object.create bug fix
-//http://webreflection.blogspot.ru/2014/04/all-ie-objects-are-broken.html
+//http://webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
 (function () {
 	var object = Object.create({});
 	object[0] = null;
@@ -39,7 +39,7 @@ if (!Object.assign) {
 
 if (!Object.is) {
 	Object.is = function (value1, value2) {
-		if (value1 === 0 && value2 === 0) {
+		if (0 === value1 && 0 === value2) {
 			return 1 / value1 === 1 / value2;
 		}
 		if (value1 !== value1) {

@@ -40,22 +40,22 @@ window.FormData || new function () {
 				if (field.disabled) {
 					return false;
 				}
-				if (tag == "fieldset") {
+				if ("fieldset" == tag) {
 					return false;
 				}
-				if (tag == "select" && field.multiple) {
+				if ("select" == tag && field.multiple) {
 					return Array.some(field.options, isSelected);
 				}
-				if (type == "submit" || type == "reset" || type == "button" || type == "file") {
+				if ("submit" == type || "reset" == type || "button" == type || "file" == type) {
 					return false;
 				}
-				if ((type == "radio" || type == "checkbox") && field.checked) {
+				if (("radio" == type || "checkbox" == type) && field.checked) {
 					return false;
 				}
 				return true;
 			}
 			function getValues(field) {
-				if (field.nodeName.toLowerCase() == "select" && field.multiple) {
+				if ("select" == field.nodeName.toLowerCase() && field.multiple) {
 					return Array.reduce(field.options, function (values, option) {
 						if (isSelected(option)) {
 							values.push(option.value);

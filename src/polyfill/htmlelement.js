@@ -99,7 +99,7 @@ function StaticDOMStringMap() {}
 					j = 0, elements = new StaticHTMLCollection;
 				while (i < length) {
 					node = nodes[i];
-					if (node.nodeType == Node.ELEMENT_NODE) {
+					if (Node.ELEMENT_NODE == node.nodeType) {
 						elements[j++] = node;
 					}
 					i++;
@@ -144,14 +144,14 @@ function StaticDOMStringMap() {}
 	var api, proto = HTMLElement.prototype;
 
 	function isContains(root, element, selector) {
-		return Array.indexOf(root.querySelectorAll(selector), element) != -1;
+		return -1 != Array.indexOf(root.querySelectorAll(selector), element);
 	}
 
 	function mutationMacro(nodes) {
 		var length = nodes.length, i, node, fragment;
-		if (length == 1) {
+		if (1 == length) {
 			node = nodes[0];
-			if (typeof node == "string") {
+			if ("string" == typeof node) {
 				return document.createTextNode(node);
 			}
 			return node;
@@ -161,7 +161,7 @@ function StaticDOMStringMap() {}
 		i = 0;
 		while (i < length) {
 			node = nodes[i];
-			if (typeof node == "string") {
+			if ("string" == typeof node) {
 				node = document.createTextNode(node);
 			}
 			fragment.appendChild(node);
@@ -238,7 +238,7 @@ function StaticDOMStringMap() {}
 				}
 				root = this.parentNode;
 				if (root) {
-					if (root.nodeType == Node.ELEMENT_NODE) {
+					if (Node.ELEMENT_NODE == root.nodeType) {
 						root = root.ownerDocument;
 					}
 					return isContains(root, this, selector);
