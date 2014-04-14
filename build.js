@@ -35,6 +35,7 @@ try {
 
 
 		"polyfill/ltie10/ie8/fix/slice.js",
+		"polyfill/ltie10/ie8/fix/splice.js",
 		"polyfill/ltie10/ie8/fix/dataset.js",
 		"polyfill/ltie10/ie8/fix/children.js",
 		"polyfill/ltie10/ie8/setimmediate.js",

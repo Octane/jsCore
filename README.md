@@ -263,6 +263,12 @@ lib.array.range(2, 7) //→ [2, 3, 4, 5, 6]
 lib.array.range(5) //→ [0, 1, 2, 3, 4]
 ```
 
+`lib.array.remove` удаляет элемент массива, возвращает false или новый массив с удаленным элементом
+```javascript
+lib.array.remove(["a, "b", "c"], "b") //→ ["b"]
+lib.array.remove(["a, "b", "c"], "x") //→ false
+```
+
 ##lib.is
 
 `lib.isTrue`, `lib.isFalse`, `lib.isHTML`, `lib.isObject`, `lib.isHTMLElement` вспомогательные функции для использования, например, в Array iteration methods:

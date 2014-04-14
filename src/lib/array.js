@@ -76,6 +76,11 @@ lib.array = {
 			array[i] = tmp;
 		}
 		return array;
+	},
+
+	remove: function (iterable, anything) {
+		var index = Array.indexOf(iterable, anything);
+		return -1 != index && Array.splice(iterable, index, 1);
 	}
 
 };
