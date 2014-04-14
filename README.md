@@ -253,8 +253,7 @@ lib.array.contains(["a", "b"], "a") //→ true
 
 `lib.array.shuffle` возвращает новый массив, состоящий из перемешанных элементов переданного массива
 ```javascript
-lib.array.range(2, 7) //→ [2, 3, 4, 5, 6]
-lib.array.range(5) //→ [0, 1, 2, 3, 4]
+lib.array.shuffle(iterbale) //→ array
 ```
 
 `lib.array.range` возвращает новый массив, заполненный числовыми значениями в указанном диапазоне
@@ -265,8 +264,8 @@ lib.array.range(5) //→ [0, 1, 2, 3, 4]
 
 `lib.array.remove` удаляет элемент массива, возвращает false или новый массив с удаленным элементом
 ```javascript
-lib.array.remove(["a, "b", "c"], "b") //→ ["b"]
-lib.array.remove(["a, "b", "c"], "x") //→ false
+lib.array.remove(["a", "b", "c"], "b") //→ ["b"]
+lib.array.remove(["a", "b", "c"], "x") //→ false
 ```
 
 ##lib.is
