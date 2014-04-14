@@ -69,7 +69,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.nextSibling;
 			}
-			while(node && node.nodeType != 1);
+			while (node && node.nodeType != 1);
 			return node;
 		},
 
@@ -78,7 +78,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.previousSibling;
 			}
-			while(node && node.nodeType != 1);
+			while (node && node.nodeType != 1);
 			return node;
 		},
 

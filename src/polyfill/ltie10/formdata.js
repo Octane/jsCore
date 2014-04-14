@@ -92,7 +92,7 @@ window.FormData || new function () {
 
 	Object.assign(FormData.prototype, {
 
-		append: function(name, value, fileName) {
+		append: function (name, value, fileName) {
 			Array.push(this, {
 				name: name,
 				value: value,
@@ -100,7 +100,7 @@ window.FormData || new function () {
 			});
 		},
 
-		toString: function() {
+		toString: function () {
 			//source by François de Metz
 			//https://github.com/francois2metz/html5-formdata
 			var boundary = this.boundary, body = "";

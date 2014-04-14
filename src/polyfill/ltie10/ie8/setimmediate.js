@@ -2,7 +2,6 @@
 //IE8 setImmediate polyfill
 document instanceof Object || new function () {
 
-	//todo code reuse
 	function fastApply(args) {
 		var func = args[0];
 		switch (args.length) {

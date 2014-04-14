@@ -14,7 +14,7 @@
 		var deltedItems = splice.apply(Array, arguments), length;
 		if (!(iterable instanceof Array)) {
 			length = iterable.length;
-			while(deleteCount--) {
+			while (deleteCount--) {
 				delete iterable[length + deleteCount];
 			}
 		}

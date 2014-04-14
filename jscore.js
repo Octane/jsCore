@@ -931,7 +931,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.nextSibling;
 			}
-			while(node && node.nodeType != 1);
+			while (node && node.nodeType != 1);
 			return node;
 		},
 
@@ -940,7 +940,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.previousSibling;
 			}
-			while(node && node.nodeType != 1);
+			while (node && node.nodeType != 1);
 			return node;
 		},
 
@@ -1343,7 +1343,7 @@ window.FormData || new function () {
 
 	Object.assign(FormData.prototype, {
 
-		append: function(name, value, fileName) {
+		append: function (name, value, fileName) {
 			Array.push(this, {
 				name: name,
 				value: value,
@@ -1351,7 +1351,7 @@ window.FormData || new function () {
 			});
 		},
 
-		toString: function() {
+		toString: function () {
 			//source by François de Metz
 			//https://github.com/francois2metz/html5-formdata
 			var boundary = this.boundary, body = "";
@@ -1440,7 +1440,7 @@ new function () {
 		var deltedItems = splice.apply(Array, arguments), length;
 		if (!(iterable instanceof Array)) {
 			length = iterable.length;
-			while(deleteCount--) {
+			while (deleteCount--) {
 				delete iterable[length + deleteCount];
 			}
 		}
@@ -1470,7 +1470,6 @@ catch (error) {
 //IE8 setImmediate polyfill
 document instanceof Object || new function () {
 
-	//todo code reuse
 	function fastApply(args) {
 		var func = args[0];
 		switch (args.length) {
