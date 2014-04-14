@@ -41,6 +41,7 @@ lib.event = {
 			root = document;
 		}
 		if (selector) {
+			selector += "," + selector + " *";
 			listener = function (event) {
 				var target = event.target;
 				if (target.matches && target.matches(selector)) {

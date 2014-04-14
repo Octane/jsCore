@@ -7,7 +7,7 @@
 		length: 1
 	};
 	Array.splice(iterable, 0, 1);
-	return 0 in iterable; //→ true in IE8
+	return iterable[0]; //→ true in IE8
 }()) && new function () {
 	var splice = Array.splice;
 	Array.splice = function (iterable, start, deleteCount) {
