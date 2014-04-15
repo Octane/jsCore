@@ -40,7 +40,7 @@ if (!window.HTMLElement) {
 //IE8 Object.keys polyfill
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
-	//в IE8 переопределенные стандартные методы не становятся enumerable
+	//IE8 [[Enumerable]] bug
 	var hasBug = [
 			"constructor", "toString", "toLocaleString", "valueOf",
 			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
@@ -65,6 +65,7 @@ if (!window.HTMLElement) {
 };
 
 if (!Object.create) {
+	//Warning: Object.create(null) instanceof Object → true, and it doesn't fix!
 	Object.create = function (prototype) {
 		if (1 in arguments) {
 			throw new Error("Object.create implementation only accepts the first parameter");
@@ -1001,8 +1002,6 @@ function StaticDOMStringMap() {}
 //DOM4 http://www.w3.org/TR/dom/#element
 "append" in document.createDocumentFragment() || new function () {
 
-	//todo HierarchyRequestError
-
 	var api, proto = HTMLElement.prototype;
 
 	function isContains(root, element, selector) {
@@ -1035,7 +1034,7 @@ function StaticDOMStringMap() {}
 	api = {
 
 		before: function (/* ...nodes */) {
-			//todo IE8 removedNode.parentNode != null
+			//todo IE8 removedNode.parentNode ≠ null
 			var parentNode = this.parentNode;
 			if (parentNode) {
 				parentNode.insertBefore(mutationMacro(arguments), this);
@@ -1095,7 +1094,7 @@ function StaticDOMStringMap() {}
 			function (selector) {
 				var root, contains;
 				if (this === document) {
-					//если documentFragment.constructor === document.constructor
+					//if documentFragment.constructor ≡ document.constructor
 					return false;
 				}
 				root = this.parentNode;
@@ -1236,7 +1235,7 @@ function StaticDOMStringMap() {}
 				);
 			}
 /*
-			//обновление DOMTokenList
+			//live update DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
 				if ("class" == event.attrName.toLowerCase()) {
 					element._classList.update();
@@ -1252,8 +1251,9 @@ function StaticDOMStringMap() {}
 
 window.FormData || new function () {
 
-	/* <input type="file"> не поддерживается, но если известно
-	 * содержимое файла, его можно добавить с помощью append:
+	/* <input type="file"> not supported,
+	 * but if you know file contents,
+	 * it can be added using append:
 	 *
 	 * (new FormData).append(name, fileValue[, fileName])
 	 *
@@ -1314,7 +1314,7 @@ window.FormData || new function () {
 						return values;
 					}, []);
 				}
-				//todo CRLF
+				//todo replace CRLF
 				return [field.value];
 			}
 			return function (form) {
@@ -1404,15 +1404,15 @@ new function () {
 	}
 
 	try {
-		//в IE8 методы массива не работают с DOM-объектами
+		//array methods don't work with array-like DOM-objects in IE8
 		Array.slice(document.documentElement.childNodes, 0);
 	}
 	catch (error) {
 		Array.slice = function (iterable, start, end) {
 			var length = arguments.length;
-			//IE8: NodeList instanceof Object → false
+			//NodeList instanceof Object → false in IE8
 			var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
-			//IE8: [1].slice(0, undefined) → []
+			//[1].slice(0, undefined) → [] in IE8
 			if (1 == length || 2 == length && 0 == start) {
 				return array == iterable ? slice.call(array, 0) : array;
 			}
@@ -1589,7 +1589,6 @@ document.addEventListener || new function () {
 		}
 	}
 
-	//todo поставить в соответсвие параметры функций свойствам объекта события в IE
 	function initEvent(type, bubbles, cancelable) {
 		Object.assign(this, {
 			type: type,
@@ -1903,8 +1902,9 @@ lib.class_ = {
 
 lib.array = {
 
-	//подсчет реального количсества элементов
-	//http://javascript.ru/forum/misc/25392-rabota-s-massivom.html#post155335
+	//counts the actual number of elements
+	//http://javascript.ru/forum/155335-post38.html
+	//example: count([1,,2]) → 2, but [1,,2].length → 3
 	count: function (iterable) {
 		return Array.reduce(iterable, function (length) {
 			return length + 1;
@@ -1927,8 +1927,8 @@ lib.array = {
 		return array;
 	},
 
-	//Array.every игнорирует пропущенные индексы,
-	//и всегда возвращает true для пустого массива
+	//Array.every ignores missing indexes and
+	//always returns true for an empty array
 	all: function (iterable, func, boundThis) {
 		var i = Object(iterable).length;
 		if (!i) {
@@ -1947,7 +1947,8 @@ lib.array = {
 		return true;
 	},
 
-	//удаляет несуществующие индексы
+	//shift the array indexes, so that was not missed
+	//example: refine([1,,2]) → [1, 2]
 	refine: function (iterable) {
 		return Array.reduce(iterable, function (array, anything) {
 			array.push(anything);

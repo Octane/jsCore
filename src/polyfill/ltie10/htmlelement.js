@@ -105,7 +105,7 @@
 				);
 			}
 /*
-			//обновление DOMTokenList
+			//live update DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
 				if ("class" == event.attrName.toLowerCase()) {
 					element._classList.update();

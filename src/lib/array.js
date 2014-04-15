@@ -2,8 +2,9 @@
 
 lib.array = {
 
-	//подсчет реального количсества элементов
-	//http://javascript.ru/forum/misc/25392-rabota-s-massivom.html#post155335
+	//counts the actual number of elements
+	//http://javascript.ru/forum/155335-post38.html
+	//example: count([1,,2]) → 2, but [1,,2].length → 3
 	count: function (iterable) {
 		return Array.reduce(iterable, function (length) {
 			return length + 1;
@@ -26,8 +27,8 @@ lib.array = {
 		return array;
 	},
 
-	//Array.every игнорирует пропущенные индексы,
-	//и всегда возвращает true для пустого массива
+	//Array.every ignores missing indexes and
+	//always returns true for an empty array
 	all: function (iterable, func, boundThis) {
 		var i = Object(iterable).length;
 		if (!i) {
@@ -46,7 +47,8 @@ lib.array = {
 		return true;
 	},
 
-	//удаляет несуществующие индексы
+	//shift the array indexes, so that was not missed
+	//example: refine([1,,2]) → [1, 2]
 	refine: function (iterable) {
 		return Array.reduce(iterable, function (array, anything) {
 			array.push(anything);

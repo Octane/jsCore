@@ -2,7 +2,7 @@
 //IE8 Object.keys polyfill
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
-	//в IE8 переопределенные стандартные методы не становятся enumerable
+	//IE8 [[Enumerable]] bug
 	var hasBug = [
 			"constructor", "toString", "toLocaleString", "valueOf",
 			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
@@ -27,6 +27,7 @@
 };
 
 if (!Object.create) {
+	//Warning: Object.create(null) instanceof Object → true, and it doesn't fix!
 	Object.create = function (prototype) {
 		if (1 in arguments) {
 			throw new Error("Object.create implementation only accepts the first parameter");

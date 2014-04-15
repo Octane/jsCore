@@ -89,7 +89,6 @@ document.addEventListener || new function () {
 		}
 	}
 
-	//todo поставить в соответсвие параметры функций свойствам объекта события в IE
 	function initEvent(type, bubbles, cancelable) {
 		Object.assign(this, {
 			type: type,

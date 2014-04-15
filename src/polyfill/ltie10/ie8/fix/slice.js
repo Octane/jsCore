@@ -14,15 +14,15 @@ new function () {
 	}
 
 	try {
-		//в IE8 методы массива не работают с DOM-объектами
+		//array methods don't work with array-like DOM-objects in IE8
 		Array.slice(document.documentElement.childNodes, 0);
 	}
 	catch (error) {
 		Array.slice = function (iterable, start, end) {
 			var length = arguments.length;
-			//IE8: NodeList instanceof Object → false
+			//NodeList instanceof Object → false in IE8
 			var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
-			//IE8: [1].slice(0, undefined) → []
+			//[1].slice(0, undefined) → [] in IE8
 			if (1 == length || 2 == length && 0 == start) {
 				return array == iterable ? slice.call(array, 0) : array;
 			}

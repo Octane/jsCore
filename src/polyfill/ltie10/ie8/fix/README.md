@@ -1,3 +1,3 @@
 src/polyfill/ltie10/ie8/fix
 
-Фиксы к полифилам или реализованым в IE8 возможностям, но работающим с ошибками.
+Fixes to polyfills or incorrectly implemented features in IE8.

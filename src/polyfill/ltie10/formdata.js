@@ -1,8 +1,9 @@
 
 window.FormData || new function () {
 
-	/* <input type="file"> не поддерживается, но если известно
-	 * содержимое файла, его можно добавить с помощью append:
+	/* <input type="file"> not supported,
+	 * but if you know file contents,
+	 * it can be added using append:
 	 *
 	 * (new FormData).append(name, fileValue[, fileName])
 	 *
@@ -63,7 +64,7 @@ window.FormData || new function () {
 						return values;
 					}, []);
 				}
-				//todo CRLF
+				//todo replace CRLF
 				return [field.value];
 			}
 			return function (form) {

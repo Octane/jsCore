@@ -139,8 +139,6 @@ function StaticDOMStringMap() {}
 //DOM4 http://www.w3.org/TR/dom/#element
 "append" in document.createDocumentFragment() || new function () {
 
-	//todo HierarchyRequestError
-
 	var api, proto = HTMLElement.prototype;
 
 	function isContains(root, element, selector) {
@@ -173,7 +171,7 @@ function StaticDOMStringMap() {}
 	api = {
 
 		before: function (/* ...nodes */) {
-			//todo IE8 removedNode.parentNode != null
+			//todo IE8 removedNode.parentNode ≠ null
 			var parentNode = this.parentNode;
 			if (parentNode) {
 				parentNode.insertBefore(mutationMacro(arguments), this);
@@ -233,7 +231,7 @@ function StaticDOMStringMap() {}
 			function (selector) {
 				var root, contains;
 				if (this === document) {
-					//если documentFragment.constructor === document.constructor
+					//if documentFragment.constructor ≡ document.constructor
 					return false;
 				}
 				root = this.parentNode;
