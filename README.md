@@ -1,6 +1,17 @@
 #<img src="https://raw.githubusercontent.com/Octane/jsCore/master/logo.png" width="66" height="66" align="left" valign="middle" hspace="10" alt="jsCore logotype">jsCore JavaScript library
 
-The library consists of a complex polyfill and a set of methods in the `lib` namespace. If you don't want to support IE8, rebuild `jscore.js` using `build.js` by deleting from the list of files that are stored in `src/polyfill/ltie10/ie8`.
+The library consists of a complex polyfill and a set of methods in the `lib` namespace.
+
+To use jsCore, just drop a single JavaScript file into your page:
+```html
+<script src="jscore.js"></script>
+```
+Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octane/jsCore/master/jscore.js).
+
+If you don't want to support IE8, rebuild `jscore.js` using `build.js`:
+```
+node build.js --no_ie8
+```
 
 ##Polyfill
 
@@ -73,10 +84,9 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `setImmediate()`, `
 
 <sup name="clearImmediate">18</sup> – `clearImmediate` function useless in IE8
 
------
 ##lib
 
-###lib.Template
+###lib.Template()
 
 `lib.Template` is a very simple string templating tool (not to be confused with HTML-templating)
 ```javascript
@@ -85,7 +95,7 @@ tmpl.match({name: "John"}) //→ "Hi, John"
 tmpl.match({name: "Luke"}) //→ "Hi, Luke"
 ```
 
-###lib.I18n
+###lib.I18n()
 
 `lib.I18n` is a handy tool for the internationalization
 ```javascript
@@ -116,16 +126,22 @@ i18n("currency", {cost: 100}) // → "100 руб."
 ```
 ###lib.html
 
+####lib.html.parse()
+
 `lib.html.parse` converts a HTML-code into a document fragment
 ```javascript
 var docFragment = lib.html.parse("<h1>Example</h1><p>…</p>");
 document.body.append(docFragment);
 ```
 
+####lib.html.escape()
+
 `lib.html.escape` converts special HTML-characters to mnemonics
 ```javascript
 lib.html.escape("<h1>Example</h1>") // → "&lt;h1&gt;Example&lt;/h1&gt;"
 ```
+
+####lib.html.unescape()
 
 `lib.html.unescape` converts HTML-mnemonics to characters
 ```javascript
@@ -142,6 +158,8 @@ Class.super_ == SuperClass //→ true
 
 ###lib.event
 
+####lib.event.on()
+
 `lib.event.on` registers a handler for an DOM event
 ```javascript
 lib.event.on(eventType[, selector][, element], callback) //→ eventDetails
@@ -150,6 +168,8 @@ delegating events using the CSS-selector:
 ```javascript
 lib.event.on("click", ".menu-item, .submenu-item", onMenuClick)
 ```
+
+####lib.event.off()
 
 `lib.event.off` removes the handler for the DOM event
 ```javascript
@@ -161,6 +181,8 @@ var eventDetails = lib.event.on("mouseup", document, onMouseUp);
 lib.event.off(eventDetails);
 ```
 
+####lib.event.one()
+
 `lib.event.one` registers the handler for the DOM event, which runs once
 ```javascript
 lib.event.one(eventType[, selector][, element], callback) //→ eventDetails
@@ -169,6 +191,8 @@ example:
 ```javascript
 lib.event.one("load", window, onLoaded);
 ```
+
+####lib.event.when()
 
 `lib.event.when` like `lib.event.one`, but returns a promise, the callback is passed to `then`
 ```javascript
@@ -179,10 +203,14 @@ example:
 lib.event.when("click", ".some-class").then(doSomething);
 ```
 
+####lib.event.preventDefault()
+
 `lib.event.preventDefault` cancels the default action of the event
 ```javascript
 lib.event.on("submit", someForm, lib.event.preventDefault);
 ```
+
+####lib.event.stopPropagation()
 
 `lib.event.stopPropagation` prevents further propagation of the event
 ```javascript
@@ -191,6 +219,8 @@ lib.event.on("click", someElement, lib.event.stopPropagation);
 
 ###lib.array
 
+####lib.array.count()
+
 `lib.array.count` counts the actual number of elements
 ```javascript
 var iterable = [,"a",,"b",];
@@ -198,37 +228,51 @@ iterable.length //→ 4
 lib.array.count(iterable) //→ 2
 ```
 
+####lib.array.all()
+
 `lib.array.all` like `Array.every`, but it is sensitive to the length of the array and missing indexes
 ```javascript
 [].every(lib.isTrue) //→ true
 lib.array.all([], lib.isTrue) //→ false
 ```
 
+####lib.array.unique()
+
 `lib.array.unique` returns the new array consisting only of unique elements of the passed array
 ```javascript
 lib.array.unique([1, 2, 1]) //→ [1, 2]
 ```
+
+####lib.array.refine()
 
 `lib.array.refine` shifts array indexes, so that was not missed
 ```javascript
 lib.array.refine([1,,2]) //→ [1, 2]
 ```
 
+####lib.array.contains()
+
 `lib.array.contains` determines whether an element may be found within the array
 ```javascript
 lib.array.contains(["a", "b"], "a") //→ true
 ```
+
+####lib.array.shuffle()
 
 `lib.array.shuffle` returns the new array consisting of mixed elements of the passed array
 ```javascript
 lib.array.shuffle(iterbale) //→ array
 ```
 
+####lib.array.range()
+
 `lib.array.range` creates the array of integers
 ```javascript
 lib.array.range(2, 7) //→ [2, 3, 4, 5, 6]
 lib.array.range(5) //→ [0, 1, 2, 3, 4]
 ```
+
+####lib.array.remove()
 
 `lib.array.remove` removes the element from the array
 ```javascript
@@ -242,11 +286,13 @@ console.log(list) //→ ["a", "c"]
 `lib.isTrue`, `lib.isFalse`, `lib.isHTML`, `lib.isObject`, `lib.isHTMLElement` are helper functions for use, e.g., in `Array` iteration methods
 ```javascript
 if (testResults.every(lib.isTrue)) {
-    …
+    //do something
 }
 ```
 
 ###lib.dom
+
+####lib.dom.query()
 
 `lib.dom.query` returns a promise to perform actions asynchronously, if a element found
 ```javascript
@@ -255,6 +301,8 @@ lib.dom.query("#nav-menu").then(function (element) {
 });
 ```
 
+####lib.dom.queryAll()
+
 `lib.dom.queryAll` returns the promise to perform actions asynchronously, if elements found
 ```javascript
 lib.dom.queryAll(".menu-item", menuElement).then(function (list) {
@@ -262,7 +310,9 @@ lib.dom.queryAll(".menu-item", menuElement).then(function (list) {
 });
 ```
 
-`lib.dom.ready` returns the promise to perform actions asynchronously after `DOMContentLoaded`
+####lib.dom.ready()
+
+`lib.dom.ready` returns the promise to perform actions after `DOMContentLoaded`
 ```javascript
 lib.dom.ready().then(function () {
     //do something
@@ -271,11 +321,15 @@ lib.dom.ready().then(function () {
 
 ###lib.date
 
+####lib.data.isLeapYear()
+
 `lib.date.isLeapYear` determines whether a leap year
 ```javascript
 lib.date.isLeapYear([date]) //→ boolean
 ```
 where `date` is instance of `Date` or the four-digit number
+
+####lib.date.monthLength()
 
 `lib.date.monthLength` returns the number of days in a month
 ```javascript
@@ -283,11 +337,9 @@ lib.date.monthLength(monthIndex, fullYear) //→ number
 ```
 if instead `monthIndex` pass the instance of `Date`, then the second argument not needed
 
-//translate into English
+###lib.request()
 
-###lib.request
-
-lib.request выполняет запрос на сервер, используя XMLHttpRequest, возвращает promise
+`lib.request` performs a request to a server using `XMLHttpRequest`, returns a promise
 ```javascript
 lib.request({
     method:   String,
@@ -302,20 +354,33 @@ lib.request({
     headers:  Object
 }) //→ promise
 ```
-параметр data может быть строкой, объектом (автоматически преобразуется в query string), содержащим пары ключ-значение, или инстансом FormData
+`data` can be a string, object (automatically converted into a query string), or an instance of `FormData`
 
-lib.request.get тоже самое, что lib.request, но помимо объекта с параметрами запроса, позволяет указать просто url
+####lib.request.get()
+
+`lib.request.get` like `lib.request`, but it always performs the GET request and lets not pass additional parameters
 ```javascript
 lib.request.get(url) //→ promise
-//или
+//or
 lib.request.get(params) //→ promise
 ```
 
-lib.request.post тоже самое, что lib.request, но позволяет не указывать метод в params
+####lib.request.post()
 
-lib.request.json сокращение для lib.request.get(params).then(JSON.parse)
+`lib.request.post` like `lib.request`, but it always performs the POST request
 
-lib.request.script выполняет загрузку указанного скрипта, возвращает promise
+####lib.request.json()
+
+`lib.request.json` is shorthand for:
+```javascript
+lib.request.get(params).then(function (xhr) {
+   return JSON.parse(xhr.responceText);
+});
+```
+
+####lib.request.script()
+
+`lib.request.script` loads a JavaScript file from the server request, then execute it, returns the promise
 ```javascript
 lib.request.script({
     url:     String,
@@ -323,19 +388,33 @@ lib.request.script({
     caching: Boolean
 }) //→ promise
 ```
-объект data автоматически преобразуется в query string
+`data` can be the string or the object, which automatically converted into the query string
 
-lib.request.jsonp тоже самое, что lib.request.script
+####lib.request.jsonp()
 
-lib.request.toQueryParam преобразует пару ключ-значение в query string
+`lib.request.jsonp` is equivalent to `lib.request.script`
+
+####lib.request.toQueryParam()
+
+`lib.request.toQueryParam` converts key-value pairs into the query string
 ```javascript
 lib.request.toQueryParam("chr", "ю") //→ "chr=%D1%8E"
 ```
 
-lib.request.toQueryString преобразует объект, содержащий пары ключ-значение, в query string
+####lib.request.toQueryString()
+
+`lib.request.toQueryString` converts the object containing key-value pairs into the query string
 ```javascript
 lib.request.toQueryString({
     chr1: "ю",
     chr2: "я"
 }) //→ "chr1=%D1%8E&chr2=%D1%8F"
 ```
+
+##Minification
+
+If you are using UglifyJS, make sure that your version fixes a [bug with whitespace](https://github.com/mishoo/UglifyJS2/issues/471).
+
+##License
+
+jsCore is released under the [MIT license](https://github.com/Octane/jsCore/blob/master/MIT-LICENSE.txt).

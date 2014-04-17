@@ -1,4 +1,5 @@
-var fs = require("fs"), strict = '"use strict";';
+var fs = require("fs"), strict = '"use strict";',
+	noIE8 = -1 != process.argv.indexOf("--no_ie8");
 
 try {
 
@@ -57,10 +58,15 @@ try {
 
 
 	].reduce(function (result, fileName) {
+		if (noIE8 && -1 != fileName.indexOf("/ie8/")) {
+			console.log("skip: " + fileName);
+			return result;
+		}
+		console.log("include: " + fileName);
 		return result + fs.readFileSync("src/" + fileName, "utf8").replace(strict, "");
 	}, strict), "utf8");
 
-	console.log("done");
+	console.log("\ndone");
 
 }
 catch (reason) {
