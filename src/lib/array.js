@@ -47,7 +47,7 @@ lib.array = {
 		return true;
 	},
 
-	//shift the array indexes, so that was not missed
+	//shifts array indexes, so that was not missed
 	//example: refine([1,,2]) → [1, 2]
 	refine: function (iterable) {
 		return Array.reduce(iterable, function (array, anything) {

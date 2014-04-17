@@ -1,6 +1,6 @@
 #<img src="https://raw.githubusercontent.com/Octane/jsCore/master/logo.png" width="66" height="66" align="left" valign="middle" hspace="10" alt="jsCore logotype">jsCore JavaScript library
 
-The library consists of a complex polyfill and a set of methods in the `lib` namespace. If you don't want to support IE8, rebuild `jscore.js` using `build.js` by deleting from the list of files that are stored in `src/polyfill/ltie10/ie8`.
+The library consists of a complex polyfill and a set of methods in the `lib` namespace. If you don't want to support IE8, rebuild `jscore.js` using `build.js` by deleting from the list of files that are stored in `src/polyfill/ltie10/ie8`.
 
 ##Polyfill
 
@@ -23,7 +23,7 @@ Object/Scope | Methods/Properties
 `Date` generics | `.now()`
 `Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`
 `Promise.prototype` | `.then`, `.catch`<sup>[17](#Promise.prototype.catch)</sup>
-global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `setImmediate()`, `.clearImmediate()`<sup>[18](#clearImmediate)</sup>, `.requestAnimationFrame()`, `.cancelAnimationFrame()`, `.getComputedStyle()`
+global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `setImmediate()`, `clearImmediate()`<sup>[18](#clearImmediate)</sup>, `requestAnimationFrame()`, `cancelAnimationFrame()`, `getComputedStyle()`
 
 ###Notes/Known Issues
 
@@ -74,216 +74,218 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `setImmediate()`, `
 <sup name="clearImmediate">18</sup> – `clearImmediate` function useless in IE8
 
 -----
+##lib
 
-//todo translate into English
+###lib.Template
 
-##lib.Template
-
-lib.Template конструктор простых строковых шаблонов (не путать с HTML-шаблонизаторами)
+`lib.Template` is a very simple string templating tool (not to be confused with HTML-templating)
 ```javascript
 var tmpl = new lib.Template("Hi, {NAME}");
 tmpl.match({name: "John"}) //→ "Hi, John"
 tmpl.match({name: "Luke"}) //→ "Hi, Luke"
 ```
 
-##lib.I18n
+###lib.I18n
 
-lib.I18n удобный инструмент для интернационализации
+`lib.I18n` is a handy tool for the internationalization
 ```javascript
-var i18n = new lib.I18n(locale, messageBundle);
+var i18n = new lib.I18n([locale[, messageBundle]]);
 i18n.add(locale, messageBundle)
 i18n.use(locale)
-i18n(message, replacements) //→ string
+i18n(message[, replacements]) //→ string
 ```
-пример:
+example:
 ```javascript
-var ru = {currency: "руб."},
-    en = {currency: "$"},
+var ruRU = {currency: "руб."},
+    enUS = {currency: "$"},
     i18n = new lib.I18n;
 
-i18n.add("ru-ru", ru);
-i18n.add("en-us", en);
+i18n.add("ru-RU", ruRU);
+i18n.add("en-US", enUS);
 
-i18n.use("ru-ru");
+i18n.use("ru-RU");
 100 + i18n("currency") // → "100руб."
 
-i18n.use("en-us");
+i18n.use("en-US");
 100 + i18n("currency") // → "100$"
 ```
-функция может принимать список автозамен
+`i18n` function can take a list of replacements
 ```javascript
-var i18n = new lib.I18n("ru-ru", {currency: "{COST} руб."});
+var i18n = new lib.I18n("ru-Ru", {currency: "{COST} руб."});
 i18n("currency", {cost: 100}) // → "100 руб."
 ```
-##lib.html
+###lib.html
 
-lib.html.parse преобразует HTML-код в DocumentFragment
+`lib.html.parse` converts a HTML-code into a document fragment
 ```javascript
 var docFragment = lib.html.parse("<h1>Example</h1><p>…</p>");
 document.body.append(docFragment);
 ```
 
-lib.html.escape преобразует специальные HTML-символы в соответствующие мнемоники
+`lib.html.escape` converts special HTML-characters to mnemonics
 ```javascript
 lib.html.escape("<h1>Example</h1>") // → "&lt;h1&gt;Example&lt;/h1&gt;"
 ```
 
-lib.html.unescape преобразует HTML-мнемоники в соответствующие символы
+`lib.html.unescape` converts HTML-mnemonics to characters
 ```javascript
 lib.html.unescape("&lt;h1&gt;Example&lt;/h1&gt;") // → "<h1>Example</h1>"
 ```
 
-##lib.class_
+###lib.class_
 
-lib.class_.extend заменяет прототип указанного конструктора объектом Object.create(SuperClass.prototype) и создает ссылку на SuperClass
+`lib.class_.extend` is the standard inheritance pattern
 ```javascript
 lib.class_.extend(Class, SuperClass);
 Class.super_ == SuperClass //→ true
 ```
 
-##lib.event
+###lib.event
 
-lib.event.on регистрирует обработчик события
+`lib.event.on` registers a handler for an DOM event
 ```javascript
 lib.event.on(eventType[, selector][, element], callback) //→ eventDetails
 ```
-если указан селектор, происходит делегирование события:
+delegating events using the CSS-selector:
 ```javascript
 lib.event.on("click", ".menu-item, .submenu-item", onMenuClick)
 ```
 
-lib.event.off удаляет обработчик события
+`lib.event.off` removes the handler for the DOM event
 ```javascript
 lib.event.off(eventDetails)
 ```
-пример:
+example:
 ```javascript
 var eventDetails = lib.event.on("mouseup", document, onMouseUp);
 lib.event.off(eventDetails);
 ```
 
-lib.event.one регистрирует обработчик события, который выполнится один раз
+`lib.event.one` registers the handler for the DOM event, which runs once
 ```javascript
 lib.event.one(eventType[, selector][, element], callback) //→ eventDetails
 ```
-пример:
+example:
 ```javascript
 lib.event.one("load", window, onLoaded);
 ```
 
-lib.event.when похож на one, но возвращает promise, а callback передается в then
+`lib.event.when` like `lib.event.one`, but returns a promise, the callback is passed to `then`
 ```javascript
 lib.event.when(eventType[, selector][, element]) //→ promise
 ```
-пример:
+example:
 ```javascript
 lib.event.when("click", ".some-class").then(doSomething);
 ```
 
-lib.event.preventDefault отменяет действие браузера по умолчанию
+`lib.event.preventDefault` cancels the default action of the event
 ```javascript
 lib.event.on("submit", someForm, lib.event.preventDefault);
 ```
 
-lib.event.stopPropagation останавливает всплывание события
+`lib.event.stopPropagation` prevents further propagation of the event
 ```javascript
 lib.event.on("click", someElement, lib.event.stopPropagation);
 ```
 
-##lib.array
+###lib.array
 
-lib.array.count подсчет реального количества элементов в массиве
+`lib.array.count` counts the actual number of elements
 ```javascript
 var iterable = [,"a",,"b",];
 iterable.length //→ 4
 lib.array.count(iterable) //→ 2
 ```
 
-lib.array.all аналогичен Array.every, но реагирует на длину массива и проущенные индексы
+`lib.array.all` like `Array.every`, but it is sensitive to the length of the array and missing indexes
 ```javascript
 [].every(lib.isTrue) //→ true
 lib.array.all([], lib.isTrue) //→ false
 ```
 
-lib.array.unique возвращает новый массив, состоящий только из уникальных элементов переданного массива
+`lib.array.unique` returns the new array consisting only of unique elements of the passed array
 ```javascript
 lib.array.unique([1, 2, 1]) //→ [1, 2]
 ```
 
-lib.array.refine возвращает новый массив, состоящий из существующих элементов переданного массива
+`lib.array.refine` shifts array indexes, so that was not missed
 ```javascript
 lib.array.refine([1,,2]) //→ [1, 2]
 ```
 
-lib.array.contains определяет, находится ли указанный элемент в массиве
+`lib.array.contains` determines whether an element may be found within the array
 ```javascript
 lib.array.contains(["a", "b"], "a") //→ true
 ```
 
-lib.array.shuffle возвращает новый массив, состоящий из перемешанных элементов переданного массива
+`lib.array.shuffle` returns the new array consisting of mixed elements of the passed array
 ```javascript
 lib.array.shuffle(iterbale) //→ array
 ```
 
-lib.array.range возвращает новый массив, заполненный числовыми значениями в указанном диапазоне
+`lib.array.range` creates the array of integers
 ```javascript
 lib.array.range(2, 7) //→ [2, 3, 4, 5, 6]
 lib.array.range(5) //→ [0, 1, 2, 3, 4]
 ```
 
-lib.array.remove удаляет элемент массива, возвращает false или новый массив с удаленным элементом
+`lib.array.remove` removes the element from the array
 ```javascript
-lib.array.remove(["a", "b", "c"], "b") //→ ["b"]
-lib.array.remove(["a", "b", "c"], "x") //→ false
+var list = ["a", "b", "c"];
+lib.array.remove(list, "b");
+console.log(list) //→ ["a", "c"]
 ```
 
-##lib.is
+###lib.is
 
-lib.isTrue, lib.isFalse, lib.isHTML, lib.isObject, lib.isHTMLElement вспомогательные функции для использования, например, в Array iteration methods:
-```javascript``
+`lib.isTrue`, `lib.isFalse`, `lib.isHTML`, `lib.isObject`, `lib.isHTMLElement` are helper functions for use, e.g., in `Array` iteration methods
+```javascript
 if (testResults.every(lib.isTrue)) {
     …
 }
 ```
 
-##lib.dom
+###lib.dom
 
-lib.dom.query возвращает promise, чтобы асинхронно выполнить действия, если элемент найден
+`lib.dom.query` returns a promise to perform actions asynchronously, if a element found
 ```javascript
 lib.dom.query("#nav-menu").then(function (element) {
     //use element
 });
 ```
 
-lib.dom.queryAll возвращает promise, чтобы асинхронно выполнить действия, если элементы найдены
+`lib.dom.queryAll` returns the promise to perform actions asynchronously, if elements found
 ```javascript
 lib.dom.queryAll(".menu-item", menuElement).then(function (list) {
     //use list
 });
 ```
 
-lib.dom.ready возвращает promise, чтобы асинхронно выполнить действия после DOMContentLoaded
+`lib.dom.ready` returns the promise to perform actions asynchronously after `DOMContentLoaded`
 ```javascript
 lib.dom.ready().then(function () {
     //do something
 });
 ```
 
-##lib.date
+###lib.date
 
-lib.date.isLeapYear определяет, является ли год високосным
+`lib.date.isLeapYear` determines whether a leap year
 ```javascript
 lib.date.isLeapYear([date]) //→ boolean
 ```
-где date – инстанс Date или четырехзначное число
+where `date` is instance of `Date` or the four-digit number
 
-lib.date.monthLength возвращает число дней в месяце, учитывая високосный год
+`lib.date.monthLength` returns the number of days in a month
 ```javascript
 lib.date.monthLength(monthIndex, fullYear) //→ number
 ```
-если вместо monthIndex передать инстанс Date, второй аргумент будет не нужен
+if instead `monthIndex` pass the instance of `Date`, then the second argument not needed
 
-##lib.request
+//translate into English
+
+###lib.request
 
 lib.request выполняет запрос на сервер, используя XMLHttpRequest, возвращает promise
 ```javascript
