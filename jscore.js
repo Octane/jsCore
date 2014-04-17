@@ -1,8 +1,7 @@
 "use strict";
 
-/**
- * jsCore JavaScript library v0.1
- * Copyright 2014, Dmitry Korobkin
+/* jsCore JavaScript library v0.1
+ * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
  */
@@ -40,7 +39,8 @@ if (!window.HTMLElement) {
 //IE8 Object.keys polyfill
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
-	//IE8 [[Enumerable]] bug
+	//IE8 DontEnum bug fix
+	//https://developer.mozilla.org/en-US/docs/ECMAScript_DontEnum_attribute#JScript_DontEnum_Bug
 	var hasBug = [
 			"constructor", "toString", "toLocaleString", "valueOf",
 			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"

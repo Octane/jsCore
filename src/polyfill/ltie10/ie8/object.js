@@ -2,7 +2,8 @@
 //IE8 Object.keys polyfill
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
-	//IE8 [[Enumerable]] bug
+	//IE8 DontEnum bug fix
+	//https://developer.mozilla.org/en-US/docs/ECMAScript_DontEnum_attribute#JScript_DontEnum_Bug
 	var hasBug = [
 			"constructor", "toString", "toLocaleString", "valueOf",
 			"hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
