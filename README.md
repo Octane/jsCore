@@ -411,10 +411,6 @@ lib.request.toQueryString({
 }) //→ "chr1=%D1%8E&chr2=%D1%8F"
 ```
 
-##Minification
-
-If you are using UglifyJS, make sure that your version fixes a [bug with whitespace](https://github.com/mishoo/UglifyJS2/issues/471).
-
 ##License
 
 jsCore is released under the [MIT license](https://github.com/Octane/jsCore/blob/master/MIT-LICENSE.txt).
