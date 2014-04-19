@@ -1,1 +1,0 @@
-node --harmony --harmony_typeof --use_strict build.js
