@@ -18,6 +18,7 @@
 	"homepage": "https://github.com/Octane/jsCore",
 	"ignore": [
 		".gitignore",
+		"bower.json",
 		"build.js",
 		"favicon.ico",
 		"index.html",
