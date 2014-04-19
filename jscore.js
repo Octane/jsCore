@@ -1454,8 +1454,18 @@ try {
 	Object.defineProperty({}, "test", {});
 }
 catch (error) {
-	StaticDOMStringMap = function () {
-		return document.createElement("dataset");
+	window.StaticDOMStringMap = new function () {
+		//https://github.com/es-shims/es5-shim/issues/152
+		var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
+			proto = createObject().constructor.prototype;
+		function createObject() {
+			return fakeDoc.getElementsByName(uid++);
+		}
+		Object.keys(proto).forEach(function (key) {
+			proto[key] = undefined;
+		});
+		proto = null;
+		return createObject;
 	};
 }
 
@@ -1808,8 +1818,12 @@ document.addEventListener || new function () {
 
 window.getComputedStyle || new function () {
 
-	function CSSStyleDeclaration() {
-		return document.createElement("compStyle");
+	//https://github.com/es-shims/es5-shim/issues/152
+	var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
+		proto = createObject().constructor.prototype;
+
+	function createObject() {
+		return fakeDoc.getElementsByName(uid++);
 	}
 
 	function toUpperCase(str) {
@@ -1844,7 +1858,7 @@ window.getComputedStyle || new function () {
 	function getComputedStyle(element) {
 		var compStyle = element._compStyle, currStyle;
 		if (!compStyle) {
-			compStyle = element._compStyle = new CSSStyleDeclaration;
+			compStyle = element._compStyle = createObject();
 			currStyle = element.currentStyle;
 			Object.keys(currStyle).forEach(function (propName) {
 				Object.defineProperty(compStyle, propName, createPropDesc(currStyle, propName));
@@ -1854,6 +1868,11 @@ window.getComputedStyle || new function () {
 		}
 		return compStyle;
 	}
+
+	Object.keys(proto).forEach(function (key) {
+		proto[key] = undefined;
+	});
+	proto = null;
 
 	window.getComputedStyle = getComputedStyle;
 
