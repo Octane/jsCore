@@ -4,10 +4,12 @@
 	"version": "0.1.0",
 	"description": "Complex JavaScript polyfill and set of methods",
 	"keywords": [
-		"jscore",
+		"browser",
+		"client",
 		"javascript",
-		"polyfill",
-		"library"
+		"jscore",
+		"library",
+		"polyfill"
 	],
 	"authors": [
 		"Dmitry Korobkin <dmitry.korobkin@gmail.com>"
@@ -15,8 +17,8 @@
 	"license": "MIT",
 	"homepage": "https://github.com/Octane/jsCore",
 	"ignore": [
-		"**/.*",
 		".gitignore",
+		"bower.json",
 		"build.js",
 		"favicon.ico",
 		"index.html",
