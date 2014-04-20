@@ -27,6 +27,7 @@ try {
 		"polyfill/generic.js",
 		"polyfill/set.js",
 		"polyfill/map.js",
+		"polyfill/weakset.js",
 		"polyfill/weakmap.js",
 		"polyfill/setimmediate.js",
 		"polyfill/promise.js",

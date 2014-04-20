@@ -62,3 +62,15 @@ console.log(s.delete_(NaN) === true);
 console.log(s.size === 3);
 console.log(s.has(objValue1) === true);
 
+console.log("WeakSet tests:");
+
+var ws = new WeakSet;
+
+ws.add(objValue1);
+ws.add(objValue2);
+ws.add(objValue1);
+ws.delete_(objValue2);
+
+console.log(ws.has(objValue1) === true);
+console.log(ws.has(objValue2) === false);
+console.log(ws.delete_(objValue1) === true);
