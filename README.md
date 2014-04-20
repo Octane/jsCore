@@ -17,6 +17,7 @@ node build.js --no_ie8
 
 Object/Scope | Methods/Properties
 :------------|:-----------------------------
+global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakMap()`, `setImmediate()`, `clearImmediate()`<sup>[18](#clearImmediate)</sup>, `requestAnimationFrame()`, `cancelAnimationFrame()`, `getComputedStyle()`
 `Object` generics | `.create()`<sup>[1](#Object.create)</sup>, `.assign()`<sup>[2](#Object.assign)</sup>, `.is()`, `.keys()`<sup>[3](#Object.keys)</sup>
 `Array` generics<sup>[4](#Array_generics)</sup> | `.isArray()`, `.from()`, `.of()`, `.concat()`, `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.join()`, `.lastIndexOf()`, `.map()`, `.pop()`, `.push()`, `.reduce()`, `.reduceRight()`, `.reverse()`, `.shift()`, `.slice()`<sup>[5](#Array.slice)</sup>, `.some()`, `.sort()`, `.splice()`<sup>[6](#Array.splice)</sup>, `.unshift()`
 `Array.prototype` | `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.lastIndexOf()`, `.map()`, `.reduce()`, `.reduceRight()`, `.some()`
@@ -34,8 +35,9 @@ Object/Scope | Methods/Properties
 `Date` generics | `.now()`
 `Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`
 `Promise.prototype` | `.then`, `.catch`<sup>[17](#Promise.prototype.catch)</sup>
-`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[19](#WeakMap.prototype.delete)</sup>, `.clear()`
-global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `WeakMap()`, `setImmediate()`, `clearImmediate()`<sup>[18](#clearImmediate)</sup>, `requestAnimationFrame()`, `cancelAnimationFrame()`, `getComputedStyle()`
+`Set.prototype` | `.add()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`, `.size`
+`Map.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`, `.size`
+`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`
 
 ###Notes/Known Issues
 
@@ -85,7 +87,7 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `WeakMap()`, `setIm
 
 <sup name="clearImmediate">18</sup> – `clearImmediate` function useless in IE8
 
-<sup name="WeakMap.prototype.delete">19</sup> – IE8 doesn't allow to use a method called `delete`, use `delete_`
+<sup name="Set.prototype.delete">19</sup> – IE8 doesn't allow to use a method called `delete`, use `delete_`
 
 ##lib
 

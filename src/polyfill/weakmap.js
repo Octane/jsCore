@@ -2,17 +2,19 @@
 
 window.WeakMap || new function () {
 
+	//todo
+	//In native WeakMaps, references to key objects are held "weakly",
+	//which means that they do not prevent garbage collection in case
+	//there would be no other reference to the object.
+
 	var KEY = 0, VALUE = 1;
 
-	function WeakMap(iterable/*or ...argumentsList*/) {
-		if (iterable) {
+	function WeakMap() {
+		if (arguments.length) {
 			//todo
-			//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-weakmap-objects
-			//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
-			//Iterable is an Array or other iterable object whose
-			//elements are key-value pairs (2-element Arrays).
-			//Each key-value pair will be added to the new Map.
+			throw Error("WeakMap implementation doesn't accept parameters");
 		}
+		this.length = 0;
 	}
 
 	function equalKey(pair) {
@@ -29,8 +31,6 @@ window.WeakMap || new function () {
 
 	Object.assign(WeakMap.prototype, {
 
-		length: 0,
-
 		_getPair: function (key) {
 			return Array.find(this, equalKey, validKey(key));
 		},
@@ -41,7 +41,6 @@ window.WeakMap || new function () {
 				pair[VALUE] = value;
 			}
 			else {
-				//todo use Map
 				Array.push(this, [key, value]);
 			}
 		},
