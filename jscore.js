@@ -1,6 +1,6 @@
 "use strict";
 
-/* jsCore JavaScript library v0.1
+/* jsCore JavaScript library v0.2
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
@@ -555,6 +555,78 @@ new function () {
 	]));
 
 };
+
+
+window.WeakMap || new function () {
+
+	var KEY = 0, VALUE = 1;
+
+	function WeakMap(iterable/*or ...argumentsList*/) {
+		if (iterable) {
+			//todo
+			//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-weakmap-objects
+			//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
+			//Iterable is an Array or other iterable object whose
+			//elements are key-value pairs (2-element Arrays).
+			//Each key-value pair will be added to the new Map.
+		}
+	}
+
+	function equalKey(pair) {
+		//this → key
+		return this === pair[KEY];
+	}
+
+	function validKey(key) {
+		if (Object(key) !== key) {
+			throw TypeError("Invalid value used as weak map key");
+		}
+		return key;
+	}
+
+	Object.assign(WeakMap.prototype, {
+
+		length: 0,
+
+		_getPair: function (key) {
+			return Array.find(this, equalKey, validKey(key));
+		},
+
+		set: function (key, value) {
+			var pair = this._getPair(key);
+			if (pair) {
+				pair[VALUE] = value;
+			}
+			else {
+				//todo use Map
+				Array.push(this, [key, value]);
+			}
+		},
+
+		get: function (key) {
+			return Object(this._getPair(key))[VALUE];
+		},
+
+		has: function (key) {
+			return Boolean(this._getPair(key));
+		},
+
+		"delete": function (key) {
+			var index = Array.findIndex(this, equalKey, validKey(key));
+			return -1 != index && Boolean(Array.splice(this, index, 1));
+		},
+
+		clear: function () {
+			Array.splice(this, 0, this.length);
+		}
+
+	});
+
+	window.WeakMap = WeakMap;
+
+};
+
+WeakMap.prototype.delete_ = WeakMap.prototype["delete"];
 
 
 window.setImmediate || new function () {
@@ -1135,37 +1207,33 @@ function StaticDOMStringMap() {}
 	//todo InvalidCharacterError
 
 	function DOMTokenList(getTokens, onChange) {
-		this.getTokens = getTokens;
-		this.onChange = onChange;
+		this._getTokens = getTokens;
+		this._onChange = onChange;
 	}
 
 	Object.assign(DOMTokenList.prototype, {
 
-		empty: function () {
-			var i = this.length;
-			while (i--) {
-				delete this[i];
-			}
-			this.length = 0;
+		_clear: function () {
+			Array.splice(this, 0, this.length);
 		},
 
-		push: function (tokens) {
+		_push: function (tokens) {
 			Array.prototype.push.apply(this, tokens);
 		},
 
-		update: function () {
-			this.empty();
-			this.push(this.getTokens());
+		_update: function () {
+			this._clear();
+			this._push(this._getTokens());
 		},
 
 		item: function (index) {
-			this.update();
+			this._update();
 			return this[index] || null;
 		},
 
 		add: function () {
 			var length;
-			this.update();
+			this._update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				if (-1 == Array.indexOf(this, token)) {
@@ -1173,13 +1241,13 @@ function StaticDOMStringMap() {}
 				}
 			}, this);
 			if (length != this.length) {
-				this.onChange();
+				this._onChange();
 			}
 		},
 
 		remove: function () {
 			var length;
-			this.update();
+			this._update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				var index = Array.indexOf(this, token);
@@ -1188,12 +1256,12 @@ function StaticDOMStringMap() {}
 				}
 			}, this);
 			if (length != this.length) {
-				this.onChange();
+				this._onChange();
 			}
 		},
 
 		toggle: function (token, force) {
-			this.update();
+			this._update();
 			if (force === false || this.contains(token)) {
 				this.remove(token);
 				return false;
@@ -1203,7 +1271,7 @@ function StaticDOMStringMap() {}
 		},
 
 		contains: function (token) {
-			this.update();
+			this._update();
 			return -1 != Array.indexOf(this, token);
 		},
 
@@ -1239,11 +1307,11 @@ function StaticDOMStringMap() {}
 			//live update DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
 				if ("class" == event.attrName.toLowerCase()) {
-					element._classList.update();
+					element._classList._update();
 				}
 			}, false);
 */
-			element._classList.update();
+			element._classList._update();
 			return element._classList;
 		}
 	});

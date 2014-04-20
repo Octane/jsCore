@@ -34,7 +34,8 @@ Object/Scope | Methods/Properties
 `Date` generics | `.now()`
 `Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`
 `Promise.prototype` | `.then`, `.catch`<sup>[17](#Promise.prototype.catch)</sup>
-global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `setImmediate()`, `clearImmediate()`<sup>[18](#clearImmediate)</sup>, `requestAnimationFrame()`, `cancelAnimationFrame()`, `getComputedStyle()`
+`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[19](#WeakMap.prototype.delete)</sup>, `.clear()`
+global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `WeakMap()`, `setImmediate()`, `clearImmediate()`<sup>[18](#clearImmediate)</sup>, `requestAnimationFrame()`, `cancelAnimationFrame()`, `getComputedStyle()`
 
 ###Notes/Known Issues
 
@@ -83,6 +84,8 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `setImmediate()`, `
 <sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called `catch`, use `catch_`
 
 <sup name="clearImmediate">18</sup> – `clearImmediate` function useless in IE8
+
+<sup name="WeakMap.prototype.delete">19</sup> – IE8 doesn't allow to use a method called `delete`, use `delete_`
 
 ##lib
 

@@ -4,37 +4,33 @@
 	//todo InvalidCharacterError
 
 	function DOMTokenList(getTokens, onChange) {
-		this.getTokens = getTokens;
-		this.onChange = onChange;
+		this._getTokens = getTokens;
+		this._onChange = onChange;
 	}
 
 	Object.assign(DOMTokenList.prototype, {
 
-		empty: function () {
-			var i = this.length;
-			while (i--) {
-				delete this[i];
-			}
-			this.length = 0;
+		_clear: function () {
+			Array.splice(this, 0, this.length);
 		},
 
-		push: function (tokens) {
+		_push: function (tokens) {
 			Array.prototype.push.apply(this, tokens);
 		},
 
-		update: function () {
-			this.empty();
-			this.push(this.getTokens());
+		_update: function () {
+			this._clear();
+			this._push(this._getTokens());
 		},
 
 		item: function (index) {
-			this.update();
+			this._update();
 			return this[index] || null;
 		},
 
 		add: function () {
 			var length;
-			this.update();
+			this._update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				if (-1 == Array.indexOf(this, token)) {
@@ -42,13 +38,13 @@
 				}
 			}, this);
 			if (length != this.length) {
-				this.onChange();
+				this._onChange();
 			}
 		},
 
 		remove: function () {
 			var length;
-			this.update();
+			this._update();
 			length = this.length;
 			Array.forEach(arguments, function (token) {
 				var index = Array.indexOf(this, token);
@@ -57,12 +53,12 @@
 				}
 			}, this);
 			if (length != this.length) {
-				this.onChange();
+				this._onChange();
 			}
 		},
 
 		toggle: function (token, force) {
-			this.update();
+			this._update();
 			if (force === false || this.contains(token)) {
 				this.remove(token);
 				return false;
@@ -72,7 +68,7 @@
 		},
 
 		contains: function (token) {
-			this.update();
+			this._update();
 			return -1 != Array.indexOf(this, token);
 		},
 
@@ -108,11 +104,11 @@
 			//live update DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
 				if ("class" == event.attrName.toLowerCase()) {
-					element._classList.update();
+					element._classList._update();
 				}
 			}, false);
 */
-			element._classList.update();
+			element._classList._update();
 			return element._classList;
 		}
 	});

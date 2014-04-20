@@ -25,6 +25,7 @@ try {
 		"polyfill/number.js",
 		"polyfill/math.js",
 		"polyfill/generic.js",
+		"polyfill/weakmap.js",
 		"polyfill/setimmediate.js",
 		"polyfill/promise.js",
 		"polyfill/requestanimationframe.js",
