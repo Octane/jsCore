@@ -1763,6 +1763,7 @@ document.addEventListener || new function () {
 	function fixEvent(event) {
 		var clone = document.createEventObject(event);
 		clone.target = clone.srcElement;
+		clone.relatedTarget = clone.fromElement === clone.target ? clone.toElement : clone.fromElement;
 		clone.pageX = clone.clientX + document.documentElement.scrollLeft;
 		clone.pageY = clone.clientY + document.documentElement.scrollTop;
 		clone.preventDefault = preventDefault;
@@ -1786,6 +1787,7 @@ document.addEventListener || new function () {
 			if (!(event instanceof CustomEvent)) {
 				event = fixEvent(event);
 			}
+			event.currentTarget = element;
 			while (i < length) {
 				setImmediate(fastBind(callbacks[i], element), event);
 				i++;
