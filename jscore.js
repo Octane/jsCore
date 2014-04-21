@@ -1719,6 +1719,8 @@ catch (error) {
 //IE8 setImmediate polyfill
 document instanceof Object || new function () {
 
+	var root = document.head, uid = 0, storage = {};
+
 	function fastApply(args) {
 		var func = args[0];
 		switch (args.length) {
@@ -1730,21 +1732,27 @@ document instanceof Object || new function () {
 	}
 
 	window.setImmediate = function () {
-		var args = arguments;
+		var args = arguments, id = uid++;
 		function onReadyStateChange() {
 			this.onreadystatechange = null;
 			this.remove();
-			fastApply(args);
+			if (storage[id]) {
+				delete storage[id];
+				fastApply(args);
+			}
 		}
+		storage[id] = true;
 		new function () {//avoid closure
 			var script = document.createElement("script");
 			script.onreadystatechange = onReadyStateChange;
-			document.head.appendChild(script);
+			root.appendChild(script);
 		}
-		return 0;
+		return id;
 	};
 
-	window.clearImmediate = function () {};
+	window.clearImmediate = function (id) {
+		delete storage[id];
+	};
 
 };
 

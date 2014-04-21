@@ -35,10 +35,10 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `
 `Date` generics | `.now()`
 `Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`
 `Promise.prototype` | `.then`, `.catch`<sup>[17](#Promise.prototype.catch)</sup>
-`Set.prototype` | `.add()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`, `.size`
-`Map.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`, `.size`
-`WeakSet.prototype` | `.add()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`
-`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[19](#Set.prototype.delete)</sup>, `.clear()`
+`Set.prototype` | `.add()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`, `.size`
+`Map.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`, `.size`
+`WeakSet.prototype` | `.add()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`
+`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`
 
 ###Notes/Known Issues
 
@@ -86,9 +86,7 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `
 
 <sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called `catch`, use `catch_`
 
-<sup name="clearImmediate">18</sup> – `clearImmediate` function useless in IE8
-
-<sup name="Set.prototype.delete">19</sup> – IE8 doesn't allow to use a method called `delete`, use `delete_`
+<sup name="Set.prototype.delete">18</sup> – IE8 doesn't allow to use a method called `delete`, use `delete_`
 
 ##lib
 
