@@ -64,5 +64,3 @@ window.Map || new function () {
 	window.Map = Map;
 
 };
-
-Map.prototype.delete_ = Map.prototype["delete"];

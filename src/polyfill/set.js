@@ -50,5 +50,3 @@ window.Set || new function () {
 	window.Set = Set;
 
 };
-
-Set.prototype.delete_ = Set.prototype["delete"];

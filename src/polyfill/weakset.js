@@ -36,7 +36,11 @@ window.WeakSet || new function () {
 
 		"delete": function (value) {
 			var index = Array.findIndex(this, equalValue, validValue(value));
-			return -1 != index && Boolean(Array.splice(this, index, 1));
+			if (-1 == index) {
+				return false;
+			}
+			Array.splice(this, index, 1);
+			return true;
 		},
 
 		clear: function () {
@@ -48,5 +52,3 @@ window.WeakSet || new function () {
 	window.WeakSet = WeakSet;
 
 };
-
-WeakSet.prototype.delete_ = WeakSet.prototype["delete"];

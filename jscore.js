@@ -608,8 +608,6 @@ window.Set || new function () {
 
 };
 
-Set.prototype.delete_ = Set.prototype["delete"];
-
 
 window.Map || new function () {
 
@@ -676,8 +674,6 @@ window.Map || new function () {
 
 };
 
-Map.prototype.delete_ = Map.prototype["delete"];
-
 
 window.WeakSet || new function () {
 
@@ -715,7 +711,11 @@ window.WeakSet || new function () {
 
 		"delete": function (value) {
 			var index = Array.findIndex(this, equalValue, validValue(value));
-			return -1 != index && Boolean(Array.splice(this, index, 1));
+			if (-1 == index) {
+				return false;
+			}
+			Array.splice(this, index, 1);
+			return true;
 		},
 
 		clear: function () {
@@ -727,8 +727,6 @@ window.WeakSet || new function () {
 	window.WeakSet = WeakSet;
 
 };
-
-WeakSet.prototype.delete_ = WeakSet.prototype["delete"];
 
 
 window.WeakMap || new function () {
@@ -786,7 +784,11 @@ window.WeakMap || new function () {
 
 		"delete": function (key) {
 			var index = Array.findIndex(this, equalKey, validKey(key));
-			return -1 != index && Boolean(Array.splice(this, index, 1));
+			if (-1 == index) {
+				return false;
+			}
+			Array.splice(this, index, 1);
+			return true;
 		},
 
 		clear: function () {
@@ -798,8 +800,6 @@ window.WeakMap || new function () {
 	window.WeakMap = WeakMap;
 
 };
-
-WeakMap.prototype.delete_ = WeakMap.prototype["delete"];
 
 
 window.setImmediate || new function () {
@@ -1067,8 +1067,6 @@ window.Promise || new function () {
 	window.Promise = Promise;
 
 };
-
-Promise.prototype.catch_ = Promise.prototype["catch"];
 
 
 window.requestAnimationFrame || new function () {
@@ -2118,6 +2116,22 @@ window.getComputedStyle || new function () {
 	window.getComputedStyle = getComputedStyle;
 
 };
+
+if (Promise) {
+	Promise.prototype.catch_ = Promise.prototype["catch"];
+}
+if (Set) {
+	Set.prototype.delete_ = Set.prototype["delete"];
+}
+if (Map) {
+	Map.prototype.delete_ = Map.prototype["delete"];
+}
+if (WeakSet) {
+	WeakSet.prototype.delete_ = WeakSet.prototype["delete"];
+}
+if (WeakMap) {
+	WeakMap.prototype.delete_ = WeakMap.prototype["delete"];
+}
 
 
 var lib = {};

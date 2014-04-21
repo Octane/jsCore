@@ -217,5 +217,3 @@ window.Promise || new function () {
 	window.Promise = Promise;
 
 };
-
-Promise.prototype.catch_ = Promise.prototype["catch"];

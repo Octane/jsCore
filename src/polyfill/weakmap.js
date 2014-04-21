@@ -55,7 +55,11 @@ window.WeakMap || new function () {
 
 		"delete": function (key) {
 			var index = Array.findIndex(this, equalKey, validKey(key));
-			return -1 != index && Boolean(Array.splice(this, index, 1));
+			if (-1 == index) {
+				return false;
+			}
+			Array.splice(this, index, 1);
+			return true;
 		},
 
 		clear: function () {
@@ -67,5 +71,3 @@ window.WeakMap || new function () {
 	window.WeakMap = WeakMap;
 
 };
-
-WeakMap.prototype.delete_ = WeakMap.prototype["delete"];
