@@ -5,7 +5,6 @@
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
  */
-
 if (!window.Node) {
 	window.Node = {
 		ELEMENT_NODE: 1,
@@ -1772,6 +1771,10 @@ document.addEventListener || new function () {
 	}
 
 	function fastBind(func, boundThis) {
+		if (func.handleEvent) {
+			boundThis = func;
+			func = func.handleEvent;
+		}
 		return function (arg) {
 			func.call(boundThis, arg);
 		};
