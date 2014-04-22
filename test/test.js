@@ -1,5 +1,19 @@
 "use strict";
 
+try {
+	console.log("jsCore");
+}
+catch (error) {
+	window.console = {
+		log: function () {
+			var pre = document.createElement("pre");
+			pre.append(Array.join(arguments, ", "));
+			document.body.append(pre);
+		}
+	};
+	console.log(document, document.head, document.body);
+}
+
 lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
 
 	var node = document.createElement("blockquote");
@@ -74,3 +88,31 @@ ws.delete_(objValue2);
 console.log(ws.has(objValue1) === true);
 console.log(ws.has(objValue2) === false);
 console.log(ws.delete_(objValue1) === true);
+
+console.log("CSS Transitions test");
+
+window.addEventListener("load", function () {
+
+	var node = document.body.appendChild(document.createElement("div"));
+
+	node.classList.add("base");
+
+	requestAnimationFrame(function () {
+
+		lib.dom.addClass("anim1", "anim2", "anim3", node).then(function (element) {
+
+			return lib.dom.removeClass("anim1", element);
+
+		}).then(function (element) {
+
+			return lib.dom.removeClass("anim2", element);
+
+		}).then(function (element) {
+
+			element.remove();
+
+		});
+
+	});
+
+});
