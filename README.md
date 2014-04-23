@@ -174,7 +174,7 @@ i18n.use("ru-RU");
 i18n.use("en-US");
 100 + i18n("currency") // → "100$"
 ```
-`i18n` function can take a list of replacements
+`i18n()` function can take a list of replacements
 ```javascript
 var i18n = new lib.I18n("ru-Ru", {currency: "{COST} руб."});
 i18n("currency", {cost: 100}) // → "100 руб."
@@ -285,7 +285,7 @@ lib.array.count(iterable) //→ 2
 
 ####lib.array.all()
 
-`.all()` like `Array.every`, but it is sensitive to the length of the array and missing indexes
+`.all()` like `Array.every()`, but it is sensitive to the length of the array and missing indexes
 ```javascript
 [].every(lib.isTrue) //→ true
 lib.array.all([], lib.isTrue) //→ false
@@ -378,9 +378,9 @@ lib.dom.ready().then(function () {
 
 `.addClass()`, `.removeClass()` and `.toggleClass()` return the promise to perform actions at the end of all CSS transitions
 ```javascript
-lib.dom.addClass(class[, class1[, class2[, ...]]], element) //→ promise
-lib.dom.removeClass(class[, class1[, class2[, ...]]], element) //→ promise
-lib.dom.toggleClass(class[, class1[, class2[, ...]]], element) //→ promise
+lib.dom.addClass(element, class1[, class2[, ...]]], element) //→ promise
+lib.dom.removeClass(element, class1[, class2[, ...]]], element) //→ promise
+lib.dom.toggleClass(element, class1[, class2[, ...]]], element) //→ promise
 ```
 for example, call `doSomething` after *3 seconds* of the transition:
 ```css
@@ -399,7 +399,7 @@ for example, call `doSomething` after *3 seconds* of the transition:
 ```
 ```javascript
 var element = document.query(".some");
-lib.dom.addClass("trans1", "trans2", element).then(doSomething);
+lib.dom.addClass(element, "trans1", "trans2").then(doSomething);
 ```
 
 ####lib.dom.getTransitionTime()

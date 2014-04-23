@@ -1468,6 +1468,7 @@ function StaticDOMStringMap() {}
 						return getClasses(element.className);
 					},
 					function () {
+						//no reflow if no changes
 						//this → element._classList
 						element.className = this.toString();
 					}
@@ -2661,7 +2662,6 @@ lib.dom = {
 	},
 
 	ready: function () {
-		//todo img, iframe support
 		return new Promise(function (resolve) {
 			if ("complete" == document.readyState) {
 				resolve();
@@ -2731,16 +2731,18 @@ new function () {
 	function promise(element, method, classes) {
 		return Promise.resolve(new Promise(function (resolve) {
 			requestAnimationFrame(function () {
+				var delay, className = element.className;
 				changeClassList(element.classList, method, classes);
-				var delay = lib.dom.getTransitionTime(element);
-				if (delay) {
-					setTimeout(function () {
-						resolve(element);
-					}, delay);
+				if (className != element.className) {
+					delay = lib.dom.getTransitionTime(element);
+					if (delay) {
+						setTimeout(function () {
+							resolve(element);
+						}, delay);
+						return;
+					}
 				}
-				else {
-					resolve(element);
-				}
+				resolve(element);
 			});
 		}));
 	}
@@ -2752,7 +2754,7 @@ new function () {
 	}
 
 	function changeClass(method, args) {
-		return promise(args[args.length - 1], method, Array.slice(args, 0, -1));
+		return promise(args[0], method, Array.slice(args, 1));
 	}
 
 	Object.assign(lib.dom, {

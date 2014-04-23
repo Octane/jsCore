@@ -95,6 +95,7 @@
 						return getClasses(element.className);
 					},
 					function () {
+						//no reflow if no changes
 						//this → element._classList
 						element.className = this.toString();
 					}

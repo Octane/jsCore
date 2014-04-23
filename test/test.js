@@ -92,27 +92,15 @@ console.log(ws.delete_(objValue1) === true);
 console.log("CSS Transitions test");
 
 window.addEventListener("load", function () {
-
 	var node = document.body.appendChild(document.createElement("div"));
-
 	node.classList.add("base");
-
 	requestAnimationFrame(function () {
-
-		lib.dom.addClass("anim1", "anim2", "anim3", node).then(function (element) {
-
-			return lib.dom.removeClass("anim1", element);
-
+		lib.dom.addClass(node, "anim1", "anim2", "anim3").then(function (element) {
+			return lib.dom.removeClass(element, "anim1");
 		}).then(function (element) {
-
-			return lib.dom.removeClass("anim2", element);
-
+			return lib.dom.removeClass(element, "anim2");
 		}).then(function (element) {
-
 			element.remove();
-
 		});
-
 	});
-
 });
