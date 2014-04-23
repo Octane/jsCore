@@ -85,7 +85,7 @@ lib.request = new function () {
 			Object.assign(headers, params.headers);
 		}
 
-		return Promise.resolve(new Promise(function (resolve, reject) {
+		return new Promise(function (resolve, reject) {
 
 			function onLoad() {
 				unbind(this);
@@ -131,7 +131,7 @@ lib.request = new function () {
 				xhr = null;
 			}, reject);
 
-		}));
+		}).then();
 
 	}
 
@@ -187,7 +187,7 @@ lib.request = new function () {
 			if ("string" == typeof data) {
 				url += (caching ? "?" : "&") + data;
 			}
-			return Promise.resolve(new Promise(function (resolve, reject) {
+			return new Promise(function (resolve, reject) {
 				document.head.appendChild(Object.assign(document.createElement("script"), {
 					onload: function () {
 						unbind(this);
@@ -203,7 +203,7 @@ lib.request = new function () {
 					defer: true,
 					src: url
 				}));
-			}));
+			}).then();
 		}
 
 	});

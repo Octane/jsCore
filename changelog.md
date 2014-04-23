@@ -4,6 +4,7 @@
 
  - new: method `.getTransitionTime()` for calculate the maximum CSS transition time
  - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions
+ - fix: `lib.event` API support `handleEvent`
 
 ##v0.2.0
 

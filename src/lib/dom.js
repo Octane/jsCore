@@ -94,7 +94,7 @@ lib.dom = {
 new function () {
 
 	function promise(element, method, classes) {
-		return Promise.resolve(new Promise(function (resolve) {
+		return new Promise(function (resolve) {
 			requestAnimationFrame(function () {
 				var delay, className = element.className;
 				changeClassList(element.classList, method, classes);
@@ -109,7 +109,7 @@ new function () {
 				}
 				resolve(element);
 			});
-		}));
+		});
 	}
 
 	function changeClassList(classList, method, classes) {
@@ -119,7 +119,7 @@ new function () {
 	}
 
 	function changeClass(method, args) {
-		return promise(args[0], method, Array.slice(args, 1));
+		return promise(args[0], method, Array.slice(args, 1)).then();
 	}
 
 	Object.assign(lib.dom, {

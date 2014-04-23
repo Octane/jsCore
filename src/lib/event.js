@@ -12,56 +12,78 @@ lib.event = {
 	},
 
 	//returns promise
-	when: function (eventType, selector, root) {
-		return Promise.resolve(new Promise(function (resolve) {
-			lib.event.one(eventType, selector, root, resolve);
-		}));
+	when: function (element, selector, eventTypes) {
+		if (arguments.length == 2) {
+			//selector is optional
+			eventTypes = selector;
+			selector = null;
+		}
+		return new Promise(function (resolve) {
+			lib.event.one(element, selector, eventTypes, resolve);
+		}).then();
 	},
 
-	one: function (eventType, selector, root, callback) {
-		var eventDetails = lib.event.on(eventType, selector, root, function (event) {
+	one: function (element, selector, eventTypes, callback) {
+		if (arguments.length == 3) {
+			//selector is optional
+			callback = eventTypes;
+			eventTypes = selector;
+			selector = null;
+		}
+		var eventDetails = lib.event.on(element, selector, eventTypes, function (event) {
 			lib.event.off(eventDetails);
-			callback(event);
+			if (callback.handleEvent) {
+				callback.handleEvent(event);
+			}
+			else {
+				callback.call(element, event);
+			}
 		});
-		return eventDetails;
 	},
 
 	//returns event details
-	on: function (eventType, selector, root, callback) {
+	on: function (element, selector, eventTypes, callback) {
 		var listener;
-		if ("function" == typeof root) {
-			callback = root;
-			root = document;
-		}
-		if ("string" != typeof selector) {
-			root = selector;
-			selector = "";
-		}
-		if (!root) {
-			root = document;
+		if (arguments.length == 3) {
+			//selector is optional
+			callback = eventTypes;
+			eventTypes = selector;
+			selector = null;
 		}
 		if (selector) {
 			selector += "," + selector + " *";
 			listener = function (event) {
 				var target = event.target;
 				if (target.matches && target.matches(selector)) {
-					callback.call(root, event);
+					if (callback.handleEvent) {
+						callback.handleEvent(event);
+					}
+					else {
+						callback.call(element, event);
+					}
 				}
 			};
 		}
 		else {
 			listener = callback;
 		}
-		root.addEventListener(eventType, listener);
+		if ("string" == typeof eventTypes) {
+			eventTypes = eventTypes.split(/[\s,]+/);
+		}
+		eventTypes.forEach(function (eventType) {
+			element.addEventListener(eventType, listener);
+		});
 		return {
-			root: root,
-			type: eventType,
+			element: element,
+			eventTypes: eventTypes,
 			callback: listener
 		};
 	},
 
 	off: function (eventDetails) {
-		eventDetails.root.removeEventListener(eventDetails.type, eventDetails.callback);
+		eventDetails.eventTypes.forEach(function (eventType) {
+			eventDetails.element.removeEventListener(eventType, eventDetails.callback);
+		});
 	}
 
 };

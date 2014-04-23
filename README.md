@@ -27,13 +27,6 @@ node build.js --no_ie8
         - [Method `.unescape()`](#libhtmlunescape)
     - [Namespace `.class_`](#libclass_)
         - [Method `.extend()`](#libclass_)
-    - [Namespace `.event`](#libevent)
-        - [Method `.on()`](#libeventon)
-        - [Method `.off()`](#libeventoff)
-        - [Method `.one()`](#libeventone)
-        - [Method `.when()`](#libeventwhen)
-        - [Method `.preventDefault()`](#libeventpreventdefault)
-        - [Method `.stopPropagation()`](#libeventstoppropagation)
     - [Namespace `.array`](#libarray)
         - [Method `.count()`](#libarraycount)
         - [Method `.all()`](#libarrayall)
@@ -51,6 +44,13 @@ node build.js --no_ie8
         - [Method `.ready()`](#libdomready)
         - [Methods `.addClass()`, `.removeClass()` and `.toggleClass()`](#libdomaddremovetoggleclass)
         - [Method `.getTransitionTime()`](#libdomgettransitiontime)
+    - [Namespace `.event`](#libevent)
+        - [Method `.on()`](#libeventon)
+        - [Method `.off()`](#libeventoff)
+        - [Method `.one()`](#libeventone)
+        - [Method `.when()`](#libeventwhen)
+        - [Method `.preventDefault()`](#libeventpreventdefault)
+        - [Method `.stopPropagation()`](#libeventstoppropagation)
     - [Namespace `.date`](#libdate)
         - [Method `.isLeapYear()`](#libdataisleapyear)
         - [Method `.monthLength()`](#libdatemonthlength)
@@ -211,67 +211,6 @@ lib.class_.extend(Class, SuperClass);
 Class.super_ == SuperClass //→ true
 ```
 
-###lib.event
-
-####lib.event.on()
-
-`.on()` registers a handler for an DOM event
-```javascript
-lib.event.on(eventType[, selector][, element], callback) //→ eventDetails
-```
-delegating events using the CSS selector:
-```javascript
-lib.event.on("click", ".menu-item, .submenu-item", onMenuClick)
-```
-
-####lib.event.off()
-
-`.off()` removes the handler for the DOM event
-```javascript
-lib.event.off(eventDetails)
-```
-example:
-```javascript
-var eventDetails = lib.event.on("mouseup", document, onMouseUp);
-lib.event.off(eventDetails);
-```
-
-####lib.event.one()
-
-`.one()` registers the handler for the DOM event, which runs once
-```javascript
-lib.event.one(eventType[, selector][, element], callback) //→ eventDetails
-```
-example:
-```javascript
-lib.event.one("load", window, onLoaded);
-```
-
-####lib.event.when()
-
-`.when()` like `.one()`, but returns a promise, the callback is passed to `then`
-```javascript
-lib.event.when(eventType[, selector][, element]) //→ promise
-```
-example:
-```javascript
-lib.event.when("click", ".some-class").then(doSomething);
-```
-
-####lib.event.preventDefault()
-
-`.preventDefault()` cancels the default action of the event
-```javascript
-lib.event.on("submit", someForm, lib.event.preventDefault);
-```
-
-####lib.event.stopPropagation()
-
-`.stopPropagation()` prevents further propagation of the event
-```javascript
-lib.event.on("click", someElement, lib.event.stopPropagation);
-```
-
 ###lib.array
 
 ####lib.array.count()
@@ -408,6 +347,67 @@ lib.dom.addClass(element, "trans1", "trans2").then(doSomething);
 ```javascript
 
 lib.dom.getTransitionTime(element) //→ number (ms)
+```
+
+###lib.event
+
+####lib.event.on()
+
+`.on()` registers a handler for an DOM event
+```javascript
+lib.event.on(element[, selector], eventTypes, callback) //→ eventDetails
+```
+for example, delegating events using the CSS selector:
+```javascript
+lib.event.on(menuContainer, ".menu-item", "click", onMenuClick);
+```
+
+####lib.event.off()
+
+`.off()` removes the handler for the DOM event
+```javascript
+lib.event.off(eventDetails)
+```
+example:
+```javascript
+var eventDetails = lib.event.on(window, "focus blur", doSomething);
+lib.event.off(eventDetails);
+```
+
+####lib.event.one()
+
+`.one()` registers the handler for the DOM event, which runs once
+```javascript
+lib.event.one(element[, selector], eventTypes, callback) //→ eventDetails
+```
+example:
+```javascript
+lib.event.one(window, "load", onLoad);
+```
+
+####lib.event.when()
+
+`.when()` like `.one()`, but returns a promise, the callback is passed to `then`
+```javascript
+lib.event.when(element[, selector], eventTypes) //→ promise
+```
+example:
+```javascript
+lib.event.when(document, "body", "click").then(doSomething);
+```
+
+####lib.event.preventDefault()
+
+`.preventDefault()` cancels the default action of the event
+```javascript
+lib.event.on("submit", someForm, lib.event.preventDefault);
+```
+
+####lib.event.stopPropagation()
+
+`.stopPropagation()` prevents further propagation of the event
+```javascript
+lib.event.on("click", someElement, lib.event.stopPropagation);
 ```
 
 ###lib.date

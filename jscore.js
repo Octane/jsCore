@@ -2289,56 +2289,78 @@ lib.event = {
 	},
 
 	//returns promise
-	when: function (eventType, selector, root) {
-		return Promise.resolve(new Promise(function (resolve) {
-			lib.event.one(eventType, selector, root, resolve);
-		}));
+	when: function (element, selector, eventTypes) {
+		if (arguments.length == 2) {
+			//selector is optional
+			eventTypes = selector;
+			selector = null;
+		}
+		return new Promise(function (resolve) {
+			lib.event.one(element, selector, eventTypes, resolve);
+		}).then();
 	},
 
-	one: function (eventType, selector, root, callback) {
-		var eventDetails = lib.event.on(eventType, selector, root, function (event) {
+	one: function (element, selector, eventTypes, callback) {
+		if (arguments.length == 3) {
+			//selector is optional
+			callback = eventTypes;
+			eventTypes = selector;
+			selector = null;
+		}
+		var eventDetails = lib.event.on(element, selector, eventTypes, function (event) {
 			lib.event.off(eventDetails);
-			callback(event);
+			if (callback.handleEvent) {
+				callback.handleEvent(event);
+			}
+			else {
+				callback.call(element, event);
+			}
 		});
-		return eventDetails;
 	},
 
 	//returns event details
-	on: function (eventType, selector, root, callback) {
+	on: function (element, selector, eventTypes, callback) {
 		var listener;
-		if ("function" == typeof root) {
-			callback = root;
-			root = document;
-		}
-		if ("string" != typeof selector) {
-			root = selector;
-			selector = "";
-		}
-		if (!root) {
-			root = document;
+		if (arguments.length == 3) {
+			//selector is optional
+			callback = eventTypes;
+			eventTypes = selector;
+			selector = null;
 		}
 		if (selector) {
 			selector += "," + selector + " *";
 			listener = function (event) {
 				var target = event.target;
 				if (target.matches && target.matches(selector)) {
-					callback.call(root, event);
+					if (callback.handleEvent) {
+						callback.handleEvent(event);
+					}
+					else {
+						callback.call(element, event);
+					}
 				}
 			};
 		}
 		else {
 			listener = callback;
 		}
-		root.addEventListener(eventType, listener);
+		if ("string" == typeof eventTypes) {
+			eventTypes = eventTypes.split(/[\s,]+/);
+		}
+		eventTypes.forEach(function (eventType) {
+			element.addEventListener(eventType, listener);
+		});
 		return {
-			root: root,
-			type: eventType,
+			element: element,
+			eventTypes: eventTypes,
 			callback: listener
 		};
 	},
 
 	off: function (eventDetails) {
-		eventDetails.root.removeEventListener(eventDetails.type, eventDetails.callback);
+		eventDetails.eventTypes.forEach(function (eventType) {
+			eventDetails.element.removeEventListener(eventType, eventDetails.callback);
+		});
 	}
 
 };
@@ -2507,7 +2529,7 @@ lib.request = new function () {
 			Object.assign(headers, params.headers);
 		}
 
-		return Promise.resolve(new Promise(function (resolve, reject) {
+		return new Promise(function (resolve, reject) {
 
 			function onLoad() {
 				unbind(this);
@@ -2553,7 +2575,7 @@ lib.request = new function () {
 				xhr = null;
 			}, reject);
 
-		}));
+		}).then();
 
 	}
 
@@ -2609,7 +2631,7 @@ lib.request = new function () {
 			if ("string" == typeof data) {
 				url += (caching ? "?" : "&") + data;
 			}
-			return Promise.resolve(new Promise(function (resolve, reject) {
+			return new Promise(function (resolve, reject) {
 				document.head.appendChild(Object.assign(document.createElement("script"), {
 					onload: function () {
 						unbind(this);
@@ -2625,7 +2647,7 @@ lib.request = new function () {
 					defer: true,
 					src: url
 				}));
-			}));
+			}).then();
 		}
 
 	});
@@ -2729,7 +2751,7 @@ lib.dom = {
 new function () {
 
 	function promise(element, method, classes) {
-		return Promise.resolve(new Promise(function (resolve) {
+		return new Promise(function (resolve) {
 			requestAnimationFrame(function () {
 				var delay, className = element.className;
 				changeClassList(element.classList, method, classes);
@@ -2744,7 +2766,7 @@ new function () {
 				}
 				resolve(element);
 			});
-		}));
+		});
 	}
 
 	function changeClassList(classList, method, classes) {
@@ -2754,7 +2776,7 @@ new function () {
 	}
 
 	function changeClass(method, args) {
-		return promise(args[0], method, Array.slice(args, 1));
+		return promise(args[0], method, Array.slice(args, 1)).then();
 	}
 
 	Object.assign(lib.dom, {
