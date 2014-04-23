@@ -378,7 +378,7 @@ lib.event.off(eventDetails);
 
 `.one()` registers the handler for the DOM event, which runs once
 ```javascript
-lib.event.one(element[, selector], eventTypes, callback) //→ eventDetails
+lib.event.one(element[, selector], eventTypes, callback)
 ```
 example:
 ```javascript
@@ -400,14 +400,14 @@ lib.event.when(document, "body", "click").then(doSomething);
 
 `.preventDefault()` cancels the default action of the event
 ```javascript
-lib.event.on("submit", someForm, lib.event.preventDefault);
+lib.event.on(someForm, "submit", lib.event.preventDefault);
 ```
 
 ####lib.event.stopPropagation()
 
 `.stopPropagation()` prevents further propagation of the event
 ```javascript
-lib.event.on("click", someElement, lib.event.stopPropagation);
+lib.event.on(someElement, "click", lib.event.stopPropagation);
 ```
 
 ###lib.date
