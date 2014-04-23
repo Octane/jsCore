@@ -13,6 +13,57 @@ If you don't want to support IE8, rebuild `jscore.js` using `build.js`:
 node build.js --no_ie8
 ```
 
+##Contents
+ - [`Polyfill`](#polyfill)
+    - [`Notes/known issues`](#notesknown-issues)
+ - [Namespace `lib`](#lib)
+    - [Constructor `.Template()`](#libtemplate)
+        - [Instance method `.match()`](#libtemplate)
+    - [Constructor `.I18n()`](#libi18n)
+        - [Instance methods `.add()` and `.use()`](#libi18n)
+    - [Namespace `.html`](#libhtml)
+        - [Method `.parse()`](#libhtmlparse)
+        - [Method `.escape()`](#libhtmlescape)
+        - [Method `.unescape()`](#libhtmlunescape)
+    - [Namespace `.class_`](#libclass)
+        - [Method `.extend()`](#libclass)
+    - [Namespace `.event`](#libevent)
+        - [Method `.on()`](#libeventon)
+        - [Method `.off()`](#libeventoff)
+        - [Method `.one()`](#libeventone)
+        - [Method `.when()`](#libeventwhen)
+        - [Method `.preventDefault()`](#libeventpreventdefault)
+        - [Method `.stopPropagation()`](#libeventstoppropagation)
+    - [Namespace `.array`](#libarray)
+        - [Method `.count()`](#libarraycount)
+        - [Method `.all()`](#libarrayall)
+        - [Method `.unique()`](#libarrayunique)
+        - [Method `.refine()`](#libarrayrefine)
+        - [Method `.contains()`](#libarraycontains)
+        - [Method `.shuffle()`](#libarrayshuffle)
+        - [Method `.range()`](#libarrayrange)
+        - [Method `.remove()`](#libarrayremove)
+    - [Namespace `.is`](#libis)
+        - [Methods `.isTrue()`, `.isFalse()`, `.isHTML()`, `.isObject()` and `.isHTMLElement()`](#libis)
+    - [Namespace `.dom`](#libdom)
+        - [Method `.query()`](#libdomquery)
+        - [Method `.queryAll()`](#libdomqueryall)
+        - [Method `.ready()`](#libdomready)
+        - [Methods `.addClass()`, `.removeClass()` and `.toggleClass()`](#libdomaddremovetoggleclass)
+        - [Method `.getTransitionTime()`](#libdomgettransitiontime)
+    - [Namespace `.date`](#libdate)
+        - [Method `.isLeapYear()`](#libdataisleapyear)
+        - [Method `.monthLength()`](#libdatemonthlength)
+    - [Namespace and method `.request()`](#librequest)
+        - [Method `.get()`](#librequestget)
+        - [Method `.post()`](#librequestpost)
+        - [Method `.json()`](#librequestjson)
+        - [Method `.script()`](#librequestscript)
+        - [Method `.jsonp()`](#librequestjsonp)
+        - [Method `.toQueryParam()`](#librequesttoqueryparam)
+        - [Method `.toQueryString()`](#librequesttoquerystring)
+ - [`License`](#license)
+
 ##Polyfill
 
 Object/Scope | Methods/Properties
@@ -60,7 +111,7 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `
   }"
 ```
 
-<sup name="Array.slice">5</sup> – `Array.slice` supports array-like DOM-objects in IE8
+<sup name="Array.slice">5</sup> – `Array.slice` supports array-like DOM objects in IE8
 
 <sup name="Array.splice">6</sup> – `Array.splice` fixes a [bug with array-like objects](http://javascript.ru/forum/307534-post71.html) in IE8
 
@@ -92,7 +143,7 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `
 
 ###lib.Template()
 
-`lib.Template` is a very simple string templating tool (not to be confused with HTML-templating)
+`.Template()` is a very simple string templating tool (not to be confused with HTML templating)
 ```javascript
 var tmpl = new lib.Template("Hi, {NAME}");
 tmpl.match({name: "John"}) //→ "Hi, John"
@@ -101,7 +152,7 @@ tmpl.match({name: "Luke"}) //→ "Hi, Luke"
 
 ###lib.I18n()
 
-`lib.I18n` is a handy tool for the internationalization
+`.I18n()` is a handy tool for the internationalization
 ```javascript
 var i18n = new lib.I18n([locale[, messageBundle]]);
 i18n.add(locale, messageBundle)
@@ -132,29 +183,29 @@ i18n("currency", {cost: 100}) // → "100 руб."
 
 ####lib.html.parse()
 
-`lib.html.parse` converts a HTML-code into a document fragment
+`.parse()` converts a HTML code into a document fragment
 ```javascript
-var docFragment = lib.html.parse("<h1>Example</h1><p>…</p>");
+var docFragment = lib.html.parse("<h1>Example</h1><p>...</p>");
 document.body.append(docFragment);
 ```
 
 ####lib.html.escape()
 
-`lib.html.escape` converts special HTML-characters to mnemonics
+`.escape()` converts special HTML characters to mnemonics
 ```javascript
 lib.html.escape("<h1>Example</h1>") // → "&lt;h1&gt;Example&lt;/h1&gt;"
 ```
 
 ####lib.html.unescape()
 
-`lib.html.unescape` converts HTML-mnemonics to characters
+`.unescape()` converts HTML mnemonics to characters
 ```javascript
 lib.html.unescape("&lt;h1&gt;Example&lt;/h1&gt;") // → "<h1>Example</h1>"
 ```
 
 ###lib.class_
 
-`lib.class_.extend` is the standard inheritance pattern
+`.extend()` is the standard inheritance pattern
 ```javascript
 lib.class_.extend(Class, SuperClass);
 Class.super_ == SuperClass //→ true
@@ -164,18 +215,18 @@ Class.super_ == SuperClass //→ true
 
 ####lib.event.on()
 
-`lib.event.on` registers a handler for an DOM event
+`.on()` registers a handler for an DOM event
 ```javascript
 lib.event.on(eventType[, selector][, element], callback) //→ eventDetails
 ```
-delegating events using the CSS-selector:
+delegating events using the CSS selector:
 ```javascript
 lib.event.on("click", ".menu-item, .submenu-item", onMenuClick)
 ```
 
 ####lib.event.off()
 
-`lib.event.off` removes the handler for the DOM event
+`.off()` removes the handler for the DOM event
 ```javascript
 lib.event.off(eventDetails)
 ```
@@ -187,7 +238,7 @@ lib.event.off(eventDetails);
 
 ####lib.event.one()
 
-`lib.event.one` registers the handler for the DOM event, which runs once
+`.one()` registers the handler for the DOM event, which runs once
 ```javascript
 lib.event.one(eventType[, selector][, element], callback) //→ eventDetails
 ```
@@ -198,7 +249,7 @@ lib.event.one("load", window, onLoaded);
 
 ####lib.event.when()
 
-`lib.event.when` like `lib.event.one`, but returns a promise, the callback is passed to `then`
+`.when()` like `.one()`, but returns a promise, the callback is passed to `then`
 ```javascript
 lib.event.when(eventType[, selector][, element]) //→ promise
 ```
@@ -209,14 +260,14 @@ lib.event.when("click", ".some-class").then(doSomething);
 
 ####lib.event.preventDefault()
 
-`lib.event.preventDefault` cancels the default action of the event
+`.preventDefault()` cancels the default action of the event
 ```javascript
 lib.event.on("submit", someForm, lib.event.preventDefault);
 ```
 
 ####lib.event.stopPropagation()
 
-`lib.event.stopPropagation` prevents further propagation of the event
+`.stopPropagation()` prevents further propagation of the event
 ```javascript
 lib.event.on("click", someElement, lib.event.stopPropagation);
 ```
@@ -225,7 +276,7 @@ lib.event.on("click", someElement, lib.event.stopPropagation);
 
 ####lib.array.count()
 
-`lib.array.count` counts the actual number of elements
+`.count()` counts the actual number of elements
 ```javascript
 var iterable = [,"a",,"b",];
 iterable.length //→ 4
@@ -234,7 +285,7 @@ lib.array.count(iterable) //→ 2
 
 ####lib.array.all()
 
-`lib.array.all` like `Array.every`, but it is sensitive to the length of the array and missing indexes
+`.all()` like `Array.every`, but it is sensitive to the length of the array and missing indexes
 ```javascript
 [].every(lib.isTrue) //→ true
 lib.array.all([], lib.isTrue) //→ false
@@ -242,35 +293,35 @@ lib.array.all([], lib.isTrue) //→ false
 
 ####lib.array.unique()
 
-`lib.array.unique` returns the new array consisting only of unique elements of the passed array
+`.unique()` returns the new array consisting only of unique elements of the passed array
 ```javascript
 lib.array.unique([1, 2, 1]) //→ [1, 2]
 ```
 
 ####lib.array.refine()
 
-`lib.array.refine` shifts array indexes, so that was not missed
+`.refine()` shifts array indexes, so that was not missed
 ```javascript
 lib.array.refine([1,,2]) //→ [1, 2]
 ```
 
 ####lib.array.contains()
 
-`lib.array.contains` determines whether an element may be found within the array
+`.contains()` determines whether an element may be found within the array
 ```javascript
 lib.array.contains(["a", "b"], "a") //→ true
 ```
 
 ####lib.array.shuffle()
 
-`lib.array.shuffle` returns the new array consisting of mixed elements of the passed array
+`.shuffle()` returns the new array consisting of mixed elements of the passed array
 ```javascript
 lib.array.shuffle(iterbale) //→ array
 ```
 
 ####lib.array.range()
 
-`lib.array.range` creates the array of integers
+`.range()` creates the array of integers
 ```javascript
 lib.array.range(2, 7) //→ [2, 3, 4, 5, 6]
 lib.array.range(5) //→ [0, 1, 2, 3, 4]
@@ -278,7 +329,7 @@ lib.array.range(5) //→ [0, 1, 2, 3, 4]
 
 ####lib.array.remove()
 
-`lib.array.remove` removes the element from the array
+`.remove()` removes the element from the array
 ```javascript
 var list = ["a", "b", "c"];
 lib.array.remove(list, "b");
@@ -287,7 +338,7 @@ console.log(list) //→ ["a", "c"]
 
 ###lib.is
 
-`lib.isTrue`, `lib.isFalse`, `lib.isHTML`, `lib.isObject`, `lib.isHTMLElement` are helper functions for use, e.g., in `Array` iteration methods
+`.isTrue()`, `.isFalse()`, `.isHTML()`, `.isObject()`, `.isHTMLElement()` are helper functions for use, e.g., in `Array` iteration methods
 ```javascript
 if (testResults.every(lib.isTrue)) {
     //do something
@@ -298,7 +349,7 @@ if (testResults.every(lib.isTrue)) {
 
 ####lib.dom.query()
 
-`lib.dom.query` returns a promise to perform actions asynchronously, if a element found
+`.query()` returns a promise to perform actions asynchronously, if a element found
 ```javascript
 lib.dom.query("#nav-menu").then(function (element) {
     //use element
@@ -307,7 +358,7 @@ lib.dom.query("#nav-menu").then(function (element) {
 
 ####lib.dom.queryAll()
 
-`lib.dom.queryAll` returns the promise to perform actions asynchronously, if elements found
+`.queryAll()` returns the promise to perform actions asynchronously, if elements found
 ```javascript
 lib.dom.queryAll(".menu-item", menuElement).then(function (list) {
     //use list
@@ -316,18 +367,54 @@ lib.dom.queryAll(".menu-item", menuElement).then(function (list) {
 
 ####lib.dom.ready()
 
-`lib.dom.ready` returns the promise to perform actions after `DOMContentLoaded`
+`.ready()` returns the promise to perform actions after `DOMContentLoaded`
 ```javascript
 lib.dom.ready().then(function () {
     //do something
 });
 ```
 
+####lib.dom.add|remove|toggleClass()
+
+`.addClass()`, `.removeClass()` and `.toggleClass()` return the promise to perform actions at the end of all CSS transitions
+```javascript
+lib.dom.addClass(class[, class1[, class2[, ...]]], element) //→ promise
+lib.dom.removeClass(class[, class1[, class2[, ...]]], element) //→ promise
+lib.dom.toggleClass(class[, class1[, class2[, ...]]], element) //→ promise
+```
+for example, call `doSomething` after *3 seconds* of the transition:
+```css
+.some {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: left 3s, top 1s;
+}
+.trans1 {
+    top: 50%;
+}
+.trans2 {
+    left: 50%;
+}
+```
+```javascript
+var element = document.query(".some");
+lib.dom.addClass("trans1", "trans2", element).then(doSomething);
+```
+
+####lib.dom.getTransitionTime()
+
+`.getTransitionTime()` returns the maximum CSS transition time
+```javascript
+
+lib.dom.getTransitionTime(element) //→ number (ms)
+```
+
 ###lib.date
 
 ####lib.data.isLeapYear()
 
-`lib.date.isLeapYear` determines whether a leap year
+`.isLeapYear()` determines whether a leap year
 ```javascript
 lib.date.isLeapYear([date]) //→ boolean
 ```
@@ -335,7 +422,7 @@ where `date` is instance of `Date` or the four-digit number
 
 ####lib.date.monthLength()
 
-`lib.date.monthLength` returns the number of days in a month
+`.monthLength()` returns the number of days in a month
 ```javascript
 lib.date.monthLength(monthIndex, fullYear) //→ number
 ```
@@ -343,7 +430,7 @@ if instead `monthIndex` pass the instance of `Date`, then the second argument no
 
 ###lib.request()
 
-`lib.request` performs a request to a server using `XMLHttpRequest`, returns a promise
+`.request()` performs a request to a server using `XMLHttpRequest`, returns a promise
 ```javascript
 lib.request({
     method:   String,
@@ -362,7 +449,7 @@ lib.request({
 
 ####lib.request.get()
 
-`lib.request.get` like `lib.request`, but it always performs the GET request and lets not pass additional parameters
+`.get()` like `.request()`, but it always performs the GET request and lets not pass additional parameters
 ```javascript
 lib.request.get(url) //→ promise
 //or
@@ -371,11 +458,11 @@ lib.request.get(params) //→ promise
 
 ####lib.request.post()
 
-`lib.request.post` like `lib.request`, but it always performs the POST request
+`.post()` like `.request()`, but it always performs the POST request
 
 ####lib.request.json()
 
-`lib.request.json` is shorthand for:
+`.json()` is shorthand for:
 ```javascript
 lib.request.get(params).then(function (xhr) {
    return JSON.parse(xhr.responceText);
@@ -384,7 +471,7 @@ lib.request.get(params).then(function (xhr) {
 
 ####lib.request.script()
 
-`lib.request.script` loads a JavaScript file from the server request, then execute it, returns the promise
+`.script()` loads a JavaScript file from the server request, then execute it, returns the promise
 ```javascript
 lib.request.script({
     url:     String,
@@ -396,18 +483,18 @@ lib.request.script({
 
 ####lib.request.jsonp()
 
-`lib.request.jsonp` is equivalent to `lib.request.script`
+`.jsonp()` is equivalent to `.script()`
 
 ####lib.request.toQueryParam()
 
-`lib.request.toQueryParam` converts key-value pairs into the query string
+`.toQueryParam()` converts key-value pairs into the query string
 ```javascript
 lib.request.toQueryParam("chr", "ю") //→ "chr=%D1%8E"
 ```
 
 ####lib.request.toQueryString()
 
-`lib.request.toQueryString` converts the object containing key-value pairs into the query string
+`.toQueryString()` converts the object containing key-value pairs into the query string
 ```javascript
 lib.request.toQueryString({
     chr1: "ю",

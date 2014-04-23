@@ -2,11 +2,8 @@
 
 ##v0.3.0
 
- - new: `lib.dom.getTransitionTime(element) → ms`
- - new: `lib.dom.addClass(class[, class1[, class2[, …]]], element) → promise`
- - new: `lib.dom.removeClass(class[, class1[, class2[, …]]], element) → promise`
- - new: `lib.dom.toggleClass(class[, class1[, class2[, …]]], element) → promise`
- - …
+ - new: method `.getTransitionTime()` for calculate the maximum CSS transition time
+ - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions
 
 ##v0.2.0
 
