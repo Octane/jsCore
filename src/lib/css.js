@@ -15,7 +15,6 @@ lib.css = {
 		var prefixed, prefixes = this.prefixes, i = prefixes.length;
 		while (i--) {
 			prefixed = prefixes[i] + property;
-			console.log(prefixed);
 			if (prefixed in style) {
 				return prefixed;
 			}

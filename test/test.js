@@ -11,7 +11,6 @@ catch (error) {
 			document.body.append(pre);
 		}
 	};
-	console.log(document, document.head, document.body);
 }
 
 lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
