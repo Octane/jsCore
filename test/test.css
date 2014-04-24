@@ -2,7 +2,7 @@ body {
 	background: #ecf0f1;
 	font-family: sans-serif;
 }
-.base {
+.animated {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -11,14 +11,14 @@ body {
 	background: #3cf;
 	transition: all 3s;
 }
-.anim1 {
+.trans1 {
 	left: 100%;
 	margin-left: -20px;
 }
-.anim2 {
+.trans2 {
 	top: 100%;
 	margin-top: -20px;
 }
-.anim3 {
+.trans3 {
 	transform: rotate(360deg);
 }

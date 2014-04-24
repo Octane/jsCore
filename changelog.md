@@ -2,7 +2,9 @@
 
 ##v0.3.0
 
+ - new: method `.prefix()` for CSS properties
  - new: method `.getTransitionTime()` for calculate the maximum CSS transition time
+ - new: method `.getFiniteAnimationTime()` for calculate the finite CSS animation time
  - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions
  - fix: `lib.event` API support `handleEvent`
 

@@ -93,12 +93,12 @@ console.log("CSS Transitions test");
 
 window.addEventListener("load", function () {
 	var node = document.body.appendChild(document.createElement("div"));
-	node.classList.add("base");
+	node.classList.add("animated");
 	requestAnimationFrame(function () {
-		lib.dom.addClass(node, "anim1", "anim2", "anim3").then(function (element) {
-			return lib.dom.removeClass(element, "anim1");
+		lib.dom.addClass(node, "trans1", "trans2", "trans3").then(function (element) {
+			return lib.dom.removeClass(element, "trans1");
 		}).then(function (element) {
-			return lib.dom.removeClass(element, "anim2");
+			return lib.dom.removeClass(element, "trans2");
 		}).then(function (element) {
 			element.remove();
 		});

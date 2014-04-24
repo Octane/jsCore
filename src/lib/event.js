@@ -11,10 +11,8 @@ lib.event = {
 		event.stopPropagation();
 	},
 
-	//returns promise
 	when: function (element, selector, eventTypes) {
 		if (arguments.length == 2) {
-			//selector is optional
 			eventTypes = selector;
 			selector = null;
 		}
@@ -25,7 +23,6 @@ lib.event = {
 
 	one: function (element, selector, eventTypes, callback) {
 		if (arguments.length == 3) {
-			//selector is optional
 			callback = eventTypes;
 			eventTypes = selector;
 			selector = null;
@@ -41,11 +38,9 @@ lib.event = {
 		});
 	},
 
-	//returns event details
 	on: function (element, selector, eventTypes, callback) {
 		var listener;
 		if (arguments.length == 3) {
-			//selector is optional
 			callback = eventTypes;
 			eventTypes = selector;
 			selector = null;

@@ -38,12 +38,15 @@ node build.js --no_ie8
         - [Method `.remove()`](#libarrayremove)
     - [Namespace `.is`](#libis)
         - [Methods `.isTrue()`, `.isFalse()`, `.isHTML()`, `.isObject()` and `.isHTMLElement()`](#libis)
+    - [Namespace `.css`](#libcss)
+        - [Method `.prefix()`](#libcssprefix)
+        - [Method `.getTransitionTime()`](#libcssgettransitiontime)
+        - [Method `.getFiniteAnimationTime()`](#libcssgetfiniteanimationtime)
     - [Namespace `.dom`](#libdom)
         - [Method `.query()`](#libdomquery)
         - [Method `.queryAll()`](#libdomqueryall)
         - [Method `.ready()`](#libdomready)
         - [Methods `.addClass()`, `.removeClass()` and `.toggleClass()`](#libdomaddremovetoggleclass)
-        - [Method `.getTransitionTime()`](#libdomgettransitiontime)
     - [Namespace `.event`](#libevent)
         - [Method `.on()`](#libeventon)
         - [Method `.off()`](#libeventoff)
@@ -284,6 +287,33 @@ if (testResults.every(lib.isTrue)) {
 }
 ```
 
+###lib.css
+
+####lib.css.prefix()
+
+`.prefix()` returns prefixed `propertyName` or `undefined`
+```javascript
+lib.css.prefix(propertyName[, style]) //→ prefixedPropertyName
+```
+example:
+```javascript
+lib.css.prefix("animationName") //→ "WebkitAnimationName"
+```
+
+####lib.css.getTransitionTime()
+
+`.getTransitionTime()` returns the maximum CSS transition time
+```javascript
+lib.css.getTransitionTime(style) //→ number (ms)
+```
+
+####lib.css.getFiniteAnimationTime()
+
+`.getFiniteAnimationTime()` returns the finite CSS animation time
+```javascript
+lib.css.getFiniteAnimationTime(style) //→ number (ms)
+```
+
 ###lib.dom
 
 ####lib.dom.query()
@@ -323,7 +353,7 @@ lib.dom.toggleClass(element, class1[, class2[, ...]]], element) //→ promise
 ```
 for example, call `doSomething` after *3 seconds* of the transition:
 ```css
-.some {
+.animated {
     position: fixed;
     top: 0;
     left: 0;
@@ -337,16 +367,8 @@ for example, call `doSomething` after *3 seconds* of the transition:
 }
 ```
 ```javascript
-var element = document.query(".some");
+var element = document.query(".animated");
 lib.dom.addClass(element, "trans1", "trans2").then(doSomething);
-```
-
-####lib.dom.getTransitionTime()
-
-`.getTransitionTime()` returns the maximum CSS transition time
-```javascript
-
-lib.dom.getTransitionTime(element) //→ number (ms)
 ```
 
 ###lib.event

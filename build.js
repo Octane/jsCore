@@ -58,6 +58,7 @@ try {
 		"lib/template.js",
 		"lib/i18n.js",
 		"lib/request.js",
+		"lib/css.js",
 		"lib/dom.js",
 		"lib/date.js"
 

@@ -2288,10 +2288,8 @@ lib.event = {
 		event.stopPropagation();
 	},
 
-	//returns promise
 	when: function (element, selector, eventTypes) {
 		if (arguments.length == 2) {
-			//selector is optional
 			eventTypes = selector;
 			selector = null;
 		}
@@ -2302,7 +2300,6 @@ lib.event = {
 
 	one: function (element, selector, eventTypes, callback) {
 		if (arguments.length == 3) {
-			//selector is optional
 			callback = eventTypes;
 			eventTypes = selector;
 			selector = null;
@@ -2318,11 +2315,9 @@ lib.event = {
 		});
 	},
 
-	//returns event details
 	on: function (element, selector, eventTypes, callback) {
 		var listener;
 		if (arguments.length == 3) {
-			//selector is optional
 			callback = eventTypes;
 			eventTypes = selector;
 			selector = null;
@@ -2657,6 +2652,99 @@ lib.request = new function () {
 };
 
 
+lib.css = {
+
+	prefixes: ["ms", "O", "Webkit", "Moz"],
+
+	prefix: function (property, style) {
+		if (!style) {
+			style = document.documentElement.style;
+		}
+		if (property in style) {
+			return property;
+		}
+		property = property.charAt(0).toUpperCase() + property.slice(1);
+		var prefixed, prefixes = this.prefixes, i = prefixes.length;
+		while (i--) {
+			prefixed = prefixes[i] + property;
+			console.log(prefixed);
+			if (prefixed in style) {
+				return prefixed;
+			}
+		}
+		return undefined;
+	}
+
+};
+
+new function () {
+
+	var css = lib.css, style = document.documentElement.style,
+		transitionDelay = css.prefix("transitionDelay", style),
+		transitionDuration = css.prefix("transitionDuration", style),
+		animationDelay = css.prefix("animationDelay", style),
+		animationDuration = css.prefix("animationDuration", style),
+		animationIterationCount = css.prefix("animationIterationCount", style);
+
+	style = null;
+
+	function parseFloats(string) {
+		return string.split(",").map(function (string) {
+			return Number.parseFloat(string) || 0;
+		});
+	}
+
+	function calcTransitionTime(delay, duration) {
+		var length = Math.max(duration.length, delay.length),
+			i = 0, time, maxTime = 0;
+		while (i < length) {
+			time = (delay[i] || 0) + (duration[i] || 0);
+			if (time > maxTime) {
+				maxTime = time;
+			}
+			i++;
+		}
+		return Math.ceil(maxTime * 1000);
+	}
+
+	function getTransitionTime(style) {
+		return calcTransitionTime(
+			parseFloats(style[transitionDelay]),
+			parseFloats(style[transitionDuration])
+		);
+	}
+
+	function calcFiniteAnimationTime(delay, duration, count) {
+		var length = Math.max(duration.length, delay.length, count.length),
+			i = 0, time, maxTime = 0;
+		while (i < length) {
+			time = (delay[i] || 0) + (duration[i] || 0) * (count[i] || 0);
+			if (time > maxTime) {
+				maxTime = time;
+			}
+			i++;
+		}
+		return Math.ceil(maxTime * 1000);
+	}
+
+	function getFiniteAnimationTime(style) {
+		return calcFiniteAnimationTime(
+			parseFloats(style[animationDelay]),
+			parseFloats(style[animationDuration]),
+			parseFloats(style[animationIterationCount])
+		);
+	}
+
+	function returnZero() {
+		return 0;
+	}
+
+	css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
+	css.getFiniteAnimationTime = animationDelay ? getFiniteAnimationTime : returnZero;
+
+};
+
+
 lib.dom = {
 
 	query: function (selector, root) {
@@ -2692,58 +2780,6 @@ lib.dom = {
 				lib.event.one("DOMContentLoaded", document, resolve);
 			}
 		});
-	},
-
-	getTransitionTime: new function () {
-
-		var style = document.documentElement.style,
-			transitionDuration = [
-				"transitionDuration",
-				"OTransitionDuration",
-				"MozTransitionDuration",
-				"WebkitTransitionDuration"
-			].find(isSupported),
-			transitionDelay = [
-				"transitionDelay",
-				"OTransitionDelay",
-				"MozTransitionDelay",
-				"WebkitTransitionDelay"
-			].find(isSupported);
-
-		style = null;
-
-		function isSupported(property) {
-			return property in style;
-		}
-
-		function parseTime(string) {
-			return string.split(",").map(function (time) {
-				return Number.parseInt(time, 10);
-			});
-		}
-
-		function getMaxTime(time1, time2) {
-			var i = 0, length = Math.max(time1.length, time2.length), time, maxTime = 0;
-			while (i < length) {
-				time = (time1[i] || 0) + (time2[i] || 0);
-				if (time > maxTime) {
-					maxTime = time;
-				}
-				i++;
-			}
-			return maxTime;
-		}
-
-		if (transitionDuration && transitionDelay) {
-			return function (element) {
-				var style = getComputedStyle(element);
-				return getMaxTime(parseTime(style[transitionDuration]), parseTime(style[transitionDelay])) * 1000;
-			};
-		}
-		return function () {
-			return 0;
-		};
-
 	}
 
 };
@@ -2753,10 +2789,16 @@ new function () {
 	function promise(element, method, classes) {
 		return new Promise(function (resolve) {
 			requestAnimationFrame(function () {
-				var delay, className = element.className;
+				var delay, style, className = element.className;
 				changeClassList(element.classList, method, classes);
 				if (className != element.className) {
-					delay = lib.dom.getTransitionTime(element);
+					style = getComputedStyle(element);
+					/*delay = Math.max(
+						lib.css.getTransitionTime(style),
+						lib.css.getFiniteAnimationTime(style)
+					);*/
+					delay = lib.css.getTransitionTime(style);
+					style = null;
 					if (delay) {
 						setTimeout(function () {
 							resolve(element);
