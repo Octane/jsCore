@@ -2788,16 +2788,18 @@ new function () {
 	function promise(element, method, classes) {
 		return new Promise(function (resolve) {
 			requestAnimationFrame(function () {
-				var delay, style, className = element.className;
+				var delay, className = element.className;
 				changeClassList(element.classList, method, classes);
 				if (className != element.className) {
-					style = getComputedStyle(element);
-					/*delay = Math.max(
+					/*todo end of all animations
+					var style = getComputedStyle(element);
+					delay = Math.max(
 						lib.css.getTransitionTime(style),
 						lib.css.getFiniteAnimationTime(style)
-					);*/
-					delay = lib.css.getTransitionTime(style);
+					);
 					style = null;
+					*/
+					delay = lib.css.getTransitionTime(getComputedStyle(element));
 					if (delay) {
 						setTimeout(function () {
 							resolve(element);
