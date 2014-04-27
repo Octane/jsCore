@@ -88,16 +88,15 @@ console.log(ws.has(objValue1) === true);
 console.log(ws.has(objValue2) === false);
 console.log(ws.delete_(objValue1) === true);
 
-console.log("CSS Transitions test");
+console.log("CSS animation test");
 
 window.addEventListener("load", function () {
 	var node = document.body.appendChild(document.createElement("div"));
 	node.classList.add("animated");
 	requestAnimationFrame(function () {
-		lib.dom.addClass(node, "trans1", "trans2", "trans3").then(function (element) {
-			return lib.dom.removeClass(element, "trans1");
-		}).then(function (element) {
-			return lib.dom.removeClass(element, "trans2");
+		lib.dom.addClass(node, "move").then(function (element) {
+			console.log("CSS animation done");
+			return element;
 		}).then(function (element) {
 			element.remove();
 		});

@@ -4,21 +4,37 @@ body {
 }
 .animated {
 	position: fixed;
-	top: 0;
-	left: 0;
+	top: 50%;
+	left: 50%;
 	width: 20px;
 	height: 20px;
 	background: #3cf;
 	transition: all 3s;
 }
-.trans1 {
-	left: 100%;
-	margin-left: -20px;
+.move {
+	width: 300px;
+	-webkit-animation: move-top 5s, move-left 1s;
+	-webkit-animation-fill-mode: both;
+	animation: move-top 5s, move-left 1s;
+	animation-fill-mode: both;
 }
-.trans2 {
-	top: 100%;
-	margin-top: -20px;
+@keyframes move-top {
+	100% {
+		top: 0;
+	}
 }
-.trans3 {
-	transform: rotate(360deg);
+@keyframes move-left {
+	100% {
+		left: 0;
+	}
+}
+@-webkit-keyframes move-top {
+	100% {
+		top: 0;
+	}
+}
+@-webkit-keyframes move-left {
+	100% {
+		left: 0;
+	}
 }

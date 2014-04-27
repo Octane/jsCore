@@ -41,7 +41,7 @@ node build.js --no_ie8
     - [Namespace `.css`](#libcss)
         - [Method `.prefix()`](#libcssprefix)
         - [Method `.getTransitionTime()`](#libcssgettransitiontime)
-        - [Method `.getFiniteAnimationTime()`](#libcssgetfiniteanimationtime)
+        - [Prefixed property names](#libcssprefixed-property-names)
     - [Namespace `.dom`](#libdom)
         - [Method `.query()`](#libdomquery)
         - [Method `.queryAll()`](#libdomqueryall)
@@ -54,6 +54,10 @@ node build.js --no_ie8
         - [Method `.when()`](#libeventwhen)
         - [Method `.preventDefault()`](#libeventpreventdefault)
         - [Method `.stopPropagation()`](#libeventstoppropagation)
+        - [Method `.awaitTransitionEnd()`](#libeventawaittransitionend)
+        - [Method `.awaitAnimationEnd()`](#libeventawaitanimationend)
+        - [Method `.awaitTransAnimEnd()`](#libeventawaittransanimend)
+        - [Prefixed event types](#libeventprefixed-event-types)
     - [Namespace `.date`](#libdate)
         - [Method `.isLeapYear()`](#libdataisleapyear)
         - [Method `.monthLength()`](#libdatemonthlength)
@@ -293,7 +297,7 @@ if (testResults.every(lib.isTrue)) {
 
 `.prefix()` returns prefixed `propertyName` or `undefined`
 ```javascript
-lib.css.prefix(propertyName[, style]) //→ prefixedPropertyName
+lib.css.prefix(propertyName) //→ prefixedPropertyName
 ```
 example:
 ```javascript
@@ -307,11 +311,13 @@ lib.css.prefix("animationName") //→ "WebkitAnimationName"
 lib.css.getTransitionTime(style) //→ number (ms)
 ```
 
-####lib.css.getFiniteAnimationTime()
+####Prefixed property names
 
-`.getFiniteAnimationTime()` returns the finite CSS animation time
+For quick access prepared prefixed CSS animation, transition and transform property names: `.animation`, ".animationName", ".transitionProperty", ".transform", etc.
 ```javascript
-lib.css.getFiniteAnimationTime(style) //→ number (ms)
+if (lib.css.animation) {
+    element.style[lib.css.animationDelay] = "5s";
+}
 ```
 
 ###lib.dom
@@ -345,7 +351,7 @@ lib.dom.ready().then(function () {
 
 ####lib.dom.add|remove|toggleClass()
 
-`.addClass()`, `.removeClass()` and `.toggleClass()` return the promise to perform actions at the end of all CSS transitions
+`.addClass()`, `.removeClass()` and `.toggleClass()` return the promise to perform actions at the end of all CSS transitions and animations
 ```javascript
 lib.dom.addClass(element, class1[, class2[, ...]]], element) //→ promise
 lib.dom.removeClass(element, class1[, class2[, ...]]], element) //→ promise
@@ -430,6 +436,36 @@ lib.event.on(someForm, "submit", lib.event.preventDefault);
 `.stopPropagation()` prevents further propagation of the event
 ```javascript
 lib.event.on(someElement, "click", lib.event.stopPropagation);
+```
+
+####lib.event.awaitTransitionEnd()
+
+`.awaitTransitionEnd()` returns the promise that is fulfilled at the end of CSS transitions
+```javascript
+lib.event.awaitTransitionEnd(element[, computedStyle]) //→ promise
+```
+
+####lib.event.awaitAnimationEnd()
+
+`.awaitAnimationEnd()` returns the promise that is fulfilled at the end of CSS animations
+```javascript
+lib.event.awaitAnimationEnd(element[, previousAnimations]) //→ promise
+```
+
+####lib.event.awaitTransAnimEnd()
+
+`.awaitTransAnimEnd()` returns the promise that is fulfilled at the end of transitions and animations
+```javascript
+lib.event.awaitTransAnimEnd(element[, previousAnimations]) //→ promise
+```
+
+####Prefixed event types
+
+For quick access prepared prefixed animation and transition event types: `.animationStart`, `.transitionEnd`, ect.
+```javascript
+if (lib.event.animationEnd) {
+    element.addEventListener(lib.event.animationEnd, onAnimationEnd);
+}
 ```
 
 ###lib.date

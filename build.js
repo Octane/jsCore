@@ -53,14 +53,14 @@ try {
 		"lib/is.js",
 		"lib/class.js",
 		"lib/array.js",
-		"lib/event.js",
+		"lib/date.js",
 		"lib/html.js",
 		"lib/template.js",
 		"lib/i18n.js",
-		"lib/request.js",
 		"lib/css.js",
+		"lib/event.js",
 		"lib/dom.js",
-		"lib/date.js"
+		"lib/request.js"
 
 
 	].reduce(function (result, fileName) {

@@ -2277,6 +2277,220 @@ lib.array = {
 };
 
 
+lib.date = {
+
+	_monthLengths: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+
+	isLeapYear: function (year) {
+		if (!arguments.length) {
+			year = new Date;
+		}
+		if (year instanceof Date) {
+			year = year.getFullYear();
+		}
+		return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+	},
+
+	monthLength: function (monthIndex, year) {
+		if (!arguments.length) {
+			monthIndex = new Date;
+		}
+		if (monthIndex instanceof Date) {
+			year = monthIndex.getFullYear();
+			monthIndex = monthIndex.getMonth();
+		}
+		if (1 == monthIndex && this.isLeapYear(year)) {
+			return 29;
+		}
+		return this._monthLengths[monthIndex];
+	}
+
+};
+
+
+lib.html = {
+
+	parse: function (string) {
+		var node = document.createElement("div"),
+			frag = document.createDocumentFragment();
+		node.innerHTML = string;
+		while (node.hasChildNodes()) {
+			frag.appendChild(node.firstChild);
+		}
+		return frag;
+	},
+
+	escape: function (string) {
+		var node = document.createElement("div");
+		node.appendChild(document.createTextNode(string));
+		return node.innerHTML;
+	},
+
+	unescape: function (string) {
+		var node = document.createElement("div");
+		node.innerHTML = string;
+		return node.textContent;
+	}
+
+};
+
+
+lib.Template = new function () {
+
+	function Template(template) {
+		this.template = Array.join(template, "");
+	}
+
+	//example: new lib.Template("Hi, {NAME}").match({name: "John"}) → "Hi, John"
+	Template.prototype.match = function (stringMap) {
+		return Object.keys(stringMap).reduceRight(function (template, key) {
+			return template.split("{" + key.toUpperCase() + "}").join(stringMap[key]);
+		}, this.template);
+	};
+
+	return Template;
+
+};
+
+
+lib.I18n = new function () {
+
+	function use(locale) {
+		this.messageBundle = this[locale];
+	}
+
+	function add(locale, messageBundle) {
+		this.locale = locale;
+		this[locale] = messageBundle;
+	}
+
+	function I18n(locale, messageBundle) {
+		function i18n(message, replacements) {
+			if (message in i18n.messageBundle) {
+				message = i18n.messageBundle[message];
+			}
+			if (replacements) {
+				return new lib.Template(message).match(replacements);
+			}
+			return message;
+		}
+		i18n.add = add;
+		i18n.use = use;
+		i18n.add(locale, messageBundle);
+		i18n.use(locale);
+		return i18n;
+	}
+
+	return I18n;
+
+};
+
+
+lib.css = {
+
+	prefix: new function () {
+
+		var cache = {},
+			prefixes = ["ms", "O", "Webkit", "Moz"],
+			properties = new function () {
+				var style = document.documentElement.style,
+					proto = style.constructor.prototype;
+				return "top" in proto ? proto : style;
+			};
+
+		return function (property) {
+			var i, name, prefixed;
+			if (property in cache) {
+				return cache[property];
+			}
+			if (property in properties) {
+				cache[property] = property;
+				return property;
+			}
+			name = property.charAt(0).toUpperCase() + property.slice(1);
+			i = prefixes.length;
+			while (i--) {
+				prefixed = prefixes[i] + name;
+				if (prefixed in properties) {
+					cache[property] = prefixed;
+					return prefixed;
+				}
+			}
+			cache[property] = undefined;
+			return undefined;
+		};
+
+	}
+
+};
+
+/* useful prefixed CSS properties
+ * example:
+ * if (lib.css.animation) {
+ *     element.style[lib.css.animationDuration] = "3s";
+ * }
+ */
+new function () {
+
+	var ns = lib.css, properties = {
+			animation: ["Delay", "Direction", "Duration", "FillMode", "IterationCount", "Name", "PlayState", "TimingFunction"],
+			transition: ["Delay", "Duration", "Property", "TimingFunction"],
+			transfrom: 	["Origin", "Style"]
+		};
+
+	Object.keys(properties).forEach(function (composite) {
+		var prefixed = ns.prefix(composite);
+		if (prefixed) {
+			ns[composite] = prefixed;
+			properties[composite].forEach(function (single) {
+				ns[composite + single] = prefixed + single;
+			});
+		}
+	});
+
+};
+
+//lib.css.getTransitionTime(computedStyle)
+new function () {
+
+	var transitionDelay = lib.css.transitionDelay,
+		transitionDuration = lib.css.transitionDuration;
+
+	function parseFloats(string) {
+		return string.split(",").map(function (string) {
+			return Number.parseFloat(string) || 0;
+		});
+	}
+
+	function calcTransitionTime(delay, duration) {
+		var length = Math.max(duration.length, delay.length),
+			i = 0, time, maxTime = 0;
+		while (i < length) {
+			time = (delay[i] || 0) + (duration[i] || 0);
+			if (time > maxTime) {
+				maxTime = time;
+			}
+			i++;
+		}
+		return Math.ceil(maxTime * 1000);
+	}
+
+	function getTransitionTime(style) {
+		return calcTransitionTime(
+			parseFloats(style[transitionDelay]),
+			parseFloats(style[transitionDuration])
+		);
+	}
+
+	function returnZero() {
+		return 0;
+	}
+
+	lib.css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
+
+};
+
+
 lib.event = {
 
 	//example: element.addEventListener("click", lib.event.preventDefault, false)
@@ -2360,81 +2574,236 @@ lib.event = {
 
 };
 
+//CSS animation and transition event types
+//example: element.addEventListener(lib.event.animationEnd, callback)
+new function () {
 
-lib.html = {
+	var animation = lib.css.prefix("animation");
 
-	parse: function (string) {
-		var node = document.createElement("div"),
-			frag = document.createDocumentFragment();
-		node.innerHTML = string;
-		while (node.hasChildNodes()) {
-			frag.appendChild(node.firstChild);
-		}
-		return frag;
-	},
+	Object.assign(lib.event, {
 
-	escape: function (string) {
-		var node = document.createElement("div");
-		node.appendChild(document.createTextNode(string));
-		return node.innerHTML;
-	},
+		animationEnd: {
+			animation: "animationend",
+			OAnimation: "oanimationend",
+			msAnimation: "MSAnimationEnd",
+			MozAnimation: "mozAnimationEnd",
+			WebkitAnimation: "webkitAnimationEnd"
+		}[animation],
 
-	unescape: function (string) {
-		var node = document.createElement("div");
-		node.innerHTML = string;
-		return node.textContent;
+		animationStart: {
+			animation: "animationstart",
+			OAnimation: "oanimationstart",
+			msAnimation: "MSAnimationStart",
+			MozAnimation: "mozAnimationStart",
+			WebkitAnimation: "webkitAnimationStart"
+		}[animation],
+
+		animationIteration: {
+			animation: "animationiteration",
+			OAnimation: "oanimationiteration",
+			msAnimation: "MSAnimationIteration",
+			MozAnimation: "mozAnimationIteration",
+			WebkitAnimation: "webkitAnimationIteration"
+		}[animation],
+
+		transitionEnd: {
+			transition: "transitionend",
+			OTransition: "otransitionend",
+			MozTransition: "mozTransitionEnd",
+			WebkitTransition: "webkitTransitionEnd"
+		}[lib.css.prefix("transition")]
+
+	});
+
+};
+
+new function () {
+
+	var transition = lib.css.transition,
+		animationName = lib.css.animationName,
+		animationEnd = lib.event.animationEnd,
+		separator = /,\s*/;
+
+	function getAnimationNames(element, style) {
+		return (style || getComputedStyle(element))[animationName].split(separator);
 	}
+
+	function getNewAnimationNames(oldNames, newNames) {
+		if (!newNames || oldNames == newNames) {
+			return [];
+		}
+		newNames = newNames.split(separator);
+		if (!oldNames) {
+			return newNames;
+		}
+		oldNames = oldNames.split(separator);
+		return newNames.reduce(function (names, name) {
+			if (-1 == oldNames.indexOf(name)) {
+				names.push(name);
+			}
+			return names;
+		}, []);
+	}
+
+	function dequeue(animations, name) {
+		var index = animations.indexOf(name);
+		if (-1 != index) {
+			animations.splice(index, 1);
+		}
+		return animations.length;
+	}
+
+	function awaitAnimationEnd(element, animations) {
+		if (!animations) {
+			animations = getAnimationNames(element);
+		}
+		if (animations.length) {
+			return new Promise(function (resolve) {
+				function onAnimationEnd(event) {
+					if (!dequeue(animations, event.animationName)) {
+						element.removeEventListener(animationEnd, onAnimationEnd);
+						resolve(element);
+					}
+				}
+				element.addEventListener(animationEnd, onAnimationEnd);
+			});
+		}
+		return fallback(element);
+	}
+
+	function awaitTransitionEnd(element, style) {
+		var delay = lib.css.getTransitionTime(style || getComputedStyle(element));
+		if (delay) {
+			return new Promise(function (resolve) {
+				setTimeout(function () {
+					resolve(element);
+				}, delay);
+			});
+		}
+		return fallback(element);
+	}
+
+	function awaitTransAnimEnd(element, prevAnimations) {
+		var style = getComputedStyle(element);
+		return Promise.all([
+			awaitAnimationEnd(element, getNewAnimationNames(prevAnimations, style[animationName])),
+			awaitTransitionEnd(element, style)
+		]).then(function () {
+			return element;
+		});
+	}
+
+	function fallback(element) {
+		return new Promise(function (resolve) {
+			resolve(element);
+		});
+	}
+
+	Object.assign(lib.event, {
+		awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
+		awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
+		awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
+	});
 
 };
 
 
-lib.Template = new function () {
+lib.dom = {
 
-	function Template(template) {
-		this.template = Array.join(template, "");
+	query: function (selector, root) {
+		return new Promise(function (resolve, reject) {
+			var element = (root || document).query(selector);
+			if (element) {
+				resolve(element);
+			}
+			else {
+				reject(new Error("not matched"));
+			}
+		});
+	},
+
+	queryAll: function (selector, root) {
+		return new Promise(function (resolve, reject) {
+			var list = (root || document).queryAll(selector);
+			if (list.length) {
+				resolve(list);
+			}
+			else {
+				reject(new Error("not matched"));
+			}
+		});
+	},
+
+	ready: function () {
+		return new Promise(function (resolve) {
+			if ("complete" == document.readyState) {
+				resolve();
+			}
+			else {
+				lib.event.one("DOMContentLoaded", document, resolve);
+			}
+		});
 	}
-
-	//example: new lib.Template("Hi, {NAME}").match({name: "John"}) → "Hi, John"
-	Template.prototype.match = function (stringMap) {
-		return Object.keys(stringMap).reduceRight(function (template, key) {
-			return template.split("{" + key.toUpperCase() + "}").join(stringMap[key]);
-		}, this.template);
-	};
-
-	return Template;
 
 };
 
+new function () {
 
-lib.I18n = new function () {
+	var promise, animationName = lib.css.prefix("animationName"),
+		transitionProperty = lib.css.prefix("transitionProperty");
 
-	function use(locale) {
-		this.messageBundle = this[locale];
+	function changeClasses(element, method, classes) {
+		var className = element.className,
+			classList = element.classList;
+		classes.forEach(function (className) {
+			classList[method](className);
+		});
+		return className != element.className;
 	}
 
-	function add(locale, messageBundle) {
-		this.locale = locale;
-		this[locale] = messageBundle;
+	function changeClass(method, args) {
+		return promise(args[0], method, Array.slice(args, 1));
 	}
 
-	function I18n(locale, messageBundle) {
-		function i18n(message, replacements) {
-			if (message in i18n.messageBundle) {
-				message = i18n.messageBundle[message];
+	function fallback(element) {
+		return new Promise(function (resolve) {
+			resolve(element);
+		});
+	}
+
+	if (transitionProperty || animationName) {
+		promise = function (element, method, classes) {
+			var animations = getComputedStyle(element)[animationName];
+			if (changeClasses(element, method, classes)) {
+				return new Promise(function (resolve) {
+					lib.event.awaitTransAnimEnd(element, animations).then(resolve);
+				}).then();
 			}
-			if (replacements) {
-				return new lib.Template(message).match(replacements);
-			}
-			return message;
+			return fallback(element);
+		};
+	}
+	else {
+		promise = function (element, method, classes) {
+			changeClasses(element, method, classes);
+			return fallback(element);
+		};
+	}
+
+	Object.assign(lib.dom, {
+
+		addClass: function () {
+			return changeClass("add", arguments);
+		},
+
+		removeClass: function () {
+			return changeClass("remove", arguments);
+		},
+
+		toggleClass: function () {
+			return changeClass("toggle", arguments);
 		}
-		i18n.add = add;
-		i18n.use = use;
-		i18n.add(locale, messageBundle);
-		i18n.use(locale);
-		return i18n;
-	}
 
-	return I18n;
+	});
 
 };
 
@@ -2648,225 +3017,5 @@ lib.request = new function () {
 	});
 
 	return request;
-
-};
-
-
-lib.css = {
-
-	prefixes: ["ms", "O", "Webkit", "Moz"],
-
-	prefix: function (property, style) {
-		if (!style) {
-			style = document.documentElement.style;
-		}
-		if (property in style) {
-			return property;
-		}
-		property = property.charAt(0).toUpperCase() + property.slice(1);
-		var prefixed, prefixes = this.prefixes, i = prefixes.length;
-		while (i--) {
-			prefixed = prefixes[i] + property;
-			if (prefixed in style) {
-				return prefixed;
-			}
-		}
-		return undefined;
-	}
-
-};
-
-new function () {
-
-	var css = lib.css, style = document.documentElement.style,
-		transitionDelay = css.prefix("transitionDelay", style),
-		transitionDuration = css.prefix("transitionDuration", style),
-		animationDelay = css.prefix("animationDelay", style),
-		animationDuration = css.prefix("animationDuration", style),
-		animationIterationCount = css.prefix("animationIterationCount", style);
-
-	style = null;
-
-	function parseFloats(string) {
-		return string.split(",").map(function (string) {
-			return Number.parseFloat(string) || 0;
-		});
-	}
-
-	function calcTransitionTime(delay, duration) {
-		var length = Math.max(duration.length, delay.length),
-			i = 0, time, maxTime = 0;
-		while (i < length) {
-			time = (delay[i] || 0) + (duration[i] || 0);
-			if (time > maxTime) {
-				maxTime = time;
-			}
-			i++;
-		}
-		return Math.ceil(maxTime * 1000);
-	}
-
-	function getTransitionTime(style) {
-		return calcTransitionTime(
-			parseFloats(style[transitionDelay]),
-			parseFloats(style[transitionDuration])
-		);
-	}
-
-	function calcFiniteAnimationTime(delay, duration, count) {
-		var length = Math.max(duration.length, delay.length, count.length),
-			i = 0, time, maxTime = 0;
-		while (i < length) {
-			time = (delay[i] || 0) + (duration[i] || 0) * (count[i] || 0);
-			if (time > maxTime) {
-				maxTime = time;
-			}
-			i++;
-		}
-		return Math.ceil(maxTime * 1000);
-	}
-
-	function getFiniteAnimationTime(style) {
-		return calcFiniteAnimationTime(
-			parseFloats(style[animationDelay]),
-			parseFloats(style[animationDuration]),
-			parseFloats(style[animationIterationCount])
-		);
-	}
-
-	function returnZero() {
-		return 0;
-	}
-
-	css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
-	css.getFiniteAnimationTime = animationDelay ? getFiniteAnimationTime : returnZero;
-
-};
-
-
-lib.dom = {
-
-	query: function (selector, root) {
-		return new Promise(function (resolve, reject) {
-			var element = (root || document).query(selector);
-			if (element) {
-				resolve(element);
-			}
-			else {
-				reject(new Error("not matched"));
-			}
-		});
-	},
-
-	queryAll: function (selector, root) {
-		return new Promise(function (resolve, reject) {
-			var list = (root || document).queryAll(selector);
-			if (list.length) {
-				resolve(list);
-			}
-			else {
-				reject(new Error("not matched"));
-			}
-		});
-	},
-
-	ready: function () {
-		return new Promise(function (resolve) {
-			if ("complete" == document.readyState) {
-				resolve();
-			}
-			else {
-				lib.event.one("DOMContentLoaded", document, resolve);
-			}
-		});
-	}
-
-};
-
-new function () {
-
-	function promise(element, method, classes) {
-		return new Promise(function (resolve) {
-			requestAnimationFrame(function () {
-				var delay, className = element.className;
-				changeClassList(element.classList, method, classes);
-				if (className != element.className) {
-					/*todo end of all animations
-					var style = getComputedStyle(element);
-					delay = Math.max(
-						lib.css.getTransitionTime(style),
-						lib.css.getFiniteAnimationTime(style)
-					);
-					style = null;
-					*/
-					delay = lib.css.getTransitionTime(getComputedStyle(element));
-					if (delay) {
-						setTimeout(function () {
-							resolve(element);
-						}, delay);
-						return;
-					}
-				}
-				resolve(element);
-			});
-		});
-	}
-
-	function changeClassList(classList, method, classes) {
-		classes.forEach(function (className) {
-			classList[method](className);
-		});
-	}
-
-	function changeClass(method, args) {
-		return promise(args[0], method, Array.slice(args, 1)).then();
-	}
-
-	Object.assign(lib.dom, {
-
-		addClass: function () {
-			return changeClass("add", arguments);
-		},
-
-		removeClass: function () {
-			return changeClass("remove", arguments);
-		},
-
-		toggleClass: function () {
-			return changeClass("toggle", arguments);
-		}
-
-	});
-
-};
-
-
-lib.date = {
-
-	_monthLengths: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-
-	isLeapYear: function (year) {
-		if (!arguments.length) {
-			year = new Date;
-		}
-		if (year instanceof Date) {
-			year = year.getFullYear();
-		}
-		return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
-	},
-
-	monthLength: function (monthIndex, year) {
-		if (!arguments.length) {
-			monthIndex = new Date;
-		}
-		if (monthIndex instanceof Date) {
-			year = monthIndex.getFullYear();
-			monthIndex = monthIndex.getMonth();
-		}
-		if (1 == monthIndex && this.isLeapYear(year)) {
-			return 29;
-		}
-		return this._monthLengths[monthIndex];
-	}
 
 };

@@ -41,41 +41,44 @@ lib.dom = {
 
 new function () {
 
-	function promise(element, method, classes) {
-		return new Promise(function (resolve) {
-			requestAnimationFrame(function () {
-				var delay, className = element.className;
-				changeClassList(element.classList, method, classes);
-				if (className != element.className) {
-					/*todo end of all animations
-					var style = getComputedStyle(element);
-					delay = Math.max(
-						lib.css.getTransitionTime(style),
-						lib.css.getFiniteAnimationTime(style)
-					);
-					style = null;
-					*/
-					delay = lib.css.getTransitionTime(getComputedStyle(element));
-					if (delay) {
-						setTimeout(function () {
-							resolve(element);
-						}, delay);
-						return;
-					}
-				}
-				resolve(element);
-			});
-		});
-	}
+	var promise, animationName = lib.css.prefix("animationName"),
+		transitionProperty = lib.css.prefix("transitionProperty");
 
-	function changeClassList(classList, method, classes) {
+	function changeClasses(element, method, classes) {
+		var className = element.className,
+			classList = element.classList;
 		classes.forEach(function (className) {
 			classList[method](className);
 		});
+		return className != element.className;
 	}
 
 	function changeClass(method, args) {
-		return promise(args[0], method, Array.slice(args, 1)).then();
+		return promise(args[0], method, Array.slice(args, 1));
+	}
+
+	function fallback(element) {
+		return new Promise(function (resolve) {
+			resolve(element);
+		});
+	}
+
+	if (transitionProperty || animationName) {
+		promise = function (element, method, classes) {
+			var animations = getComputedStyle(element)[animationName];
+			if (changeClasses(element, method, classes)) {
+				return new Promise(function (resolve) {
+					lib.event.awaitTransAnimEnd(element, animations).then(resolve);
+				}).then();
+			}
+			return fallback(element);
+		};
+	}
+	else {
+		promise = function (element, method, classes) {
+			changeClasses(element, method, classes);
+			return fallback(element);
+		};
 	}
 
 	Object.assign(lib.dom, {

@@ -2,10 +2,12 @@
 
 ##v0.3.0
 
+ - new: prefixed transition and animation event types
+ - new: prefixed transition and animation property names
  - new: method `.prefix()` for CSS properties
  - new: method `.getTransitionTime()` for calculate the maximum CSS transition time
- - new: method `.getFiniteAnimationTime()` for calculate the finite CSS animation time
- - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions
+ - new: methods `.awaitAnimationEnd()`, `.awaitTransitionEnd()` and `.awaitTransAnimEnd()`
+ - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions and animations
  - fix: `lib.event` API support `handleEvent`
 
 ##v0.2.0

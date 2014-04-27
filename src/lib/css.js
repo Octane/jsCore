@@ -2,38 +2,73 @@
 
 lib.css = {
 
-	prefixes: ["ms", "O", "Webkit", "Moz"],
+	prefix: new function () {
 
-	prefix: function (property, style) {
-		if (!style) {
-			style = document.documentElement.style;
-		}
-		if (property in style) {
-			return property;
-		}
-		property = property.charAt(0).toUpperCase() + property.slice(1);
-		var prefixed, prefixes = this.prefixes, i = prefixes.length;
-		while (i--) {
-			prefixed = prefixes[i] + property;
-			if (prefixed in style) {
-				return prefixed;
+		var cache = {},
+			prefixes = ["ms", "O", "Webkit", "Moz"],
+			properties = new function () {
+				var style = document.documentElement.style,
+					proto = style.constructor.prototype;
+				return "top" in proto ? proto : style;
+			};
+
+		return function (property) {
+			var i, name, prefixed;
+			if (property in cache) {
+				return cache[property];
 			}
-		}
-		return undefined;
+			if (property in properties) {
+				cache[property] = property;
+				return property;
+			}
+			name = property.charAt(0).toUpperCase() + property.slice(1);
+			i = prefixes.length;
+			while (i--) {
+				prefixed = prefixes[i] + name;
+				if (prefixed in properties) {
+					cache[property] = prefixed;
+					return prefixed;
+				}
+			}
+			cache[property] = undefined;
+			return undefined;
+		};
+
 	}
 
 };
 
+/* useful prefixed CSS properties
+ * example:
+ * if (lib.css.animation) {
+ *     element.style[lib.css.animationDuration] = "3s";
+ * }
+ */
 new function () {
 
-	var css = lib.css, style = document.documentElement.style,
-		transitionDelay = css.prefix("transitionDelay", style),
-		transitionDuration = css.prefix("transitionDuration", style),
-		animationDelay = css.prefix("animationDelay", style),
-		animationDuration = css.prefix("animationDuration", style),
-		animationIterationCount = css.prefix("animationIterationCount", style);
+	var ns = lib.css, properties = {
+			animation: ["Delay", "Direction", "Duration", "FillMode", "IterationCount", "Name", "PlayState", "TimingFunction"],
+			transition: ["Delay", "Duration", "Property", "TimingFunction"],
+			transfrom: 	["Origin", "Style"]
+		};
 
-	style = null;
+	Object.keys(properties).forEach(function (composite) {
+		var prefixed = ns.prefix(composite);
+		if (prefixed) {
+			ns[composite] = prefixed;
+			properties[composite].forEach(function (single) {
+				ns[composite + single] = prefixed + single;
+			});
+		}
+	});
+
+};
+
+//lib.css.getTransitionTime(computedStyle)
+new function () {
+
+	var transitionDelay = lib.css.transitionDelay,
+		transitionDuration = lib.css.transitionDuration;
 
 	function parseFloats(string) {
 		return string.split(",").map(function (string) {
@@ -61,32 +96,10 @@ new function () {
 		);
 	}
 
-	function calcFiniteAnimationTime(delay, duration, count) {
-		var length = Math.max(duration.length, delay.length, count.length),
-			i = 0, time, maxTime = 0;
-		while (i < length) {
-			time = (delay[i] || 0) + (duration[i] || 0) * (count[i] || 0);
-			if (time > maxTime) {
-				maxTime = time;
-			}
-			i++;
-		}
-		return Math.ceil(maxTime * 1000);
-	}
-
-	function getFiniteAnimationTime(style) {
-		return calcFiniteAnimationTime(
-			parseFloats(style[animationDelay]),
-			parseFloats(style[animationDuration]),
-			parseFloats(style[animationIterationCount])
-		);
-	}
-
 	function returnZero() {
 		return 0;
 	}
 
-	css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
-	css.getFiniteAnimationTime = animationDelay ? getFiniteAnimationTime : returnZero;
+	lib.css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
 
 };
