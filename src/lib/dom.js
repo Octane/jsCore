@@ -41,8 +41,8 @@ lib.dom = {
 
 new function () {
 
-	var promise, animationName = lib.css.prefix("animationName"),
-		transitionProperty = lib.css.prefix("transitionProperty");
+	var promise, animationName = lib.css.animationName,
+		transitionProperty = lib.css.transitionProperty;
 
 	function changeClasses(element, method, classes) {
 		var className = element.className,

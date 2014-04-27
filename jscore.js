@@ -2578,7 +2578,7 @@ lib.event = {
 //example: element.addEventListener(lib.event.animationEnd, callback)
 new function () {
 
-	var animation = lib.css.prefix("animation");
+	var animation = lib.css.animation;
 
 	Object.assign(lib.event, {
 
@@ -2611,7 +2611,7 @@ new function () {
 			OTransition: "otransitionend",
 			MozTransition: "mozTransitionEnd",
 			WebkitTransition: "webkitTransitionEnd"
-		}[lib.css.prefix("transition")]
+		}[lib.css.transition)]
 
 	});
 
@@ -2749,8 +2749,8 @@ lib.dom = {
 
 new function () {
 
-	var promise, animationName = lib.css.prefix("animationName"),
-		transitionProperty = lib.css.prefix("transitionProperty");
+	var promise, animationName = lib.css.animationName,
+		transitionProperty = lib.css.transitionProperty;
 
 	function changeClasses(element, method, classes) {
 		var className = element.className,

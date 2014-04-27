@@ -87,7 +87,7 @@ lib.event = {
 //example: element.addEventListener(lib.event.animationEnd, callback)
 new function () {
 
-	var animation = lib.css.prefix("animation");
+	var animation = lib.css.animation;
 
 	Object.assign(lib.event, {
 
@@ -120,7 +120,7 @@ new function () {
 			OTransition: "otransitionend",
 			MozTransition: "mozTransitionEnd",
 			WebkitTransition: "webkitTransitionEnd"
-		}[lib.css.prefix("transition")]
+		}[lib.css.transition)]
 
 	});
 
