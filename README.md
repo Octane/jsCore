@@ -41,7 +41,7 @@ node build.js --no_ie8
     - [Namespace `.css`](#libcss)
         - [Method `.prefix()`](#libcssprefix)
         - [Method `.getTransitionTime()`](#libcssgettransitiontime)
-        - [Prefixed property names](#libcssprefixed-property-names)
+        - [Prefixed property names](#prefixed-property-names)
     - [Namespace `.dom`](#libdom)
         - [Method `.query()`](#libdomquery)
         - [Method `.queryAll()`](#libdomqueryall)
@@ -57,7 +57,7 @@ node build.js --no_ie8
         - [Method `.awaitTransitionEnd()`](#libeventawaittransitionend)
         - [Method `.awaitAnimationEnd()`](#libeventawaitanimationend)
         - [Method `.awaitTransAnimEnd()`](#libeventawaittransanimend)
-        - [Prefixed event types](#libeventprefixed-event-types)
+        - [Prefixed event types](#prefixed-event-types)
     - [Namespace `.date`](#libdate)
         - [Method `.isLeapYear()`](#libdataisleapyear)
         - [Method `.monthLength()`](#libdatemonthlength)
@@ -461,7 +461,7 @@ lib.event.awaitTransAnimEnd(element[, previousAnimations]) //→ promise
 
 ####Prefixed event types
 
-For quick access prepared prefixed animation and transition event types: `.animationStart`, `.transitionEnd`, ect.
+For quick access prepared prefixed animation and transition event types: `.animationStart`, `.animationEnd`, `.animationIteration` and `.transitionEnd`
 ```javascript
 if (lib.event.animationEnd) {
     element.addEventListener(lib.event.animationEnd, onAnimationEnd);
