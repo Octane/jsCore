@@ -120,7 +120,7 @@ new function () {
 			OTransition: "otransitionend",
 			MozTransition: "mozTransitionEnd",
 			WebkitTransition: "webkitTransitionEnd"
-		}[lib.css.transition)]
+		}[lib.css.transition]
 
 	});
 
