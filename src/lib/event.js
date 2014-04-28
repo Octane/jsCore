@@ -18,7 +18,7 @@ lib.event = {
 		}
 		return new Promise(function (resolve) {
 			lib.event.one(element, selector, eventTypes, resolve);
-		}).then();
+		});
 	},
 
 	one: function (element, selector, eventTypes, callback) {
@@ -85,11 +85,11 @@ lib.event = {
 
 //CSS animation and transition event types
 //example: element.addEventListener(lib.event.animationEnd, callback)
-new function () {
+Object.assign(lib.event, new function () {
 
 	var animation = lib.css.animation;
 
-	Object.assign(lib.event, {
+	return {
 
 		animationEnd: {
 			animation: "animationend",
@@ -122,11 +122,12 @@ new function () {
 			WebkitTransition: "webkitTransitionEnd"
 		}[lib.css.transition]
 
-	});
+	};
 
-};
+});
 
-new function () {
+//
+Object.assign(lib.event, new function () {
 
 	var transition = lib.css.transition,
 		animationName = lib.css.animationName,
@@ -208,10 +209,14 @@ new function () {
 		});
 	}
 
-	Object.assign(lib.event, {
-		awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
-		awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
-		awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
-	});
+	return {
 
-};
+		awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
+
+		awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
+
+		awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
+
+	};
+
+});

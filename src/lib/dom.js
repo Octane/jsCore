@@ -27,22 +27,18 @@ lib.dom = {
 	},
 
 	ready: function () {
-		return new Promise(function (resolve) {
-			if ("complete" == document.readyState) {
-				resolve();
-			}
-			else {
-				lib.event.one("DOMContentLoaded", document, resolve);
-			}
-		});
+		if ("complete" == document.readyState) {
+			return Promise.resolve();
+		}
+		return lib.event.when(document, "DOMContentLoaded");
 	}
 
 };
 
-new function () {
+//addClass, removeClass and toggleClass
+Object.assign(lib.dom, new function () {
 
-	var promise, animationName = lib.css.animationName,
-		transitionProperty = lib.css.transitionProperty;
+	var promise;
 
 	function changeClasses(element, method, classes) {
 		var className = element.className,
@@ -63,13 +59,13 @@ new function () {
 		});
 	}
 
-	if (transitionProperty || animationName) {
+	if (lib.css.animation || lib.css.transition) {
 		promise = function (element, method, classes) {
-			var animations = getComputedStyle(element)[animationName];
+			var animations = getComputedStyle(element)[lib.css.animationName];
 			if (changeClasses(element, method, classes)) {
 				return new Promise(function (resolve) {
 					lib.event.awaitTransAnimEnd(element, animations).then(resolve);
-				}).then();
+				});
 			}
 			return fallback(element);
 		};
@@ -81,7 +77,7 @@ new function () {
 		};
 	}
 
-	Object.assign(lib.dom, {
+	return {
 
 		addClass: function () {
 			return changeClass("add", arguments);
@@ -95,6 +91,6 @@ new function () {
 			return changeClass("toggle", arguments);
 		}
 
-	});
+	};
 
-};
+});

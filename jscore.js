@@ -2509,7 +2509,7 @@ lib.event = {
 		}
 		return new Promise(function (resolve) {
 			lib.event.one(element, selector, eventTypes, resolve);
-		}).then();
+		});
 	},
 
 	one: function (element, selector, eventTypes, callback) {
@@ -2576,11 +2576,11 @@ lib.event = {
 
 //CSS animation and transition event types
 //example: element.addEventListener(lib.event.animationEnd, callback)
-new function () {
+Object.assign(lib.event, new function () {
 
 	var animation = lib.css.animation;
 
-	Object.assign(lib.event, {
+	return {
 
 		animationEnd: {
 			animation: "animationend",
@@ -2613,11 +2613,12 @@ new function () {
 			WebkitTransition: "webkitTransitionEnd"
 		}[lib.css.transition]
 
-	});
+	};
 
-};
+});
 
-new function () {
+//
+Object.assign(lib.event, new function () {
 
 	var transition = lib.css.transition,
 		animationName = lib.css.animationName,
@@ -2699,13 +2700,17 @@ new function () {
 		});
 	}
 
-	Object.assign(lib.event, {
-		awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
-		awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
-		awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
-	});
+	return {
 
-};
+		awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
+
+		awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
+
+		awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
+
+	};
+
+});
 
 
 lib.dom = {
@@ -2735,22 +2740,18 @@ lib.dom = {
 	},
 
 	ready: function () {
-		return new Promise(function (resolve) {
-			if ("complete" == document.readyState) {
-				resolve();
-			}
-			else {
-				lib.event.one("DOMContentLoaded", document, resolve);
-			}
-		});
+		if ("complete" == document.readyState) {
+			return Promise.resolve();
+		}
+		return lib.event.when(document, "DOMContentLoaded");
 	}
 
 };
 
-new function () {
+//addClass, removeClass and toggleClass
+Object.assign(lib.dom, new function () {
 
-	var promise, animationName = lib.css.animationName,
-		transitionProperty = lib.css.transitionProperty;
+	var promise;
 
 	function changeClasses(element, method, classes) {
 		var className = element.className,
@@ -2771,13 +2772,13 @@ new function () {
 		});
 	}
 
-	if (transitionProperty || animationName) {
+	if (lib.css.animation || lib.css.transition) {
 		promise = function (element, method, classes) {
-			var animations = getComputedStyle(element)[animationName];
+			var animations = getComputedStyle(element)[lib.css.animationName];
 			if (changeClasses(element, method, classes)) {
 				return new Promise(function (resolve) {
 					lib.event.awaitTransAnimEnd(element, animations).then(resolve);
-				}).then();
+				});
 			}
 			return fallback(element);
 		};
@@ -2789,7 +2790,7 @@ new function () {
 		};
 	}
 
-	Object.assign(lib.dom, {
+	return {
 
 		addClass: function () {
 			return changeClass("add", arguments);
@@ -2803,9 +2804,9 @@ new function () {
 			return changeClass("toggle", arguments);
 		}
 
-	});
+	};
 
-};
+});
 
 
 lib.request = new function () {
