@@ -1,6 +1,6 @@
 "use strict";
 
-/* jsCore JavaScript library v0.3
+/* jsCore JavaScript library v0.4
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
@@ -801,7 +801,7 @@ window.WeakMap || new function () {
 };
 
 
-window.setImmediate || new function () {
+window.setImmediate || Object.assign(window, new function () {
 
 	var id = 0, storage = {}, firstCall = true,
 		message = "setImmediatePolyfillMessage";
@@ -828,25 +828,26 @@ window.setImmediate || new function () {
 		}
 	}
 
-	function setImmediate() {
-		var key = message + ++id;
-		storage[key] = arguments;
-		if (firstCall) {
-			firstCall = false;
-			addEventListener("message", callback);
+	return {
+
+		setImmediate: function () {
+			var key = message + ++id;
+			storage[key] = arguments;
+			if (firstCall) {
+				firstCall = false;
+				addEventListener("message", callback);
+			}
+			postMessage(key, "*");
+			return id;
+		},
+
+		clearImmediate: function (id) {
+			delete storage[message + id];
 		}
-		postMessage(key, "*");
-		return id;
-	}
 
-	function clearImmediate(id) {
-		delete storage[message + id];
-	}
+	};
 
-	window.setImmediate = setImmediate;
-	window.clearImmediate = clearImmediate;
-
-};
+});
 
 
 window.Promise || new function () {
@@ -1069,9 +1070,9 @@ window.Promise || new function () {
 };
 
 
-window.requestAnimationFrame || new function () {
+window.requestAnimationFrame || Object.assign(window, {
 
-	window.requestAnimationFrame = [
+	requestAnimationFrame: [
 		window.oRequestAnimationFrame,
 		window.msRequestAnimationFrame,
 		window.mozRequestAnimationFrame,
@@ -1089,9 +1090,9 @@ window.requestAnimationFrame || new function () {
 				}, timeout);
 			};
 		}
-	].find(Boolean);
+	].find(Boolean),
 
-	window.cancelAnimationFrame = [
+	cancelAnimationFrame: [
 		window.oCancelAnimationFrame,
 		window.msCancelAnimationFrame,
 		window.mozCancelAnimationFrame,
@@ -1101,54 +1102,56 @@ window.requestAnimationFrame || new function () {
 		window.msCancelRequestAnimationFrame,
 		window.mozCancelRequestAnimationFrame,
 		window.webkitCancelRequestAnimationFrame,
-		window.clearTimeout
-	].find(Boolean);
+		clearTimeout
+	].find(Boolean)
 
-};
+});
 
 
 function StaticDOMStringMap() {}
 
-"dataset" in document.documentElement || new function () {
+"dataset" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "dataset", {
 
 	//simple implementation: the new property will not create an attribute
 
-	function toUpperCase(str) {
-		return str.charAt(1).toUpperCase();
-	}
+	get: new function () {
 
-	function attrToPropName(attrName) {
-		return attrName.substr(5).replace(/-./g, toUpperCase);
-	}
-
-	function attrToPropDesc(attr) {
-		return {
-			get: function () {
-				return attr.value;
-			},
-			set: function (value) {
-				attr.value = String(value);
-			}
-		};
-	}
-
-	function fillDataset(dataset, attrs) {
-		Array.forEach(attrs, function (attr) {
-			var attrName = attr.name.toLowerCase();
-			if (attrName.startsWith("data-")) {
-				Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
-			}
-		});
-		return dataset;
-	}
-
-	Object.defineProperty(HTMLElement.prototype, "dataset", {
-		get: function () {
-			return fillDataset(new StaticDOMStringMap, this.attributes);
+		function toUpperCase(str) {
+			return str.charAt(1).toUpperCase();
 		}
-	});
 
-};
+		function attrToPropName(attrName) {
+			return attrName.substr(5).replace(/-./g, toUpperCase);
+		}
+
+		function attrToPropDesc(attr) {
+			return {
+				get: function () {
+					return attr.value;
+				},
+				set: function (value) {
+					attr.value = String(value);
+				}
+			};
+		}
+
+		function fillDataset(dataset, attrs) {
+			Array.forEach(attrs, function (attr) {
+				var attrName = attr.name.toLowerCase();
+				if (attrName.startsWith("data-")) {
+					Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
+				}
+			});
+			return dataset;
+		}
+
+		return function () {
+			return fillDataset(new StaticDOMStringMap, this.attributes);
+		};
+
+	}
+
+});
 
 //Element traversal polyfill
 "children" in document.createDocumentFragment() || new function () {
@@ -1373,95 +1376,93 @@ function StaticDOMStringMap() {}
 
 };
 
-"classList" in document.documentElement || new function () {
+"classList" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "classList", {
 
-	//todo InvalidCharacterError
+	get: new function () {
 
-	function DOMTokenList(getTokens, onChange) {
-		this._getTokens = getTokens;
-		this._onChange = onChange;
-	}
+		//todo InvalidCharacterError
 
-	Object.assign(DOMTokenList.prototype, {
-
-		_clear: function () {
-			Array.splice(this, 0, this.length);
-		},
-
-		_push: function (tokens) {
-			Array.prototype.push.apply(this, tokens);
-		},
-
-		_update: function () {
-			this._clear();
-			this._push(this._getTokens());
-		},
-
-		item: function (index) {
-			this._update();
-			return this[index] || null;
-		},
-
-		add: function () {
-			var length;
-			this._update();
-			length = this.length;
-			Array.forEach(arguments, function (token) {
-				if (-1 == Array.indexOf(this, token)) {
-					Array.push(this, token);
-				}
-			}, this);
-			if (length != this.length) {
-				this._onChange();
-			}
-		},
-
-		remove: function () {
-			var length;
-			this._update();
-			length = this.length;
-			Array.forEach(arguments, function (token) {
-				var index = Array.indexOf(this, token);
-				if (-1 != index) {
-					Array.splice(this, index, 1);
-				}
-			}, this);
-			if (length != this.length) {
-				this._onChange();
-			}
-		},
-
-		toggle: function (token, force) {
-			this._update();
-			if (force === false || this.contains(token)) {
-				this.remove(token);
-				return false;
-			}
-			this.add(token);
-			return true;
-		},
-
-		contains: function (token) {
-			this._update();
-			return -1 != Array.indexOf(this, token);
-		},
-
-		toString: function () {
-			return Array.join(this, " ");
+		function DOMTokenList(getTokens, onChange) {
+			this._getTokens = getTokens;
+			this._onChange = onChange;
 		}
 
-	});
+		Object.assign(DOMTokenList.prototype, {
 
-	function getClasses(className) {
-		className = className.trim();
-		if (className.length) {
-			return className.split(/\s\s*/);
+			_clear: function () {
+				Array.splice(this, 0, this.length);
+			},
+
+			_push: function (tokens) {
+				Array.prototype.push.apply(this, tokens);
+			},
+
+			_update: function () {
+				this._clear();
+				this._push(this._getTokens());
+			},
+
+			item: function (index) {
+				this._update();
+				return this[index] || null;
+			},
+
+			add: function () {
+				var length;
+				this._update();
+				length = this.length;
+				Array.forEach(arguments, function (token) {
+					if (-1 == Array.indexOf(this, token)) {
+						Array.push(this, token);
+					}
+				}, this);
+				if (length != this.length) {
+					this._onChange();
+				}
+			},
+
+			remove: function () {
+				var length;
+				this._update();
+				length = this.length;
+				Array.forEach(arguments, function (token) {
+					var index = Array.indexOf(this, token);
+					if (-1 != index) {
+						Array.splice(this, index, 1);
+					}
+				}, this);
+				if (length != this.length) {
+					this._onChange();
+				}
+			},
+
+			toggle: function (token, force) {
+				this._update();
+				if (force === false || this.contains(token)) {
+					this.remove(token);
+					return false;
+				}
+				this.add(token);
+				return true;
+			},
+
+			contains: function (token) {
+				this._update();
+				return -1 != Array.indexOf(this, token);
+			},
+
+			toString: function () {
+				return Array.join(this, " ");
+			}
+
+		});
+
+		function getClasses(className) {
+			className = className.trim();
+			return className ? className.split(/\s\s*/) : [];
 		}
-		return [];
-	}
 
-	Object.defineProperty(HTMLElement.prototype, "classList", {
-		get: function () {
+		return function () {
 			var element = this;
 			if (!element._classList) {
 				element._classList = new DOMTokenList(
@@ -1475,20 +1476,19 @@ function StaticDOMStringMap() {}
 					}
 				);
 			}
-/*
-			//live update DOMTokenList
+			/*live update DOMTokenList
 			element.addEventListener("DOMAttrModified", function (event) {
 				if ("class" == event.attrName.toLowerCase()) {
 					element._classList._update();
 				}
-			}, false);
-*/
+			}, false);*/
 			element._classList._update();
 			return element._classList;
-		}
-	});
+		};
 
-};
+	}
+
+});
 
 window.FormData || new function () {
 
@@ -1719,7 +1719,7 @@ catch (error) {
 });
 
 //IE8 setImmediate polyfill
-document instanceof Object || new function () {
+document instanceof Object || Object.assign(window, new function () {
 
 	var root = document.head, uid = 0, storage = {};
 
@@ -1733,30 +1733,34 @@ document instanceof Object || new function () {
 		return func.apply(window, Array.slice(args, 1));
 	}
 
-	window.setImmediate = function () {
-		var args = arguments, id = uid++;
-		function onReadyStateChange() {
-			this.onreadystatechange = null;
-			this.remove();
-			if (storage[id]) {
-				delete storage[id];
-				fastApply(args);
+	return {
+
+		setImmediate: function () {
+			var args = arguments, id = uid++;
+			function onReadyStateChange() {
+				this.onreadystatechange = null;
+				this.remove();
+				if (storage[id]) {
+					delete storage[id];
+					fastApply(args);
+				}
 			}
+			storage[id] = true;
+			new function () {//avoid closure
+				var script = document.createElement("script");
+				script.onreadystatechange = onReadyStateChange;
+				root.appendChild(script);
+			}
+			return id;
+		},
+
+		clearImmediate: function (id) {
+			delete storage[id];
 		}
-		storage[id] = true;
-		new function () {//avoid closure
-			var script = document.createElement("script");
-			script.onreadystatechange = onReadyStateChange;
-			root.appendChild(script);
-		}
-		return id;
+
 	};
 
-	window.clearImmediate = function (id) {
-		delete storage[id];
-	};
-
-};
+});
 
 document.addEventListener || new function () {
 

@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.4.0
+
+ -
+
 ##v0.3.0
 
  - new: prefixed transition and animation event types
@@ -9,7 +13,7 @@
  - new: methods `.awaitAnimationEnd()`, `.awaitTransitionEnd()` and `.awaitTransAnimEnd()`
  - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions and animations
  - fix: `lib.event` API support `handleEvent`
- - fix: Promise polyfill behavior (call a resolver when the promise is created)
+ - fix: `Promise` polyfill behavior (call a `resolver` when the `promise` is created)
 
 ##v0.2.0
 

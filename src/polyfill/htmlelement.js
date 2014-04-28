@@ -2,46 +2,48 @@
 
 function StaticDOMStringMap() {}
 
-"dataset" in document.documentElement || new function () {
+"dataset" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "dataset", {
 
 	//simple implementation: the new property will not create an attribute
 
-	function toUpperCase(str) {
-		return str.charAt(1).toUpperCase();
-	}
+	get: new function () {
 
-	function attrToPropName(attrName) {
-		return attrName.substr(5).replace(/-./g, toUpperCase);
-	}
-
-	function attrToPropDesc(attr) {
-		return {
-			get: function () {
-				return attr.value;
-			},
-			set: function (value) {
-				attr.value = String(value);
-			}
-		};
-	}
-
-	function fillDataset(dataset, attrs) {
-		Array.forEach(attrs, function (attr) {
-			var attrName = attr.name.toLowerCase();
-			if (attrName.startsWith("data-")) {
-				Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
-			}
-		});
-		return dataset;
-	}
-
-	Object.defineProperty(HTMLElement.prototype, "dataset", {
-		get: function () {
-			return fillDataset(new StaticDOMStringMap, this.attributes);
+		function toUpperCase(str) {
+			return str.charAt(1).toUpperCase();
 		}
-	});
 
-};
+		function attrToPropName(attrName) {
+			return attrName.substr(5).replace(/-./g, toUpperCase);
+		}
+
+		function attrToPropDesc(attr) {
+			return {
+				get: function () {
+					return attr.value;
+				},
+				set: function (value) {
+					attr.value = String(value);
+				}
+			};
+		}
+
+		function fillDataset(dataset, attrs) {
+			Array.forEach(attrs, function (attr) {
+				var attrName = attr.name.toLowerCase();
+				if (attrName.startsWith("data-")) {
+					Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
+				}
+			});
+			return dataset;
+		}
+
+		return function () {
+			return fillDataset(new StaticDOMStringMap, this.attributes);
+		};
+
+	}
+
+});
 
 //Element traversal polyfill
 "children" in document.createDocumentFragment() || new function () {

@@ -1,8 +1,8 @@
 "use strict";
 
-window.requestAnimationFrame || new function () {
+window.requestAnimationFrame || Object.assign(window, {
 
-	window.requestAnimationFrame = [
+	requestAnimationFrame: [
 		window.oRequestAnimationFrame,
 		window.msRequestAnimationFrame,
 		window.mozRequestAnimationFrame,
@@ -20,9 +20,9 @@ window.requestAnimationFrame || new function () {
 				}, timeout);
 			};
 		}
-	].find(Boolean);
+	].find(Boolean),
 
-	window.cancelAnimationFrame = [
+	cancelAnimationFrame: [
 		window.oCancelAnimationFrame,
 		window.msCancelAnimationFrame,
 		window.mozCancelAnimationFrame,
@@ -32,7 +32,7 @@ window.requestAnimationFrame || new function () {
 		window.msCancelRequestAnimationFrame,
 		window.mozCancelRequestAnimationFrame,
 		window.webkitCancelRequestAnimationFrame,
-		window.clearTimeout
-	].find(Boolean);
+		clearTimeout
+	].find(Boolean)
 
-};
+});

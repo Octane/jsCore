@@ -1,6 +1,6 @@
 "use strict";
 
-window.setImmediate || new function () {
+window.setImmediate || Object.assign(window, new function () {
 
 	var id = 0, storage = {}, firstCall = true,
 		message = "setImmediatePolyfillMessage";
@@ -27,22 +27,23 @@ window.setImmediate || new function () {
 		}
 	}
 
-	function setImmediate() {
-		var key = message + ++id;
-		storage[key] = arguments;
-		if (firstCall) {
-			firstCall = false;
-			addEventListener("message", callback);
+	return {
+
+		setImmediate: function () {
+			var key = message + ++id;
+			storage[key] = arguments;
+			if (firstCall) {
+				firstCall = false;
+				addEventListener("message", callback);
+			}
+			postMessage(key, "*");
+			return id;
+		},
+
+		clearImmediate: function (id) {
+			delete storage[message + id];
 		}
-		postMessage(key, "*");
-		return id;
-	}
 
-	function clearImmediate(id) {
-		delete storage[message + id];
-	}
+	};
 
-	window.setImmediate = setImmediate;
-	window.clearImmediate = clearImmediate;
-
-};
+});

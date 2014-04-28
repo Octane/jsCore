@@ -1,6 +1,6 @@
 
 //IE8 setImmediate polyfill
-document instanceof Object || new function () {
+document instanceof Object || Object.assign(window, new function () {
 
 	var root = document.head, uid = 0, storage = {};
 
@@ -14,27 +14,31 @@ document instanceof Object || new function () {
 		return func.apply(window, Array.slice(args, 1));
 	}
 
-	window.setImmediate = function () {
-		var args = arguments, id = uid++;
-		function onReadyStateChange() {
-			this.onreadystatechange = null;
-			this.remove();
-			if (storage[id]) {
-				delete storage[id];
-				fastApply(args);
+	return {
+
+		setImmediate: function () {
+			var args = arguments, id = uid++;
+			function onReadyStateChange() {
+				this.onreadystatechange = null;
+				this.remove();
+				if (storage[id]) {
+					delete storage[id];
+					fastApply(args);
+				}
 			}
+			storage[id] = true;
+			new function () {//avoid closure
+				var script = document.createElement("script");
+				script.onreadystatechange = onReadyStateChange;
+				root.appendChild(script);
+			}
+			return id;
+		},
+
+		clearImmediate: function (id) {
+			delete storage[id];
 		}
-		storage[id] = true;
-		new function () {//avoid closure
-			var script = document.createElement("script");
-			script.onreadystatechange = onReadyStateChange;
-			root.appendChild(script);
-		}
-		return id;
+
 	};
 
-	window.clearImmediate = function (id) {
-		delete storage[id];
-	};
-
-};
+});
