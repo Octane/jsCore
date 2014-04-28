@@ -126,7 +126,7 @@ Object.assign(lib.event, new function () {
 
 });
 
-//
+//awaitAnimationEnd, awaitTransitionEnd and awaitTransAnimEnd
 Object.assign(lib.event, new function () {
 
 	var transition = lib.css.transition,
