@@ -1,6 +1,6 @@
 
 //IE8 setImmediate polyfill
-document instanceof Object || Object.assign(window, new function () {
+window instanceof Object || Object.assign(window, new function () {
 
 	var root = document.head, uid = 0, storage = {};
 
