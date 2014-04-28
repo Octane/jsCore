@@ -38,7 +38,16 @@ lib.dom = {
 //addClass, removeClass and toggleClass
 Object.assign(lib.dom, new function () {
 
-	var promise;
+	var promise = lib.css.animation || lib.css.transition ? function (element, method, classes) {
+			var animations = getComputedStyle(element)[lib.css.animationName];
+			if (changeClasses(element, method, classes)) {
+				return lib.event.awaitTransAnimEnd(element, animations);
+			}
+			return Promise.resolve(element);
+		} : function (element, method, classes) {
+			changeClasses(element, method, classes);
+			return Promise.resolve(element);
+		};
 
 	function changeClasses(element, method, classes) {
 		var className = element.className,
@@ -49,46 +58,22 @@ Object.assign(lib.dom, new function () {
 		return className != element.className;
 	}
 
-	function changeClass(method, args) {
+	function apply(method, args) {
 		return promise(args[0], method, Array.slice(args, 1));
-	}
-
-	function fallback(element) {
-		return new Promise(function (resolve) {
-			resolve(element);
-		});
-	}
-
-	if (lib.css.animation || lib.css.transition) {
-		promise = function (element, method, classes) {
-			var animations = getComputedStyle(element)[lib.css.animationName];
-			if (changeClasses(element, method, classes)) {
-				return new Promise(function (resolve) {
-					lib.event.awaitTransAnimEnd(element, animations).then(resolve);
-				});
-			}
-			return fallback(element);
-		};
-	}
-	else {
-		promise = function (element, method, classes) {
-			changeClasses(element, method, classes);
-			return fallback(element);
-		};
 	}
 
 	return {
 
 		addClass: function () {
-			return changeClass("add", arguments);
+			return apply("add", arguments);
 		},
 
 		removeClass: function () {
-			return changeClass("remove", arguments);
+			return apply("remove", arguments);
 		},
 
 		toggleClass: function () {
-			return changeClass("toggle", arguments);
+			return apply("toggle", arguments);
 		}
 
 	};

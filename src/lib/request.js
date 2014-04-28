@@ -131,7 +131,7 @@ lib.request = new function () {
 				xhr = null;
 			}, reject);
 
-		}).then();
+		});
 
 	}
 
@@ -203,7 +203,7 @@ lib.request = new function () {
 					defer: true,
 					src: url
 				}));
-			}).then();
+			});
 		}
 
 	});

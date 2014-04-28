@@ -178,7 +178,7 @@ Object.assign(lib.event, new function () {
 				element.addEventListener(animationEnd, onAnimationEnd);
 			});
 		}
-		return fallback(element);
+		return Promise.resolve(element);
 	}
 
 	function awaitTransitionEnd(element, style) {
@@ -190,7 +190,7 @@ Object.assign(lib.event, new function () {
 				}, delay);
 			});
 		}
-		return fallback(element);
+		return Promise.resolve(element);
 	}
 
 	function awaitTransAnimEnd(element, prevAnimations) {
@@ -204,9 +204,7 @@ Object.assign(lib.event, new function () {
 	}
 
 	function fallback(element) {
-		return new Promise(function (resolve) {
-			resolve(element);
-		});
+		return Promise.resolve(element);
 	}
 
 	return {

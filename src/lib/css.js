@@ -64,11 +64,7 @@ new function () {
 
 };
 
-//lib.css.getTransitionTime(computedStyle)
-new function () {
-
-	var transitionDelay = lib.css.transitionDelay,
-		transitionDuration = lib.css.transitionDuration;
+lib.css.getTransitionTime = lib.css.transition ? new function () {
 
 	function parseFloats(string) {
 		return string.split(",").map(function (string) {
@@ -89,17 +85,13 @@ new function () {
 		return Math.ceil(maxTime * 1000);
 	}
 
-	function getTransitionTime(style) {
+	return function (style) {
 		return calcTransitionTime(
-			parseFloats(style[transitionDelay]),
-			parseFloats(style[transitionDuration])
+			parseFloats(style[lib.css.transitionDelay]),
+			parseFloats(style[lib.css.transitionDuration])
 		);
-	}
+	};
 
-	function returnZero() {
-		return 0;
-	}
-
-	lib.css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
-
+} : function () {
+	return 0;
 };

@@ -102,3 +102,34 @@ window.addEventListener("load", function () {
 		});
 	});
 });
+
+console.log("Promise tests");
+
+new Promise(function (resolve) {
+	console.log("call promise 1 resolver");
+	resolve();
+});
+new Promise(function (resolve) {
+	console.log("call promise 2 resolver");
+	resolve();
+});
+Promise.all([
+	new Promise(function (resolve) {
+		console.log("call promise 3 resolver");
+		resolve();
+	}),
+	new Promise(function (resolve) {
+		console.log("call promise 4 resolver");
+		resolve();
+	})
+]);
+Promise.race([
+	new Promise(function (resolve) {
+		console.log("call promise 5 resolver");
+		resolve();
+	}),
+	new Promise(function (resolve) {
+		console.log("call promise 6 resolver");
+		resolve();
+	})
+]);

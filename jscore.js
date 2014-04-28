@@ -887,7 +887,7 @@ window.Promise || new function () {
 		});
 	}
 
-	function Promise(resolver) {
+	function Promise(resolver, _defer) {
 		Object.assign(this, {
 			_resolver: resolver,
 			_pending: true,
@@ -899,6 +899,7 @@ window.Promise || new function () {
 			_onFulfilled: [],
 			_onRejected: []
 		});
+		return _defer ? this : this.then();
 	}
 
 	Object.assign(Promise, {
@@ -1053,7 +1054,7 @@ window.Promise || new function () {
 
 			return new Promise(function (resolve, reject) {
 				promise._enqueue(resolve, reject);
-			});
+			}, true);
 
 		},
 
@@ -2450,11 +2451,7 @@ new function () {
 
 };
 
-//lib.css.getTransitionTime(computedStyle)
-new function () {
-
-	var transitionDelay = lib.css.transitionDelay,
-		transitionDuration = lib.css.transitionDuration;
+lib.css.getTransitionTime = lib.css.transition ? new function () {
 
 	function parseFloats(string) {
 		return string.split(",").map(function (string) {
@@ -2475,19 +2472,15 @@ new function () {
 		return Math.ceil(maxTime * 1000);
 	}
 
-	function getTransitionTime(style) {
+	return function (style) {
 		return calcTransitionTime(
-			parseFloats(style[transitionDelay]),
-			parseFloats(style[transitionDuration])
+			parseFloats(style[lib.css.transitionDelay]),
+			parseFloats(style[lib.css.transitionDuration])
 		);
-	}
+	};
 
-	function returnZero() {
-		return 0;
-	}
-
-	lib.css.getTransitionTime = transitionDelay ? getTransitionTime : returnZero;
-
+} : function () {
+	return 0;
 };
 
 
@@ -2669,7 +2662,7 @@ Object.assign(lib.event, new function () {
 				element.addEventListener(animationEnd, onAnimationEnd);
 			});
 		}
-		return fallback(element);
+		return Promise.resolve(element);
 	}
 
 	function awaitTransitionEnd(element, style) {
@@ -2681,7 +2674,7 @@ Object.assign(lib.event, new function () {
 				}, delay);
 			});
 		}
-		return fallback(element);
+		return Promise.resolve(element);
 	}
 
 	function awaitTransAnimEnd(element, prevAnimations) {
@@ -2695,9 +2688,7 @@ Object.assign(lib.event, new function () {
 	}
 
 	function fallback(element) {
-		return new Promise(function (resolve) {
-			resolve(element);
-		});
+		return Promise.resolve(element);
 	}
 
 	return {
@@ -2751,7 +2742,16 @@ lib.dom = {
 //addClass, removeClass and toggleClass
 Object.assign(lib.dom, new function () {
 
-	var promise;
+	var promise = lib.css.animation || lib.css.transition ? function (element, method, classes) {
+			var animations = getComputedStyle(element)[lib.css.animationName];
+			if (changeClasses(element, method, classes)) {
+				return lib.event.awaitTransAnimEnd(element, animations);
+			}
+			return Promise.resolve(element);
+		} : function (element, method, classes) {
+			changeClasses(element, method, classes);
+			return Promise.resolve(element);
+		};
 
 	function changeClasses(element, method, classes) {
 		var className = element.className,
@@ -2762,46 +2762,22 @@ Object.assign(lib.dom, new function () {
 		return className != element.className;
 	}
 
-	function changeClass(method, args) {
+	function apply(method, args) {
 		return promise(args[0], method, Array.slice(args, 1));
-	}
-
-	function fallback(element) {
-		return new Promise(function (resolve) {
-			resolve(element);
-		});
-	}
-
-	if (lib.css.animation || lib.css.transition) {
-		promise = function (element, method, classes) {
-			var animations = getComputedStyle(element)[lib.css.animationName];
-			if (changeClasses(element, method, classes)) {
-				return new Promise(function (resolve) {
-					lib.event.awaitTransAnimEnd(element, animations).then(resolve);
-				});
-			}
-			return fallback(element);
-		};
-	}
-	else {
-		promise = function (element, method, classes) {
-			changeClasses(element, method, classes);
-			return fallback(element);
-		};
 	}
 
 	return {
 
 		addClass: function () {
-			return changeClass("add", arguments);
+			return apply("add", arguments);
 		},
 
 		removeClass: function () {
-			return changeClass("remove", arguments);
+			return apply("remove", arguments);
 		},
 
 		toggleClass: function () {
-			return changeClass("toggle", arguments);
+			return apply("toggle", arguments);
 		}
 
 	};
@@ -2940,7 +2916,7 @@ lib.request = new function () {
 				xhr = null;
 			}, reject);
 
-		}).then();
+		});
 
 	}
 
@@ -3012,7 +2988,7 @@ lib.request = new function () {
 					defer: true,
 					src: url
 				}));
-			}).then();
+			});
 		}
 
 	});

@@ -38,7 +38,7 @@ window.Promise || new function () {
 		});
 	}
 
-	function Promise(resolver) {
+	function Promise(resolver, _defer) {
 		Object.assign(this, {
 			_resolver: resolver,
 			_pending: true,
@@ -50,6 +50,7 @@ window.Promise || new function () {
 			_onFulfilled: [],
 			_onRejected: []
 		});
+		return _defer ? this : this.then();
 	}
 
 	Object.assign(Promise, {
@@ -204,7 +205,7 @@ window.Promise || new function () {
 
 			return new Promise(function (resolve, reject) {
 				promise._enqueue(resolve, reject);
-			});
+			}, true);
 
 		},
 
