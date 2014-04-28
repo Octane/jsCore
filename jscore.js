@@ -2435,7 +2435,7 @@ new function () {
 	var ns = lib.css, properties = {
 			animation: ["Delay", "Direction", "Duration", "FillMode", "IterationCount", "Name", "PlayState", "TimingFunction"],
 			transition: ["Delay", "Duration", "Property", "TimingFunction"],
-			transfrom: 	["Origin", "Style"]
+			transform: 	["Origin", "Style"]
 		};
 
 	Object.keys(properties).forEach(function (composite) {
