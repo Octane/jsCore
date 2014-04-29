@@ -1,7 +1,7 @@
 "use strict";
 
 try {
-	console.log("jsCore");
+	console.log;
 }
 catch (error) {
 	window.console = {

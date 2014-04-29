@@ -32,20 +32,19 @@ lib.request = new function () {
 	}
 
 	function request(params) {
-		/*
-			params = {
-				method:   String,
-				url:      String,
-				data:     String|Object|FormData,
-				userName: String,
-				password: String,
-				timeout:  Number,
-				async:    Boolean,
-				caching:  Boolean,
-				credentials: Boolean,
-				mimeType: String,
-				headers: Object
-			}
+		/* params = {
+		 *     method:   String,
+		 *     url:      String,
+		 *     data:     String|Object|FormData,
+		 *     userName: String,
+		 *     password: String,
+		 *     timeout:  Number,
+		 *     async:    Boolean,
+		 *     caching:  Boolean,
+		 *     credentials: Boolean,
+		 *     mimeType: String,
+		 *     headers: Object
+		 * }
 		*/
 		var method = (params.method || "GET").toUpperCase(),
 			url = params.url || location.href,
@@ -105,12 +104,9 @@ lib.request = new function () {
 				reject(new Error("time is out"));
 			}
 
-			new Promise(function (resolve) {
+			new function () {//avoid closure
 				var xhr = new XMLHttpRequest;
 				xhr.open(method, url, async, userName, password);
-				if (timeout) {
-					xhr.timeout = timeout;
-				}
 				if (credentials) {
 					xhr.withCredentials = true;
 				}
@@ -120,16 +116,14 @@ lib.request = new function () {
 				Object.keys(headers).forEach(function (key) {
 					xhr.setRequestHeader(key, headers[key]);
 				});
-				resolve(xhr);
-			}).then(function (xhr) {
 				xhr.onload = onLoad;
 				xhr.onerror = onError;
 				if (timeout) {
+					xhr.timeout = timeout;
 					xhr.ontimeout = onTimeout;
 				}
 				xhr.send(data);
-				xhr = null;
-			}, reject);
+			}
 
 		});
 
