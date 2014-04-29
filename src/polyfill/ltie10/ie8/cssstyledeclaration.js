@@ -54,11 +54,11 @@ window instanceof Object || new function () {
 		},
 		set: function (value) {
 			var filter = this.filter.trim();
-			if (value < 0) {
-				value = 0;
-			}
-			else if (value > 1) {
+			if (!value || value > 1) {
 				value = 1;
+			}
+			else if (value < 0) {
+				value = 0;
 			}
 			if (filter) {
 				if (hasAlphaFilter(filter)) {
@@ -74,24 +74,39 @@ window instanceof Object || new function () {
 		}
 	});
 
-	Object.defineProperty(proto, "getPropertyValue", {
-		value: function (property) {
+	Object.assign(proto, {
+
+		getPropertyValue: function (property) {
 			property = property.toLowerCase();
 			if ("float" == property) {
 				return this.styleFloat;
 			}
 			return this[toCamelCase(property)];
-		}
-	});
+		},
 
-	Object.defineProperty(proto, "setProperty", {
-		value: function (property, value) {
+		removeProperty: function (property) {
+			var value;
+			property = property.toLowerCase();
+			if ("float" == property) {
+				property = "styleFloat";
+				value = this.styleFloat
+			}
+			else {
+				property = toCamelCase(property);
+				value = this[property];
+			}
+			this[property] = "";
+			return value;
+		},
+
+		setProperty: function (property, value) {
 			property = property.toLowerCase();
 			if ("float" == property) {
 				this.styleFloat = value;
 			}
 			this[toCamelCase(property)] = value;
 		}
+
 	});
 
 };
