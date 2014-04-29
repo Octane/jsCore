@@ -2,8 +2,12 @@
 
 ##v0.4.0
 
- - new: methods `.get()` and `.set()` for CSS properties
+ - new: `.get()` and `.set()` for CSS properties
  - new: `CSSStyleDeclaration` polyfill
+ - new: `opacity` in computed style
+ - rename `lib.class._extend` to `lib.classExtends`
+ - delete `lib.dom.query` and `lib.dom.queryAll`
+ - simplify `lib.request` code
 
 ##v0.3.0
 

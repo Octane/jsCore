@@ -48,11 +48,11 @@ lib.css = {
 	},
 
 	set: function (element, properties) {
-		var style = element.style,
+		var prefix = this.prefix, style = element.style,
 			animations = getComputedStyle(element)[this.animationName];
 		Object.keys(properties).forEach(function (property) {
-			style[this.prefix(property)] = properties[property];
-		}, this);
+			style[prefix(property)] = properties[property];
+		});
 		return lib.event.awaitTransAnimEnd(element, animations);
 	}
 
