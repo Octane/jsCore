@@ -40,6 +40,8 @@ node build.js --no_ie8
         - [Methods `.isTrue()`, `.isFalse()`, `.isHTML()`, `.isObject()` and `.isHTMLElement()`](#libis)
     - [Namespace `.css`](#libcss)
         - [Method `.prefix()`](#libcssprefix)
+        - [Method `.get()`](#libcssget)
+        - [Method `.set()`](#libcssset)
         - [Method `.getTransitionTime()`](#libcssgettransitiontime)
         - [Prefixed property names](#prefixed-property-names)
     - [Namespace `.dom`](#libdom)
@@ -303,6 +305,43 @@ lib.css.prefix(propertyName) //→ prefixedPropertyName
 example:
 ```javascript
 lib.css.prefix("animationName") //→ "WebkitAnimationName"
+```
+
+####lib.css.get()
+
+`.get()` returns computed property values
+```javascript
+lib.css.get(element, property) //→ string
+lib.css.get(element, arrayOfPropertyNames) //→ object
+```
+example:
+```javascript
+//single property
+var delay = lib.css.get(element, "animationDelay"); //animationDelay will be prefixed automatically
+if (delay > 0) {
+    //do something
+}
+
+//several properties
+var rect = lib.css.get(element, ["top", "left", "height", "width"]);
+if (parseInt(rect.width) > someValue) {
+    //do something
+}
+```
+
+####lib.css.set()
+
+`.set()` changes property values and returns a promise that is fulfilled at the end of transitions and animations
+```javascript
+lib.css.set(element, properties) //→ promise
+```
+example:
+```javascript
+lib.css.set(element, {
+    //properties will be prefixed automatically
+    animationName: "someName",
+    animationDuration: "5s"
+}).then(doSomething);
 ```
 
 ####lib.css.getTransitionTime()

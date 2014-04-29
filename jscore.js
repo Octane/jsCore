@@ -2560,39 +2560,25 @@ lib.css = {
 
 	},
 
-	get: function (element, properties, computedStyle) {
-		var prefix = this.prefix;
-		if (!computedStyle) {
-			computedStyle = getComputedStyle(element);
-		}
+	get: function (element, properties) {
+		var prefix = this.prefix, style = getComputedStyle(element);
 		if (Array.isArray(properties)) {
 			return properties.reduce(function (result, property) {
-				result[property] = computedStyle[prefix(property)];
+				result[property] = style[prefix(property)];
 				return result;
 			}, {});
 		}
-		return computedStyle[prefix(properties)];
+		return style[prefix(properties)];
 	},
 
-	set: function (element, properties, computedStyle) {
-		var animations, modified = false, style = element.style, prefix = this.prefix;
-		if (!computedStyle) {
-			computedStyle = getComputedStyle(element);
-		}
-		animations = computedStyle[this.animationName];
+	set: function (element, properties) {
+		var style = element.style,
+			animations = getComputedStyle(element)[this.animationName];
 		Object.keys(properties).forEach(function (property) {
-			var value = properties[property];
-			property = prefix(property);
-			if (computedStyle[property] != value) {
-				modified = true;
-			}
-			style[property] = value;
-		});
-		if (modified) {
-			//todo if transition or animation
-			return lib.event.awaitTransAnimEnd(element, animations);
-		}
-		return Promise.resolve(element);
+			style[this.prefix(property)] = properties[property];
+		}, this);
+		//todo if modified
+		return lib.event.awaitTransAnimEnd(element, animations);
 	}
 
 };
