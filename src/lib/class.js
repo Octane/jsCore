@@ -1,14 +1,7 @@
 "use strict";
 
-lib["class"] = {
-
-	extend: function (Class, SuperClass) {
-		Class.prototype = Object.create(SuperClass.prototype);
-		Class.prototype.constructor = Class;
-		Class.super_ = SuperClass;
-		return Class;
-	}
-
+lib.classExtends = function (Class, SuperClass) {
+	Class.prototype = Object.create(SuperClass.prototype);
+	Class.prototype.constructor = Class;
+	Class.Super = SuperClass;
 };
-
-lib.class_ = lib["class"];

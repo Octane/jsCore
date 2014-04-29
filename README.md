@@ -17,6 +17,7 @@ node build.js --no_ie8
  - [`Polyfill`](#polyfill)
     - [`Notes/known issues`](#notesknown-issues)
  - [Namespace `lib`](#lib)
+    - [Function `.classExtends`](#libclassextends)
     - [Constructor `.Template()`](#libtemplate)
         - [Instance method `.match()`](#libtemplate)
     - [Constructor `.I18n()`](#libi18n)
@@ -25,8 +26,6 @@ node build.js --no_ie8
         - [Method `.parse()`](#libhtmlparse)
         - [Method `.escape()`](#libhtmlescape)
         - [Method `.unescape()`](#libhtmlunescape)
-    - [Namespace `.class_`](#libclass_)
-        - [Method `.extend()`](#libclass_)
     - [Namespace `.array`](#libarray)
         - [Method `.count()`](#libarraycount)
         - [Method `.all()`](#libarrayall)
@@ -149,6 +148,14 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `
 
 ##lib
 
+###lib.classExtends()
+
+`.classExtends()` is the standard inheritance pattern
+```javascript
+lib.classExtends(Class, SuperClass);
+Class.Super //→ SuperClass
+```
+
 ###lib.Template()
 
 `.Template()` is a very simple string templating tool (not to be confused with HTML templating)
@@ -209,14 +216,6 @@ lib.html.escape("<h1>Example</h1>") // → "&lt;h1&gt;Example&lt;/h1&gt;"
 `.unescape()` converts HTML mnemonics to characters
 ```javascript
 lib.html.unescape("&lt;h1&gt;Example&lt;/h1&gt;") // → "<h1>Example</h1>"
-```
-
-###lib.class_
-
-`.extend()` is the standard inheritance pattern
-```javascript
-lib.class_.extend(Class, SuperClass);
-Class.super_ == SuperClass //→ true
 ```
 
 ###lib.array
