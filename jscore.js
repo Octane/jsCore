@@ -3113,12 +3113,11 @@ lib.request = new function () {
 		},
 
 		script: function (params) {
-			/*
-				params = {
-					url:     String,
-					data:    String|Object,
-					caching: Boolean
-				}
+			/* params = {
+			 *     url:     String,
+			 *     data:    String|Object,
+			 *     caching: Boolean
+			 * }
 			*/
 			var url, data, caching;
 			if ("string" == typeof params) {
