@@ -1,6 +1,6 @@
 "use strict";
 
-lib.class_ = {
+lib["class"] = {
 
 	extend: function (Class, SuperClass) {
 		Class.prototype = Object.create(SuperClass.prototype);
@@ -10,3 +10,5 @@ lib.class_ = {
 	}
 
 };
+
+lib.class_ = lib["class"];
