@@ -19,7 +19,10 @@ window.getComputedStyle || new function () {
 
 	function getPropertyValue(propName) {
 		propName = propName.toLowerCase();
-		return this["float" == propName ? "cssFloat" : toCamelCase(propName)];
+		if ("float" == propName) {
+			return this.cssFloat;
+		}
+		return this[toCamelCase(propName)];
 	}
 
 	function createPropDesc(obj, propName) {

@@ -45,6 +45,7 @@ try {
 		"polyfill/ltie10/ie8/fix/children.js",
 		"polyfill/ltie10/ie8/setimmediate.js",
 		"polyfill/ltie10/ie8/event.js",
+		"polyfill/ltie10/ie8/cssstyledeclaration.js",
 		"polyfill/ltie10/ie8/getcomputedstyle.js",
 		"polyfill/ltie10/ie8/fix/keyword.js",
 

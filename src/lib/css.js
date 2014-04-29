@@ -34,6 +34,41 @@ lib.css = {
 			return undefined;
 		};
 
+	},
+
+	get: function (element, property, style) {
+		//todo hyphen-style → camelCase
+		var prefix = this.prefix;
+		if (!style) {
+			style = getComputedStyle(element);
+		}
+		if (Array.isArray(property)) {
+			return property.reduce(function (properties, property) {
+				properties[property] = style[prefix(property)];
+				return properties;
+			}, {});
+		}
+		return style[prefix(property)];
+	},
+
+	set: function (element, properties, computedStyle) {
+		//todo hyphen-style → camelCase
+		var animations, style = element.style, prefix = this.prefix;
+		if (!computedStyle) {
+			computedStyle = getComputedStyle(element);
+		}
+		animations = computedStyle[this.animationName];
+		if (Object(properties) === properties) {
+			Object.keys(properties).forEach(function (property) {
+				var value = properties[property];
+				property = prefix(property);
+				if (computedStyle[property] != value) {
+					style[property] = value;
+				}
+			});
+		}
+		//todo if modified
+		return lib.event.awaitTransAnimEnd(element, animations);
 	}
 
 };
