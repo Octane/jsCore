@@ -13,22 +13,22 @@ window.getComputedStyle || new function () {
 		return str.charAt(1).toUpperCase();
 	}
 
-	function toCamelCase(propName) {
-		return propName.replace(/-./g, toUpperCase);
+	function toCamelCase(property) {
+		return property.replace(/-./g, toUpperCase);
 	}
 
-	function getPropertyValue(propName) {
-		propName = propName.toLowerCase();
-		if ("float" == propName) {
+	function getPropertyValue(property) {
+		property = property.toLowerCase();
+		if ("float" == property) {
 			return this.cssFloat;
 		}
-		return this[toCamelCase(propName)];
+		return this[toCamelCase(property)];
 	}
 
-	function createPropDesc(obj, propName) {
+	function createPropDesc(obj, property) {
 		return {
 			get: function () {
-				return obj[propName];
+				return obj[property];
 			}
 		};
 	}
@@ -41,13 +41,16 @@ window.getComputedStyle || new function () {
 		};
 	}
 
-	function getComputedStyle(element) {
+	function getComputedStyle(element, pseudo) {
+		if (pseudo) {
+			throw new Error("getComputedStyle implementation only accepts the first parameter");
+		}
 		var compStyle = element._compStyle, currStyle;
 		if (!compStyle) {
 			compStyle = element._compStyle = createObject();
 			currStyle = element.currentStyle;
-			Object.keys(currStyle).forEach(function (propName) {
-				Object.defineProperty(compStyle, propName, createPropDesc(currStyle, propName));
+			Object.keys(currStyle).forEach(function (property) {
+				Object.defineProperty(compStyle, property, createPropDesc(currStyle, property));
 			});
 			Object.defineProperty(compStyle, "cssFloat", createCSSFloatDesc(currStyle));
 			compStyle.getPropertyValue = getPropertyValue;

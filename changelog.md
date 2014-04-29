@@ -3,7 +3,7 @@
 ##v0.4.0
 
  - new: methods `.get()` and `.set()` for CSS properties
- - new: `.cssFloat` and `.getPropertyValue()` for `CSSStyleDeclaration` in IE8
+ - new: `CSSStyleDeclaration` polyfill
 
 ##v0.3.0
 

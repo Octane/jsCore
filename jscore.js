@@ -65,8 +65,8 @@ if (!window.HTMLElement) {
 
 if (!Object.create) {
 	//Warning: Object.create(null) instanceof Object → true, and it doesn't fix!
-	Object.create = function (prototype) {
-		if (1 in arguments) {
+	Object.create = function (prototype, properties) {
+		if (properties) {
 			throw new Error("Object.create implementation only accepts the first parameter");
 		}
 		function NOP() {}
@@ -2076,29 +2076,96 @@ document.addEventListener || new function () {
 
 window instanceof Object || new function () {
 
-	var proto = CSSStyleDeclaration.prototype;
+	var proto = CSSStyleDeclaration.prototype,
+		prefix = "progid:DXImageTransform.Microsoft.",
+		alpha = "Alpha(opacity={VALUE}, enabled={ENABLED})",
+		opacityRegExp = /\bopacity\s*=\s*(\d+)/i,
+		alphaRegExp = /alpha\s*\(.*?\)/i;
 
 	function toUpperCase(str) {
 		return str.charAt(1).toUpperCase();
 	}
 
-	function toCamelCase(propName) {
-		return propName.replace(/-./g, toUpperCase);
+	function toCamelCase(property) {
+		return property.replace(/-./g, toUpperCase);
+	}
+
+	function fixFontSmoothing(filter, value) {
+		return filter.replace("{ENABLED}", 1 != value);
+	}
+
+	function createAlphaFilter(value) {
+		return fixFontSmoothing(alpha.replace("{VALUE}", Math.trunc(value * 100)), value);
+	}
+
+	function changeAlphaFilter(filter, value) {
+		return filter.replace(alphaRegExp, createAlphaFilter(value));
+	}
+
+	function hasAlphaFilter(filter) {
+		return filter.toLowerCase().contains("alpha");
 	}
 
 	Object.defineProperty(proto, "cssFloat", {
 		get: function () {
 			return this.styleFloat;
+		},
+		set: function (value) {
+			this.styleFloat = value;
+		}
+	});
+
+	Object.defineProperty(proto, "opacity", {
+		get: function () {
+			var opacity = "1", filter = this.filter.trim();
+			if (filter) {
+				filter.replace(alphaRegExp, function (alpha) {
+					alpha.replace(opacityRegExp, function (str, value) {
+						opacity = String(value / 100);
+					});
+				});
+			}
+			return opacity;
+		},
+		set: function (value) {
+			var filter = this.filter.trim();
+			if (value < 0) {
+				value = 0;
+			}
+			else if (value > 1) {
+				value = 1;
+			}
+			if (filter) {
+				if (hasAlphaFilter(filter)) {
+					this.filter = changeAlphaFilter(filter, value);
+				}
+				else {
+					this.filter += " " + prefix + createAlphaFilter(value);
+				}
+			}
+			else {
+				this.filter = prefix + createAlphaFilter(value);
+			}
 		}
 	});
 
 	Object.defineProperty(proto, "getPropertyValue", {
-		value: function (propName) {
-			propName = propName.toLowerCase();
-			if ("float" == propName) {
+		value: function (property) {
+			property = property.toLowerCase();
+			if ("float" == property) {
 				return this.styleFloat;
 			}
-			return this[toCamelCase(propName)];
+			return this[toCamelCase(property)];
+		}
+	});
+
+	Object.defineProperty(proto, "setProperty", {
+		value: function (property, value) {
+			property = property.toLowerCase();
+			if ("float" == property) {
+				this.styleFloat = value;
+			}
+			this[toCamelCase(property)] = value;
 		}
 	});
 
@@ -2118,22 +2185,22 @@ window.getComputedStyle || new function () {
 		return str.charAt(1).toUpperCase();
 	}
 
-	function toCamelCase(propName) {
-		return propName.replace(/-./g, toUpperCase);
+	function toCamelCase(property) {
+		return property.replace(/-./g, toUpperCase);
 	}
 
-	function getPropertyValue(propName) {
-		propName = propName.toLowerCase();
-		if ("float" == propName) {
+	function getPropertyValue(property) {
+		property = property.toLowerCase();
+		if ("float" == property) {
 			return this.cssFloat;
 		}
-		return this[toCamelCase(propName)];
+		return this[toCamelCase(property)];
 	}
 
-	function createPropDesc(obj, propName) {
+	function createPropDesc(obj, property) {
 		return {
 			get: function () {
-				return obj[propName];
+				return obj[property];
 			}
 		};
 	}
@@ -2146,13 +2213,16 @@ window.getComputedStyle || new function () {
 		};
 	}
 
-	function getComputedStyle(element) {
+	function getComputedStyle(element, pseudo) {
+		if (pseudo) {
+			throw new Error("getComputedStyle implementation only accepts the first parameter");
+		}
 		var compStyle = element._compStyle, currStyle;
 		if (!compStyle) {
 			compStyle = element._compStyle = createObject();
 			currStyle = element.currentStyle;
-			Object.keys(currStyle).forEach(function (propName) {
-				Object.defineProperty(compStyle, propName, createPropDesc(currStyle, propName));
+			Object.keys(currStyle).forEach(function (property) {
+				Object.defineProperty(compStyle, property, createPropDesc(currStyle, property));
 			});
 			Object.defineProperty(compStyle, "cssFloat", createCSSFloatDesc(currStyle));
 			compStyle.getPropertyValue = getPropertyValue;

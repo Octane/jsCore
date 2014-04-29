@@ -29,8 +29,8 @@
 
 if (!Object.create) {
 	//Warning: Object.create(null) instanceof Object → true, and it doesn't fix!
-	Object.create = function (prototype) {
-		if (1 in arguments) {
+	Object.create = function (prototype, properties) {
+		if (properties) {
 			throw new Error("Object.create implementation only accepts the first parameter");
 		}
 		function NOP() {}

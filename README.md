@@ -86,6 +86,7 @@ global (`window`) | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `
 `Function.prototype` | `.bind()`
 `HTMLElement.prototype` | `.append()`, `.prepend()`, `.after()`, `.before()`, `.replace()`, `.remove()`, `.query()`, `.queryAll()`, `.matches()`, `.addEventListener()`, `.removeEventListner()`, `.dispatchEvent()`, `.children`<sup>[7](#HTMLElement.prototype.children)</sup>, `.firstElementChild`, `.lastElementChild`, `.childElementCount`, `.nextElementSibling`, `.previousElementSibling`, `.textContent`, `.classList`<sup>[8](#HTMLElement.prototype.classList)</sup>, `.dataset`<sup>[9](#HTMLElement.prototype.dataset)</sup>
 `HTMLScriptElement.prototype` | `.onload()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>, `.onerror()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>
+`CSSStyleDeclaration.prototype` | `.getPropertyValue()`, `.setProperty()`, `.cssFloat`, `.opacity`
 `document` | `.head`, `.createEvent()`<sup>[11](#document.createEvent)</sup>
 `FormData.prototype` | `.append()`
 `Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMutationEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initKeyEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`<sup>[14](#Event.prototype.initEvent)</sup>
