@@ -17,7 +17,7 @@ node build.js --no_ie8
  - [`Polyfill`](#polyfill)
     - [`Notes/known issues`](#notesknown-issues)
  - [Namespace `lib`](#lib)
-    - [Function `.classExtends`](#libclassextends)
+    - [Method `.classExtends`](#libclassextends)
     - [Constructor `.Template()`](#libtemplate)
         - [Instance method `.match()`](#libtemplate)
     - [Constructor `.I18n()`](#libi18n)
