@@ -42,7 +42,7 @@ window instanceof Object || new function () {
 
 	Object.defineProperty(proto, "opacity", {
 		get: function () {
-			var opacity = "1", filter = this.filter.trim();
+			var opacity = "", filter = this.filter.trim();
 			if (filter) {
 				filter.replace(alphaRegExp, function (alpha) {
 					alpha.replace(opacityRegExp, function (str, value) {

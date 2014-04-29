@@ -2117,7 +2117,7 @@ window instanceof Object || new function () {
 
 	Object.defineProperty(proto, "opacity", {
 		get: function () {
-			var opacity = "1", filter = this.filter.trim();
+			var opacity = "", filter = this.filter.trim();
 			if (filter) {
 				filter.replace(alphaRegExp, function (alpha) {
 					alpha.replace(opacityRegExp, function (str, value) {
@@ -2197,18 +2197,30 @@ window.getComputedStyle || new function () {
 		return this[toCamelCase(property)];
 	}
 
-	function createPropDesc(obj, property) {
+	function createPropDesc(style, property) {
 		return {
 			get: function () {
-				return obj[property];
+				return style[property];
 			}
 		};
 	}
 
-	function createCSSFloatDesc(obj) {
+	function createCSSFloatDesc(style) {
 		return {
 			get: function () {
-				return obj.styleFloat;
+				return style.styleFloat;
+			}
+		};
+	}
+
+	function createOpacityDesc(filters) {
+		return {
+			get: function () {
+				var alpha = filters["DXImageTransform.Microsoft.Alpha"] || filters.alpha;
+				if (alpha) {
+					return String(alpha.opacity / 100);
+				}
+				return "1";
 			}
 		};
 	}
@@ -2225,6 +2237,7 @@ window.getComputedStyle || new function () {
 				Object.defineProperty(compStyle, property, createPropDesc(currStyle, property));
 			});
 			Object.defineProperty(compStyle, "cssFloat", createCSSFloatDesc(currStyle));
+			Object.defineProperty(compStyle, "opacity", createOpacityDesc(element.filters));
 			compStyle.getPropertyValue = getPropertyValue;
 		}
 		return compStyle;
