@@ -45,8 +45,6 @@ node build.js --no_ie8
         - [Method `.getTransitionTime()`](#libcssgettransitiontime)
         - [Prefixed property names](#prefixed-property-names)
     - [Namespace `.dom`](#libdom)
-        - [Method `.query()`](#libdomquery)
-        - [Method `.queryAll()`](#libdomqueryall)
         - [Method `.ready()`](#libdomready)
         - [Methods `.addClass()`, `.removeClass()` and `.toggleClass()`](#libdomaddremovetoggleclass)
     - [Namespace `.event`](#libevent)
@@ -362,27 +360,9 @@ if (lib.css.animation) {
 
 ###lib.dom
 
-####lib.dom.query()
-
-`.query()` returns a promise to perform actions asynchronously, if a element found
-```javascript
-lib.dom.query("#nav-menu").then(function (element) {
-    //use element
-});
-```
-
-####lib.dom.queryAll()
-
-`.queryAll()` returns the promise to perform actions asynchronously, if elements found
-```javascript
-lib.dom.queryAll(".menu-item", menuElement).then(function (list) {
-    //use list
-});
-```
-
 ####lib.dom.ready()
 
-`.ready()` returns the promise to perform actions after `DOMContentLoaded`
+`.ready()` returns a promise to perform actions after `DOMContentLoaded`
 ```javascript
 lib.dom.ready().then(function () {
     //do something

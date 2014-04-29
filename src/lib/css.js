@@ -53,7 +53,6 @@ lib.css = {
 		Object.keys(properties).forEach(function (property) {
 			style[this.prefix(property)] = properties[property];
 		}, this);
-		//todo if modified
 		return lib.event.awaitTransAnimEnd(element, animations);
 	}
 
