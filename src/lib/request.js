@@ -123,7 +123,7 @@ lib.request = new function () {
 					xhr.ontimeout = onTimeout;
 				}
 				xhr.send(data);
-			}
+			};
 
 		});
 
