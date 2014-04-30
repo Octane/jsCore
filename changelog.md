@@ -2,7 +2,8 @@
 
 ##v0.4.1
 
-- simplify `EventTarget` and `setImmediate` polyfills
+- fix: `.setImmediate()` polyfill uses `.msSetImmediate()` in IE10
+- simplify `EventTarget()` and `.setImmediate()` polyfills
 - optimize `lib.css.set()`
 
 ##v0.4.0
@@ -23,7 +24,7 @@
  - new: methods `.awaitAnimationEnd()`, `.awaitTransitionEnd()` and `.awaitTransAnimEnd()`
  - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions and animations
  - fix: `lib.event` API support `handleEvent`
- - fix: `Promise` polyfill behavior (call a `resolver` when the `promise` is created)
+ - fix: `Promise()` polyfill behavior (call a `resolver` when the `promise` is created)
 
 ##v0.2.0
 
