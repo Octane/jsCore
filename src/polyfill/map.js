@@ -1,8 +1,6 @@
 "use strict";
 
-var Map;
-
-Map || (Map = new function () {
+var Map = Map || new function () {
 
 	var KEY = 0, VALUE = 1;
 
@@ -65,4 +63,4 @@ Map || (Map = new function () {
 
 	return Map;
 
-});
+};

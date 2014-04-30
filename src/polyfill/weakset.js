@@ -1,8 +1,6 @@
 "use strict";
 
-var WeakSet;
-
-WeakSet || (WeakSet = new function () {
+var WeakSet = WeakSet || new function () {
 
 	function WeakSet() {
 		if (arguments.length) {
@@ -53,4 +51,4 @@ WeakSet || (WeakSet = new function () {
 
 	return WeakSet;
 
-});
+};

@@ -1,8 +1,6 @@
 "use strict";
 
-var Promise;
-
-Promise || (Promise = new function () {
+var Promise = Promise || new function () {
 
 	//todo thenable value support
 
@@ -219,4 +217,4 @@ Promise || (Promise = new function () {
 
 	return Promise;
 
-});
+};

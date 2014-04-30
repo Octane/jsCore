@@ -1,8 +1,6 @@
 "use strict";
 
-var Set;
-
-Set || (Set = new function () {
+var Set = Set || new function () {
 
 	function Set() {
 		if (arguments.length) {
@@ -51,4 +49,4 @@ Set || (Set = new function () {
 
 	return Set;
 
-});
+};

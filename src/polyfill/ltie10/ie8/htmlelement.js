@@ -1,8 +1,5 @@
 
-var HTMLElement;
-if (!HTMLElement) {
-	HTMLElement = Element;
-}
+var HTMLElement = HTMLElement || Element;
 
 "textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {
 	get: function () {

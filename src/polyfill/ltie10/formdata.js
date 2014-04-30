@@ -1,7 +1,5 @@
 
-var FormData;
-
-FormData || (FormData = new function () {
+var FormData = FormData || function () {
 
 	/* <input type="file"> not supported,
 	 * but if you know file contents,
@@ -139,4 +137,4 @@ FormData || (FormData = new function () {
 
 	return FormData;
 
-});
+};

@@ -5,10 +5,7 @@
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
  */
-var HTMLElement;
-if (!HTMLElement) {
-	HTMLElement = Element;
-}
+var HTMLElement = HTMLElement || Element;
 
 "textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {
 	get: function () {
@@ -553,9 +550,7 @@ new function () {
 };
 
 
-var Set;
-
-Set || (Set = new function () {
+var Set = Set || new function () {
 
 	function Set() {
 		if (arguments.length) {
@@ -604,12 +599,10 @@ Set || (Set = new function () {
 
 	return Set;
 
-});
+};
 
 
-var Map;
-
-Map || (Map = new function () {
+var Map = Map || new function () {
 
 	var KEY = 0, VALUE = 1;
 
@@ -672,12 +665,10 @@ Map || (Map = new function () {
 
 	return Map;
 
-});
+};
 
 
-var WeakSet;
-
-WeakSet || (WeakSet = new function () {
+var WeakSet = WeakSet || new function () {
 
 	function WeakSet() {
 		if (arguments.length) {
@@ -728,12 +719,10 @@ WeakSet || (WeakSet = new function () {
 
 	return WeakSet;
 
-});
+};
 
 
-var WeakMap;
-
-WeakMap || (WeakMap = new function () {
+var WeakMap = WeakMap || new function () {
 
 	//todo
 	//In native WeakMaps, references to key objects are held "weakly",
@@ -803,7 +792,7 @@ WeakMap || (WeakMap = new function () {
 
 	return WeakMap;
 
-});
+};
 
 
 window.setImmediate || Object.assign(window, window.msSetImmediate ? {
@@ -861,9 +850,7 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 });
 
 
-var Promise;
-
-Promise || (Promise = new function () {
+var Promise = Promise || new function () {
 
 	//todo thenable value support
 
@@ -1080,7 +1067,7 @@ Promise || (Promise = new function () {
 
 	return Promise;
 
-});
+};
 
 
 window.requestAnimationFrame || Object.assign(window, {
@@ -1499,9 +1486,7 @@ function StaticDOMStringMap() {}
 
 });
 
-var FormData;
-
-FormData || (FormData = new function () {
+var FormData = FormData || function () {
 
 	/* <input type="file"> not supported,
 	 * but if you know file contents,
@@ -1639,7 +1624,7 @@ FormData || (FormData = new function () {
 
 	return FormData;
 
-});
+};
 
 //IE8 Array.slice fix
 new function () {

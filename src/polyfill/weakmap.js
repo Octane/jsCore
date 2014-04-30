@@ -1,8 +1,6 @@
 "use strict";
 
-var WeakMap;
-
-WeakMap || (WeakMap = new function () {
+var WeakMap = WeakMap || new function () {
 
 	//todo
 	//In native WeakMaps, references to key objects are held "weakly",
@@ -72,4 +70,4 @@ WeakMap || (WeakMap = new function () {
 
 	return WeakMap;
 
-});
+};
