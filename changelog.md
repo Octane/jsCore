@@ -1,5 +1,10 @@
 #jsCore changelog
 
+##v0.4.1
+
+- simplify `EventTarget` polyfill
+- optimize `lib.css.set()`
+
 ##v0.4.0
 
  - new: `.get()` and `.set()` for CSS properties

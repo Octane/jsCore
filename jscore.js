@@ -1,6 +1,6 @@
 "use strict";
 
-/* jsCore JavaScript library v0.4
+/* jsCore JavaScript library v0.4.1
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
@@ -1762,28 +1762,7 @@ window instanceof Object || Object.assign(window, new function () {
 
 });
 
-document.addEventListener || new function () {
-
-	//todo handleEvent support
-
-	function preventDefault() {
-		this.returnValue = false;
-	}
-
-	function stopPropagation() {
-		this.cancelBubble = true;
-	}
-
-	function fixEvent(event) {
-		var clone = document.createEventObject(event);
-		clone.target = clone.srcElement;
-		clone.relatedTarget = clone.fromElement === clone.target ? clone.toElement : clone.fromElement;
-		clone.pageX = clone.clientX + document.documentElement.scrollLeft;
-		clone.pageY = clone.clientY + document.documentElement.scrollTop;
-		clone.preventDefault = preventDefault;
-		clone.stopPropagation = stopPropagation;
-		return clone;
-	}
+window.addEventListener || new function () {
 
 	function fastBind(func, boundThis) {
 		if (func.handleEvent) {
@@ -1793,6 +1772,14 @@ document.addEventListener || new function () {
 		return function (arg) {
 			func.call(boundThis, arg);
 		};
+	}
+
+	function fixEvent(event) {
+		var clone = document.createEventObject(event),
+			docEl = document.documentElement;
+		clone.pageX = clone.clientX + docEl.scrollLeft;
+		clone.pageY = clone.clientY + docEl.scrollTop;
+		return clone;
 	}
 
 	function createEventListener(callbacks, element) {
@@ -1825,7 +1812,6 @@ document.addEventListener || new function () {
 			};
 			event.listener = createEventListener(event.callbacks, element);
 			events[eventType] = event;
-			//todo exclude custom event
 			this.attachEvent("on" + eventType, event.listener);
 		}
 		if (-1 == event.callbacks.indexOf(callback)) {
@@ -1858,88 +1844,6 @@ document.addEventListener || new function () {
 		}
 	}
 
-	function initEvent(type, bubbles, cancelable) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable
-		});
-	}
-
-	function initUIEvent(type, bubbles, cancelable, windowObject, detail) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			windowObject: windowObject,
-			detail: detail
-		});
-	}
-
-	function initMouseEvent(type, bubbles, cancelable, windowObject, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			windowObject: windowObject,
-			detail: detail,
-			screenX: screenX,
-			screenY: screenY,
-			clientX: clientX,
-			clientY: clientY,
-			ctrlKey: ctrlKey,
-			altKey: altKey,
-			shiftKey: shiftKey,
-			metaKey: metaKey,
-			button: button,
-			relatedTarget: relatedTarget
-		});
-	}
-
-	//deprecated
-	function initMutationEvent(type, bubbles, cancelable, relatedNode, prevValue, newValue, attrName, attrChange) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			relatedNode: relatedNode,
-			prevValue: prevValue,
-			newValue: newValue,
-			attrName: attrName,
-			attrChange: attrChange
-		});
-	}
-
-	function initKeyEvent(type, bubbles, cancelable, windowObject, ctrlKey, altKey, shiftKey, metaKey, keyCode, charCode) {
-		Object.assign(this, {
-			type: type,
-			bubbles: bubbles,
-			cancelable: cancelable,
-			windowObject: windowObject,
-			ctrlKey: ctrlKey,
-			altKey: altKey,
-			shiftKey: shiftKey,
-			metaKey: metaKey,
-			keyCode: keyCode,
-			charCode: charCode
-		});
-	}
-
-	function CustomEvent() {}
-
-	Object.assign(CustomEvent.prototype, {
-		initCustomEvent: function (type, bubbles, cancelable, detail) {
-			Object.assign(this, {
-				type: type,
-				bubbles: bubbles,
-				cancelable: cancelable,
-				detail: detail
-			});
-		},
-		stopPropagation: stopPropagation,
-		preventDefault: preventDefault
-	});
-
 	function dispatchEvent(event) {
 		var events;
 		if (event instanceof CustomEvent) {
@@ -1954,6 +1858,114 @@ document.addEventListener || new function () {
 		}
 	}
 
+	function initEvent(type, bubbles, cancelable) {
+		Object.assign(this, {
+			type: type,
+			bubbles: bubbles,
+			cancelable: cancelable
+		});
+	}
+
+	function preventDefault() {
+		this.defaultPrevented = true;
+		this.returnValue = false;
+	}
+
+	function stopPropagation() {
+		this.cancelBubble = true;
+	}
+
+	function CustomEvent() {}
+
+	Object.assign(CustomEvent.prototype, {
+
+		defaultPrevented: false,
+
+		preventDefault: preventDefault,
+		stopPropagation: stopPropagation,
+
+		initEvent: initEvent,
+
+		initCustomEvent: function (type, bubbles, cancelable, detail) {
+			this.initEvent(type, bubbles, cancelable);
+			this.detail = detail;
+		}
+
+	});
+
+	Object.assign(Event.prototype, {
+
+		defaultPrevented: false,
+
+		preventDefault: preventDefault,
+		stopPropagation: stopPropagation,
+
+		initEvent: initEvent,
+
+		initUIEvent: function (type, bubbles, cancelable, windowObject, detail) {
+			this.initEvent(type, bubbles, cancelable);
+			Object.assign(this, {
+				windowObject: windowObject,
+				detail: detail
+			});
+		},
+
+		initKeyEvent: function (type, bubbles, cancelable, windowObject, ctrlKey, altKey, shiftKey, metaKey, keyCode, charCode) {
+			this.initEvent(type, bubbles, cancelable);
+			Object.assign(this, {
+				windowObject: windowObject,
+				ctrlKey: ctrlKey,
+				altKey: altKey,
+				shiftKey: shiftKey,
+				metaKey: metaKey,
+				keyCode: keyCode,
+				charCode: charCode
+			});
+		},
+
+		initMouseEvent: function (type, bubbles, cancelable, windowObject, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
+			this.initEvent(type, bubbles, cancelable);
+			Object.assign(this, {
+				windowObject: windowObject,
+				detail: detail,
+				screenX: screenX,
+				screenY: screenY,
+				clientX: clientX,
+				clientY: clientY,
+				ctrlKey: ctrlKey,
+				altKey: altKey,
+				shiftKey: shiftKey,
+				metaKey: metaKey,
+				button: button,
+				fromElement: relatedTarget
+			});
+		},
+
+		initMutationEvent: function (type, bubbles, cancelable, relatedNode, prevValue, newValue, attrName, attrChange) {
+			this.initEvent(type, bubbles, cancelable);
+			Object.assign(this, {
+				relatedNode: relatedNode,
+				prevValue: prevValue,
+				newValue: newValue,
+				attrName: attrName,
+				attrChange: attrChange
+			});
+		}
+
+	});
+
+	Object.defineProperty(Event.prototype, "target", {
+		get: function () {
+			return this.srcElement;
+		}
+	});
+
+	Object.defineProperty(Event.prototype, "relatedTarget", {
+		get: function () {
+			return this.fromElement === this.target ? this.toElement : this.fromElement;
+		}
+	});
+
 	[Window, HTMLDocument, HTMLElement, XMLHttpRequest].forEach(function (eventTarget) {
 		var proto = eventTarget.prototype;
 		proto.dispatchEvent = dispatchEvent;
@@ -1965,13 +1977,7 @@ document.addEventListener || new function () {
 		if ("CustomEvent" == group) {
 			return new CustomEvent;
 		}
-		return Object.assign(document.createEventObject(), {
-			initEvent: initEvent,
-			initUIEvent: initUIEvent,
-			initKeyEvent: initKeyEvent,
-			initMouseEvent: initMouseEvent,
-			initMutationEvent: initMutationEvent
-		});
+		return this.createEventObject();
 	};
 
 };
@@ -1997,7 +2003,7 @@ document.addEventListener || new function () {
 
 		_fireEvent: function (eventType) {
 			var event = document.createEvent("CustomEvent");
-			event.initCustomEvent(eventType, false, false, null);
+			event.initEvent(eventType, false, false);
 			this.dispatchEvent(event);
 			eventType = "on" + eventType;
 			if (this[eventType]) {
