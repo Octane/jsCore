@@ -45,15 +45,6 @@ lib.css = {
 			}, {});
 		}
 		return style[prefix(properties)];
-	},
-
-	set: function (element, properties) {
-		var prefix = this.prefix, style = element.style,
-			animations = getComputedStyle(element)[this.animationName];
-		Object.keys(properties).forEach(function (property) {
-			style[prefix(property)] = properties[property];
-		});
-		return lib.event.awaitTransAnimEnd(element, animations);
 	}
 
 };
@@ -84,34 +75,60 @@ new function () {
 
 };
 
-lib.css.getTransitionTime = lib.css.transition ? new function () {
+Object.assign(lib.css, {
 
-	function parseFloats(string) {
-		return string.split(",").map(function (string) {
-			return Number.parseFloat(string) || 0;
-		});
-	}
+	set: new function () {
 
-	function calcTransitionTime(delay, duration) {
-		var length = Math.max(duration.length, delay.length),
-			i = 0, time, maxTime = 0;
-		while (i < length) {
-			time = (delay[i] || 0) + (duration[i] || 0);
-			if (time > maxTime) {
-				maxTime = time;
-			}
-			i++;
+		function changeStyle(style, properties) {
+			Object.keys(properties).forEach(function (property) {
+				style[lib.css.prefix(property)] = properties[property];
+			});
 		}
-		return Math.ceil(maxTime * 1000);
+
+		if (lib.css.transition || lib.css.animation) {
+			return function (element, properties) {
+				var animations = getComputedStyle(element)[this.animationName];
+				changeStyle(element.style, properties);
+				return lib.event.awaitTransAnimEnd(element, animations);
+			};
+		}
+		return function (element, properties) {
+			changeStyle(element.style, properties);
+			return Promise.resolve(element);
+		};
+
+	},
+
+	getTransitionTime: lib.css.transition ? new function () {
+
+		function parseFloats(string) {
+			return string.split(",").map(function (string) {
+				return Number.parseFloat(string) || 0;
+			});
+		}
+
+		function calcTransitionTime(delay, duration) {
+			var length = Math.max(duration.length, delay.length),
+				i = 0, time, maxTime = 0;
+			while (i < length) {
+				time = (delay[i] || 0) + (duration[i] || 0);
+				if (time > maxTime) {
+					maxTime = time;
+				}
+				i++;
+			}
+			return Math.ceil(maxTime * 1000);
+		}
+
+		return function (style) {
+			return calcTransitionTime(
+				parseFloats(style[lib.css.transitionDelay]),
+				parseFloats(style[lib.css.transitionDuration])
+			);
+		};
+
+	} : function () {
+		return 0;
 	}
 
-	return function (style) {
-		return calcTransitionTime(
-			parseFloats(style[lib.css.transitionDelay]),
-			parseFloats(style[lib.css.transitionDuration])
-		);
-	};
-
-} : function () {
-	return 0;
-};
+});
