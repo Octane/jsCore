@@ -3,7 +3,6 @@
 window.requestAnimationFrame || Object.assign(window, {
 
 	requestAnimationFrame: [
-		window.oRequestAnimationFrame,
 		window.msRequestAnimationFrame,
 		window.mozRequestAnimationFrame,
 		window.webkitRequestAnimationFrame,
@@ -23,12 +22,9 @@ window.requestAnimationFrame || Object.assign(window, {
 	].find(Boolean),
 
 	cancelAnimationFrame: [
-		window.oCancelAnimationFrame,
-		window.msCancelAnimationFrame,
 		window.mozCancelAnimationFrame,
 		window.webkitCancelAnimationFrame,
 		window.cancelRequestAnimationFrame,
-		window.oCancelRequestAnimationFrame,
 		window.msCancelRequestAnimationFrame,
 		window.mozCancelRequestAnimationFrame,
 		window.webkitCancelRequestAnimationFrame,
