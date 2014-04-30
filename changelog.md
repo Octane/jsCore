@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.4.2
+
+ -
+
 ##v0.4.1
 
 - fix: `.setImmediate()` polyfill uses `.msSetImmediate()` in IE10

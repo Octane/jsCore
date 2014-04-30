@@ -1,6 +1,6 @@
 "use strict";
 
-/* jsCore JavaScript library v0.4.1
+/* jsCore JavaScript library v0.4.2
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
@@ -25,7 +25,7 @@ var HTMLElement = HTMLElement || Element;
 	}
 });
 
-"head" in document || Object.defineProperty(HTMLDocument.prototype, "head", {
+"head" in document || Object.defineProperty(document, "head", {
 	get: function () {
 		return this.query("head");
 	}
