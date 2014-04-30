@@ -14,7 +14,7 @@ window.requestAnimationFrame || Object.assign(window, {
 					timeout = Math.max(0, delay - (currCallTime - prevCallTime)),
 					timeToCall = currCallTime + timeout;
 				prevCallTime = timeToCall;
-				return setTimeout(function () {
+				return window.setTimeout(function () {
 					callback(timeToCall - navigationStart);
 				}, timeout);
 			};
@@ -28,7 +28,7 @@ window.requestAnimationFrame || Object.assign(window, {
 		window.msCancelRequestAnimationFrame,
 		window.mozCancelRequestAnimationFrame,
 		window.webkitCancelRequestAnimationFrame,
-		clearTimeout
+		window.clearTimeout
 	].find(Boolean)
 
 });

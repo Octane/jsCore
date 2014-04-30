@@ -15,7 +15,7 @@ lib.dom = {
 Object.assign(lib.dom, new function () {
 
 	var promise = lib.css.animation || lib.css.transition ? function (element, method, classes) {
-			var animations = getComputedStyle(element)[lib.css.animationName];
+			var animations = window.getComputedStyle(element)[lib.css.animationName];
 			if (changeClasses(element, method, classes)) {
 				return lib.event.awaitTransAnimEnd(element, animations);
 			}

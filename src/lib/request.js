@@ -47,7 +47,7 @@ lib.request = new function () {
 		 * }
 		*/
 		var method = (params.method || "GET").toUpperCase(),
-			url = params.url || location.href,
+			url = params.url || window.location.href,
 			data = params.data,
 			userName = params.userName || "",
 			password = params.password || "",
@@ -168,7 +168,7 @@ lib.request = new function () {
 			if ("string" == typeof params) {
 				params = {url: params};
 			}
-			url = params.url || location.href;
+			url = params.url || window.location.href;
 			data = params.data;
 			caching = params.caching !== false;
 			if (Object(data) === data) {

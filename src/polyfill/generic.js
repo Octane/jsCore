@@ -3,8 +3,6 @@
 //Array and String generic methods polyfill
 new function () {
 
-	var slice = Array.prototype.slice;
-
 	function fastApply(method, args) {
 		var target = args[0];
 		switch (args.length) {
@@ -12,7 +10,7 @@ new function () {
 			case 2: return method.call(target, args[1]);
 			case 3: return method.call(target, args[1], args[2]);
 		}
-		return method.apply(target, slice.call(args, 1));
+		return method.apply(target, Array.prototype.slice.call(args, 1));
 	}
 
 	function createGeneric(method) {

@@ -34,7 +34,7 @@ window.Promise || new function () {
 
 	function callEach(callbacks, data) {
 		callbacks.forEach(function (callback) {
-			setImmediate(tryCall, callback, data);
+			window.setImmediate(tryCall, callback, data);
 		});
 	}
 
@@ -129,7 +129,7 @@ window.Promise || new function () {
 				if (!settled) {
 					settled = true;
 					promise._value = value;
-					setImmediate(function () {
+					window.setImmediate(function () {
 						promise._settled = true;
 						try {
 							promise._value = onFulfilled(promise._value);
@@ -156,7 +156,7 @@ window.Promise || new function () {
 				if (!settled) {
 					settled = true;
 					promise._reason = reason;
-					setImmediate(function () {
+					window.setImmediate(function () {
 						promise._settled = true;
 						try {
 							promise._reason = onRejected(promise._reason);

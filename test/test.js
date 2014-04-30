@@ -96,7 +96,7 @@ console.log("CSS animation test");
 window.addEventListener("load", function () {
 	var node = document.body.appendChild(document.createElement("div"));
 	node.classList.add("animated");
-	requestAnimationFrame(function () {
+	window.requestAnimationFrame(function () {
 		lib.dom.addClass(node, "move").then(function (element) {
 			console.log("CSS animation done");
 			return element;

@@ -52,21 +52,21 @@ if (!Array.prototype.findIndex) {
 }
 
 if (!Array.prototype.fill) {
-	Array.prototype.fill = function (value, startIndex, endIndex) {
+	Array.prototype.fill = function (value, start, end) {
 		var i, length = this.length;
 		if (!(1 in arguments)) {
-			startIndex = 0;
+			start = 0;
 		}
 		if (!(2 in arguments)) {
-			endIndex = length;
+			end = length;
 		}
-		if (startIndex < 0) {
-			i = Math.max(length + startIndex, 0);
+		if (start < 0) {
+			i = Math.max(length + start, 0);
 		}
 		else {
-			i = Math.min(startIndex, length);
+			i = Math.min(start, length);
 		}
-		while (i < length && i < endIndex) {
+		while (i < length && i < end) {
 			this[i] = value;
 			i++;
 		}

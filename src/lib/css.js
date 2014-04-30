@@ -37,7 +37,7 @@ lib.css = {
 	},
 
 	get: function (element, properties) {
-		var prefix = this.prefix, style = getComputedStyle(element);
+		var prefix = this.prefix, style = window.getComputedStyle(element);
 		if (Array.isArray(properties)) {
 			return properties.reduce(function (result, property) {
 				result[property] = style[prefix(property)];
@@ -87,7 +87,7 @@ Object.assign(lib.css, {
 
 		if (lib.css.transition || lib.css.animation) {
 			return function (element, properties) {
-				var animations = getComputedStyle(element)[this.animationName];
+				var animations = window.getComputedStyle(element)[this.animationName];
 				changeStyle(element.style, properties);
 				return lib.event.awaitTransAnimEnd(element, animations);
 			};

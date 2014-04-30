@@ -27,7 +27,7 @@ window.addEventListener || new function () {
 			}
 			event.currentTarget = element;
 			while (i < length) {
-				setImmediate(fastBind(callbacks[i], element), event);
+				window.setImmediate(fastBind(callbacks[i], element), event);
 				i++;
 			}
 		};
@@ -244,7 +244,7 @@ window.addEventListener || new function () {
 			this.dispatchEvent(event);
 			eventType = "on" + eventType;
 			if (this[eventType]) {
-				setImmediate(function () {
+				window.setImmediate(function () {
 					event.target[eventType](event);
 				});
 			}

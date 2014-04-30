@@ -1,6 +1,12 @@
 "use strict";
 
-window.setImmediate || Object.assign(window, new function () {
+window.setImmediate || Object.assign(window, window.msSetImmediate ? {
+
+	//IE10
+	setImmediate: window.msSetImmediate,
+	clearImmediate: window.msClearImmediate
+
+} : new function () {
 
 	var id = 0, storage = {}, firstCall = true,
 		message = "setImmediatePolyfillMessage";
@@ -34,9 +40,9 @@ window.setImmediate || Object.assign(window, new function () {
 			storage[key] = arguments;
 			if (firstCall) {
 				firstCall = false;
-				addEventListener("message", callback);
+				window.addEventListener("message", callback);
 			}
-			postMessage(key, "*");
+			window.postMessage(key, "*");
 			return id;
 		},
 

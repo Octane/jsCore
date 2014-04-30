@@ -397,21 +397,21 @@ if (!Array.prototype.findIndex) {
 }
 
 if (!Array.prototype.fill) {
-	Array.prototype.fill = function (value, startIndex, endIndex) {
+	Array.prototype.fill = function (value, start, end) {
 		var i, length = this.length;
 		if (!(1 in arguments)) {
-			startIndex = 0;
+			start = 0;
 		}
 		if (!(2 in arguments)) {
-			endIndex = length;
+			end = length;
 		}
-		if (startIndex < 0) {
-			i = Math.max(length + startIndex, 0);
+		if (start < 0) {
+			i = Math.max(length + start, 0);
 		}
 		else {
-			i = Math.min(startIndex, length);
+			i = Math.min(start, length);
 		}
-		while (i < length && i < endIndex) {
+		while (i < length && i < end) {
 			this[i] = value;
 			i++;
 		}
@@ -505,8 +505,6 @@ if (!Math.sign) {
 //Array and String generic methods polyfill
 new function () {
 
-	var slice = Array.prototype.slice;
-
 	function fastApply(method, args) {
 		var target = args[0];
 		switch (args.length) {
@@ -514,7 +512,7 @@ new function () {
 			case 2: return method.call(target, args[1]);
 			case 3: return method.call(target, args[1], args[2]);
 		}
-		return method.apply(target, slice.call(args, 1));
+		return method.apply(target, Array.prototype.slice.call(args, 1));
 	}
 
 	function createGeneric(method) {
@@ -801,7 +799,13 @@ window.WeakMap || new function () {
 };
 
 
-window.setImmediate || Object.assign(window, new function () {
+window.setImmediate || Object.assign(window, window.msSetImmediate ? {
+
+	//IE10
+	setImmediate: window.msSetImmediate,
+	clearImmediate: window.msClearImmediate
+
+} : new function () {
 
 	var id = 0, storage = {}, firstCall = true,
 		message = "setImmediatePolyfillMessage";
@@ -835,9 +839,9 @@ window.setImmediate || Object.assign(window, new function () {
 			storage[key] = arguments;
 			if (firstCall) {
 				firstCall = false;
-				addEventListener("message", callback);
+				window.addEventListener("message", callback);
 			}
-			postMessage(key, "*");
+			window.postMessage(key, "*");
 			return id;
 		},
 
@@ -884,7 +888,7 @@ window.Promise || new function () {
 
 	function callEach(callbacks, data) {
 		callbacks.forEach(function (callback) {
-			setImmediate(tryCall, callback, data);
+			window.setImmediate(tryCall, callback, data);
 		});
 	}
 
@@ -979,7 +983,7 @@ window.Promise || new function () {
 				if (!settled) {
 					settled = true;
 					promise._value = value;
-					setImmediate(function () {
+					window.setImmediate(function () {
 						promise._settled = true;
 						try {
 							promise._value = onFulfilled(promise._value);
@@ -1006,7 +1010,7 @@ window.Promise || new function () {
 				if (!settled) {
 					settled = true;
 					promise._reason = reason;
-					setImmediate(function () {
+					window.setImmediate(function () {
 						promise._settled = true;
 						try {
 							promise._reason = onRejected(promise._reason);
@@ -1084,7 +1088,7 @@ window.requestAnimationFrame || Object.assign(window, {
 					timeout = Math.max(0, delay - (currCallTime - prevCallTime)),
 					timeToCall = currCallTime + timeout;
 				prevCallTime = timeToCall;
-				return setTimeout(function () {
+				return window.setTimeout(function () {
 					callback(timeToCall - navigationStart);
 				}, timeout);
 			};
@@ -1098,7 +1102,7 @@ window.requestAnimationFrame || Object.assign(window, {
 		window.msCancelRequestAnimationFrame,
 		window.mozCancelRequestAnimationFrame,
 		window.webkitCancelRequestAnimationFrame,
-		clearTimeout
+		window.clearTimeout
 	].find(Boolean)
 
 });
@@ -1786,7 +1790,7 @@ window.addEventListener || new function () {
 			}
 			event.currentTarget = element;
 			while (i < length) {
-				setImmediate(fastBind(callbacks[i], element), event);
+				window.setImmediate(fastBind(callbacks[i], element), event);
 				i++;
 			}
 		};
@@ -2003,7 +2007,7 @@ window.addEventListener || new function () {
 			this.dispatchEvent(event);
 			eventType = "on" + eventType;
 			if (this[eventType]) {
-				setImmediate(function () {
+				window.setImmediate(function () {
 					event.target[eventType](event);
 				});
 			}
@@ -2556,7 +2560,7 @@ lib.css = {
 	},
 
 	get: function (element, properties) {
-		var prefix = this.prefix, style = getComputedStyle(element);
+		var prefix = this.prefix, style = window.getComputedStyle(element);
 		if (Array.isArray(properties)) {
 			return properties.reduce(function (result, property) {
 				result[property] = style[prefix(property)];
@@ -2606,7 +2610,7 @@ Object.assign(lib.css, {
 
 		if (lib.css.transition || lib.css.animation) {
 			return function (element, properties) {
-				var animations = getComputedStyle(element)[this.animationName];
+				var animations = window.getComputedStyle(element)[this.animationName];
 				changeStyle(element.style, properties);
 				return lib.event.awaitTransAnimEnd(element, animations);
 			};
@@ -2788,7 +2792,7 @@ Object.assign(lib.event, new function () {
 		separator = /,\s*/;
 
 	function getAnimationNames(element, style) {
-		return (style || getComputedStyle(element))[animationName].split(separator);
+		return (style || window.getComputedStyle(element))[animationName].split(separator);
 	}
 
 	function getNewAnimationNames(oldNames, newNames) {
@@ -2835,10 +2839,10 @@ Object.assign(lib.event, new function () {
 	}
 
 	function awaitTransitionEnd(element, style) {
-		var delay = lib.css.getTransitionTime(style || getComputedStyle(element));
+		var delay = lib.css.getTransitionTime(style || window.getComputedStyle(element));
 		if (delay) {
 			return new Promise(function (resolve) {
-				setTimeout(function () {
+				window.setTimeout(function () {
 					resolve(element);
 				}, delay);
 			});
@@ -2847,7 +2851,7 @@ Object.assign(lib.event, new function () {
 	}
 
 	function awaitTransAnimEnd(element, prevAnimations) {
-		var style = getComputedStyle(element);
+		var style = window.getComputedStyle(element);
 		return Promise.all([
 			awaitAnimationEnd(element, getNewAnimationNames(prevAnimations, style[animationName])),
 			awaitTransitionEnd(element, style)
@@ -2888,7 +2892,7 @@ lib.dom = {
 Object.assign(lib.dom, new function () {
 
 	var promise = lib.css.animation || lib.css.transition ? function (element, method, classes) {
-			var animations = getComputedStyle(element)[lib.css.animationName];
+			var animations = window.getComputedStyle(element)[lib.css.animationName];
 			if (changeClasses(element, method, classes)) {
 				return lib.event.awaitTransAnimEnd(element, animations);
 			}
@@ -2977,7 +2981,7 @@ lib.request = new function () {
 		 * }
 		*/
 		var method = (params.method || "GET").toUpperCase(),
-			url = params.url || location.href,
+			url = params.url || window.location.href,
 			data = params.data,
 			userName = params.userName || "",
 			password = params.password || "",
@@ -3098,7 +3102,7 @@ lib.request = new function () {
 			if ("string" == typeof params) {
 				params = {url: params};
 			}
-			url = params.url || location.href;
+			url = params.url || window.location.href;
 			data = params.data;
 			caching = params.caching !== false;
 			if (Object(data) === data) {

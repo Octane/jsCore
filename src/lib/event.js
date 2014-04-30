@@ -135,7 +135,7 @@ Object.assign(lib.event, new function () {
 		separator = /,\s*/;
 
 	function getAnimationNames(element, style) {
-		return (style || getComputedStyle(element))[animationName].split(separator);
+		return (style || window.getComputedStyle(element))[animationName].split(separator);
 	}
 
 	function getNewAnimationNames(oldNames, newNames) {
@@ -182,10 +182,10 @@ Object.assign(lib.event, new function () {
 	}
 
 	function awaitTransitionEnd(element, style) {
-		var delay = lib.css.getTransitionTime(style || getComputedStyle(element));
+		var delay = lib.css.getTransitionTime(style || window.getComputedStyle(element));
 		if (delay) {
 			return new Promise(function (resolve) {
-				setTimeout(function () {
+				window.setTimeout(function () {
 					resolve(element);
 				}, delay);
 			});
@@ -194,7 +194,7 @@ Object.assign(lib.event, new function () {
 	}
 
 	function awaitTransAnimEnd(element, prevAnimations) {
-		var style = getComputedStyle(element);
+		var style = window.getComputedStyle(element);
 		return Promise.all([
 			awaitAnimationEnd(element, getNewAnimationNames(prevAnimations, style[animationName])),
 			awaitTransitionEnd(element, style)
