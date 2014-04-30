@@ -11,7 +11,7 @@ window instanceof Object || Object.assign(window, new function () {
 			case 2: return func(args[1]);
 			case 3: return func(args[1], args[2]);
 		}
-		return func.apply(window, Array.slice(args, 1));
+		return func.apply(window, Array.prototype.slice.call(args, 1));
 	}
 
 	return {

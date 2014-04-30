@@ -1,5 +1,5 @@
 
-window.getComputedStyle || new function () {
+window.getComputedStyle || (window.getComputedStyle = new function () {
 
 	//https://github.com/es-shims/es5-shim/issues/152
 	var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
@@ -76,6 +76,6 @@ window.getComputedStyle || new function () {
 	});
 	proto = null;
 
-	window.getComputedStyle = getComputedStyle;
+	return getComputedStyle;
 
-};
+});

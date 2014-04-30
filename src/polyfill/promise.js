@@ -1,6 +1,8 @@
 "use strict";
 
-window.Promise || new function () {
+var Promise;
+
+Promise || (Promise = new function () {
 
 	//todo thenable value support
 
@@ -215,6 +217,6 @@ window.Promise || new function () {
 
 	});
 
-	window.Promise = Promise;
+	return Promise;
 
-};
+});

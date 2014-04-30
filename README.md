@@ -84,6 +84,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `Number` generics | `.isInteger()`, `.isFinite()`, `.isNaN()`, `.parseInt()`, `.parseFloat()`
 `Math` generics | `.trunc()`, `.sign()`
 `Function.prototype` | `.bind()`
+`Text.prototype` | `.textContent`
 `HTMLElement.prototype` | `.append()`, `.prepend()`, `.after()`, `.before()`, `.replace()`, `.remove()`, `.query()`, `.queryAll()`, `.matches()`, `.addEventListener()`, `.removeEventListner()`, `.dispatchEvent()`, `.children`<sup>[7](#HTMLElement.prototype.children)</sup>, `.firstElementChild`, `.lastElementChild`, `.childElementCount`, `.nextElementSibling`, `.previousElementSibling`, `.textContent`, `.classList`<sup>[8](#HTMLElement.prototype.classList)</sup>, `.dataset`<sup>[9](#HTMLElement.prototype.dataset)</sup>
 `HTMLScriptElement.prototype` | `.onload()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>, `.onerror()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>
 `CSSStyleDeclaration.prototype` | `.getPropertyValue()`, `.removeProperty()`, `.setProperty()`, `.cssFloat`, `.opacity`

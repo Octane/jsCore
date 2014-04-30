@@ -1,5 +1,7 @@
 
-window.FormData || new function () {
+var FormData;
+
+FormData || (FormData = new function () {
 
 	/* <input type="file"> not supported,
 	 * but if you know file contents,
@@ -83,15 +85,15 @@ window.FormData || new function () {
 		};
 
 	function FormData(form) {
-		this.fake = true;
 		this.boundary = getBoundary();
 		if (form) {
-			this.form = form;
 			Array.prototype.push.apply(this, serializeForm(form));
 		}
 	}
 
 	Object.assign(FormData.prototype, {
+
+		notNative: true,
 
 		append: function (name, value, fileName) {
 			Array.push(this, {
@@ -135,6 +137,6 @@ window.FormData || new function () {
 		};
 	};
 
-	window.FormData = FormData;
+	return FormData;
 
-};
+});

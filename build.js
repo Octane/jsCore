@@ -9,8 +9,8 @@ try {
 		"header.js",
 
 
-		"polyfill/ltie10/ie8/node.js",
 		"polyfill/ltie10/ie8/htmlelement.js",
+		"polyfill/ltie10/ie8/text.js",
 		"polyfill/ltie10/ie8/head.js",
 		"polyfill/ltie10/ie8/object.js",
 		"polyfill/ltie10/ie8/array.js",

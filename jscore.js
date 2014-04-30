@@ -5,19 +5,9 @@
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
  */
-if (!window.Node) {
-	window.Node = {
-		ELEMENT_NODE: 1,
-		ATTRIBUTE_NODE: 2,
-		TEXT_NODE: 3,
-		COMMENT_NODE: 8,
-		DOCUMENT_NODE: 9,
-		DOCUMENT_FRAGMENT_NODE: 11
-	};
-}
-
-if (!window.HTMLElement) {
-	window.HTMLElement = Element;
+var HTMLElement;
+if (!HTMLElement) {
+	HTMLElement = Element;
 }
 
 "textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {
@@ -29,7 +19,16 @@ if (!window.HTMLElement) {
 	}
 });
 
-"head" in document || Object.defineProperty(document.constructor.prototype, "head", {
+"textContent" in document.createTextNode("test") || Object.defineProperty(Text.prototype, "textContent", {
+	get: function () {
+		return this.nodeValue;
+	},
+	set: function (value) {
+		this.nodeValue = value;
+	}
+});
+
+"head" in document || Object.defineProperty(HTMLDocument.prototype, "head", {
 	get: function () {
 		return this.query("head");
 	}
@@ -554,7 +553,9 @@ new function () {
 };
 
 
-window.Set || new function () {
+var Set;
+
+Set || (Set = new function () {
 
 	function Set() {
 		if (arguments.length) {
@@ -601,12 +602,14 @@ window.Set || new function () {
 
 	});
 
-	window.Set = Set;
+	return Set;
 
-};
+});
 
 
-window.Map || new function () {
+var Map;
+
+Map || (Map = new function () {
 
 	var KEY = 0, VALUE = 1;
 
@@ -667,12 +670,14 @@ window.Map || new function () {
 
 	});
 
-	window.Map = Map;
+	return Map;
 
-};
+});
 
 
-window.WeakSet || new function () {
+var WeakSet;
+
+WeakSet || (WeakSet = new function () {
 
 	function WeakSet() {
 		if (arguments.length) {
@@ -721,12 +726,14 @@ window.WeakSet || new function () {
 
 	});
 
-	window.WeakSet = WeakSet;
+	return WeakSet;
 
-};
+});
 
 
-window.WeakMap || new function () {
+var WeakMap;
+
+WeakMap || (WeakMap = new function () {
 
 	//todo
 	//In native WeakMaps, references to key objects are held "weakly",
@@ -794,9 +801,9 @@ window.WeakMap || new function () {
 
 	});
 
-	window.WeakMap = WeakMap;
+	return WeakMap;
 
-};
+});
 
 
 window.setImmediate || Object.assign(window, window.msSetImmediate ? {
@@ -817,7 +824,7 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 			case 2: return func(args[1]);
 			case 3: return func(args[1], args[2]);
 		}
-		return func.apply(window, Array.slice(args, 1));
+		return func.apply(window, Array.prototype.slice.call(args, 1));
 	}
 
 	function callback(event) {
@@ -854,7 +861,9 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 });
 
 
-window.Promise || new function () {
+var Promise;
+
+Promise || (Promise = new function () {
 
 	//todo thenable value support
 
@@ -1069,9 +1078,9 @@ window.Promise || new function () {
 
 	});
 
-	window.Promise = Promise;
+	return Promise;
 
-};
+});
 
 
 window.requestAnimationFrame || Object.assign(window, {
@@ -1156,11 +1165,11 @@ function StaticDOMStringMap() {}
 //Element traversal polyfill
 "children" in document.createDocumentFragment() || new function () {
 
-	var proto, api = {
+	var ELEMENT_NODE = 1, proto, api = {
 
 		firstElementChild: function () {
 			var node = this.firstChild;
-			while (node && node.nodeType != 1) {
+			while (node && ELEMENT_NODE != node.nodeType) {
 				node = node.nextSibling;
 			}
 			return node;
@@ -1168,7 +1177,7 @@ function StaticDOMStringMap() {}
 
 		lastElementChild: function () {
 			var node = this.lastChild;
-			while (node && node.nodeType != 1) {
+			while (node && ELEMENT_NODE != node.nodeType) {
 				node = node.previousSibling;
 			}
 			return node;
@@ -1179,7 +1188,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.nextSibling;
 			}
-			while (node && node.nodeType != 1);
+			while (node && ELEMENT_NODE != node.nodeType);
 			return node;
 		},
 
@@ -1188,7 +1197,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.previousSibling;
 			}
-			while (node && node.nodeType != 1);
+			while (node && ELEMENT_NODE != node.nodeType);
 			return node;
 		},
 
@@ -1209,7 +1218,7 @@ function StaticDOMStringMap() {}
 					j = 0, elements = new StaticHTMLCollection;
 				while (i < length) {
 					node = nodes[i];
-					if (Node.ELEMENT_NODE == node.nodeType) {
+					if (ELEMENT_NODE == node.nodeType) {
 						elements[j++] = node;
 					}
 					i++;
@@ -1249,7 +1258,7 @@ function StaticDOMStringMap() {}
 //DOM4 http://www.w3.org/TR/dom/#element
 "append" in document.createDocumentFragment() || new function () {
 
-	var api, proto = HTMLElement.prototype;
+	var ELEMENT_NODE = 1, api, proto = HTMLElement.prototype;
 
 	function isContains(root, element, selector) {
 		return -1 != Array.indexOf(root.querySelectorAll(selector), element);
@@ -1346,7 +1355,7 @@ function StaticDOMStringMap() {}
 				}
 				root = this.parentNode;
 				if (root) {
-					if (Node.ELEMENT_NODE == root.nodeType) {
+					if (ELEMENT_NODE == root.nodeType) {
 						root = root.ownerDocument;
 					}
 					return isContains(root, this, selector);
@@ -1490,7 +1499,9 @@ function StaticDOMStringMap() {}
 
 });
 
-window.FormData || new function () {
+var FormData;
+
+FormData || (FormData = new function () {
 
 	/* <input type="file"> not supported,
 	 * but if you know file contents,
@@ -1574,15 +1585,15 @@ window.FormData || new function () {
 		};
 
 	function FormData(form) {
-		this.fake = true;
 		this.boundary = getBoundary();
 		if (form) {
-			this.form = form;
 			Array.prototype.push.apply(this, serializeForm(form));
 		}
 	}
 
 	Object.assign(FormData.prototype, {
+
+		notNative: true,
 
 		append: function (name, value, fileName) {
 			Array.push(this, {
@@ -1626,9 +1637,9 @@ window.FormData || new function () {
 		};
 	};
 
-	window.FormData = FormData;
+	return FormData;
 
-};
+});
 
 //IE8 Array.slice fix
 new function () {
@@ -1715,7 +1726,7 @@ catch (error) {
 	node.appendChild(document.createComment("test"));
 	return node.children.length; //→ 1 in IE8
 }()) && Object.defineProperty(HTMLElement.prototype, "children", {
-	get: Object.getOwnPropertyDescriptor(document.constructor.prototype, "children").get
+	get: Object.getOwnPropertyDescriptor(HTMLDocument.prototype, "children").get
 });
 
 //IE8 setImmediate polyfill
@@ -1730,7 +1741,7 @@ window instanceof Object || Object.assign(window, new function () {
 			case 2: return func(args[1]);
 			case 3: return func(args[1], args[2]);
 		}
-		return func.apply(window, Array.slice(args, 1));
+		return func.apply(window, Array.prototype.slice.call(args, 1));
 	}
 
 	return {
@@ -2030,10 +2041,10 @@ window.addEventListener || new function () {
 			}
 		},
 
-		send: function () {
+		send: function (data) {
 			this.onreadystatechange = this._onReadyStateChange;
 			try {
-				send.apply(this, arguments);
+				send.call(this, data);
 			}
 			catch (error) {
 				this._unbind();
@@ -2056,11 +2067,10 @@ window.addEventListener || new function () {
 
 	set: function (callback) {
 		if ("function" == typeof callback) {
-			this.onreadystatechange = function () {
-				var event;
+			this.onreadystatechange = function (event) {
 				if ("loaded" == this.readyState) {
 					this.onreadystatechange = null;
-					event = document.createEvent("Event");
+					event = document.createEvent("CustomEvent");
 					if (this.text) {
 						event.initEvent("load", false, false);
 						callback.call(this, event);
@@ -2192,7 +2202,7 @@ window instanceof Object || new function () {
 
 };
 
-window.getComputedStyle || new function () {
+window.getComputedStyle || (window.getComputedStyle = new function () {
 
 	//https://github.com/es-shims/es5-shim/issues/152
 	var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
@@ -2269,9 +2279,9 @@ window.getComputedStyle || new function () {
 	});
 	proto = null;
 
-	window.getComputedStyle = getComputedStyle;
+	return getComputedStyle;
 
-};
+});
 
 if (Promise) {
 	Promise.prototype.catch_ = Promise.prototype["catch"];

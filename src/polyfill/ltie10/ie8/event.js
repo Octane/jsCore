@@ -267,10 +267,10 @@ window.addEventListener || new function () {
 			}
 		},
 
-		send: function () {
+		send: function (data) {
 			this.onreadystatechange = this._onReadyStateChange;
 			try {
-				send.apply(this, arguments);
+				send.call(this, data);
 			}
 			catch (error) {
 				this._unbind();
@@ -293,11 +293,10 @@ window.addEventListener || new function () {
 
 	set: function (callback) {
 		if ("function" == typeof callback) {
-			this.onreadystatechange = function () {
-				var event;
+			this.onreadystatechange = function (event) {
 				if ("loaded" == this.readyState) {
 					this.onreadystatechange = null;
-					event = document.createEvent("Event");
+					event = document.createEvent("CustomEvent");
 					if (this.text) {
 						event.initEvent("load", false, false);
 						callback.call(this, event);

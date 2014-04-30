@@ -1,6 +1,7 @@
 
-if (!window.HTMLElement) {
-	window.HTMLElement = Element;
+var HTMLElement;
+if (!HTMLElement) {
+	HTMLElement = Element;
 }
 
 "textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {

@@ -48,11 +48,11 @@ function StaticDOMStringMap() {}
 //Element traversal polyfill
 "children" in document.createDocumentFragment() || new function () {
 
-	var proto, api = {
+	var ELEMENT_NODE = 1, proto, api = {
 
 		firstElementChild: function () {
 			var node = this.firstChild;
-			while (node && node.nodeType != 1) {
+			while (node && ELEMENT_NODE != node.nodeType) {
 				node = node.nextSibling;
 			}
 			return node;
@@ -60,7 +60,7 @@ function StaticDOMStringMap() {}
 
 		lastElementChild: function () {
 			var node = this.lastChild;
-			while (node && node.nodeType != 1) {
+			while (node && ELEMENT_NODE != node.nodeType) {
 				node = node.previousSibling;
 			}
 			return node;
@@ -71,7 +71,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.nextSibling;
 			}
-			while (node && node.nodeType != 1);
+			while (node && ELEMENT_NODE != node.nodeType);
 			return node;
 		},
 
@@ -80,7 +80,7 @@ function StaticDOMStringMap() {}
 			do {
 				node = node.previousSibling;
 			}
-			while (node && node.nodeType != 1);
+			while (node && ELEMENT_NODE != node.nodeType);
 			return node;
 		},
 
@@ -101,7 +101,7 @@ function StaticDOMStringMap() {}
 					j = 0, elements = new StaticHTMLCollection;
 				while (i < length) {
 					node = nodes[i];
-					if (Node.ELEMENT_NODE == node.nodeType) {
+					if (ELEMENT_NODE == node.nodeType) {
 						elements[j++] = node;
 					}
 					i++;
@@ -141,7 +141,7 @@ function StaticDOMStringMap() {}
 //DOM4 http://www.w3.org/TR/dom/#element
 "append" in document.createDocumentFragment() || new function () {
 
-	var api, proto = HTMLElement.prototype;
+	var ELEMENT_NODE = 1, api, proto = HTMLElement.prototype;
 
 	function isContains(root, element, selector) {
 		return -1 != Array.indexOf(root.querySelectorAll(selector), element);
@@ -238,7 +238,7 @@ function StaticDOMStringMap() {}
 				}
 				root = this.parentNode;
 				if (root) {
-					if (Node.ELEMENT_NODE == root.nodeType) {
+					if (ELEMENT_NODE == root.nodeType) {
 						root = root.ownerDocument;
 					}
 					return isContains(root, this, selector);
