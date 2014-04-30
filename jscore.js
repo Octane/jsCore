@@ -1721,7 +1721,7 @@ catch (error) {
 //IE8 setImmediate polyfill
 window instanceof Object || Object.assign(window, new function () {
 
-	var root = document.head, uid = 0, storage = {};
+	var uid = 0, storage = {};
 
 	function fastApply(args) {
 		var func = args[0];
@@ -1739,7 +1739,7 @@ window instanceof Object || Object.assign(window, new function () {
 			var args = arguments, id = uid++;
 			function onReadyStateChange() {
 				this.onreadystatechange = null;
-				this.remove();
+				document.removeChild(this);
 				if (storage[id]) {
 					delete storage[id];
 					fastApply(args);
@@ -1749,7 +1749,7 @@ window instanceof Object || Object.assign(window, new function () {
 			new function () {//avoid closure
 				var script = document.createElement("script");
 				script.onreadystatechange = onReadyStateChange;
-				root.appendChild(script);
+				document.appendChild(script);
 			}
 			return id;
 		},
