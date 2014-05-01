@@ -2,7 +2,7 @@
 
 ##v0.4.2
 
- -
+ - fix: bug in `.stopPropagation()`
 
 ##v0.4.1
 

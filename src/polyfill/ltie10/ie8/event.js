@@ -1,41 +1,39 @@
 
 window.addEventListener || new function () {
 
-	function fastBind(func, boundThis) {
-		if (func.handleEvent) {
-			boundThis = func;
-			func = func.handleEvent;
-		}
-		return function (arg) {
-			func.call(boundThis, arg);
-		};
-	}
-
 	function fixEvent(event) {
-		var clone = document.createEventObject(event),
-			docEl = document.documentElement;
-		clone.pageX = clone.clientX + docEl.scrollLeft;
-		clone.pageY = clone.clientY + docEl.scrollTop;
-		return clone;
+		var root = document.documentElement;
+		event.pageX = event.clientX + root.scrollLeft;
+		event.pageY = event.clientY + root.scrollTop;
+		if (!event.timeStamp) {
+			event.timeStamp = Date.now();
+		}
+		return event;
 	}
 
 	function createEventListener(callbacks, element) {
 		return function (event) {
-			var i = 0, length = callbacks.length;
+			var i = 0, length = callbacks.length, callback;
 			if (!(event instanceof CustomEvent)) {
 				event = fixEvent(event);
 			}
 			event.currentTarget = element;
 			while (i < length) {
-				window.setImmediate(fastBind(callbacks[i], element), event);
+				callback = callbacks[i];
+				if (callback.handleEvent) {
+					callback.handleEvent(event);
+				}
+				else {
+					callback.call(element, event);
+				}
 				i++;
 			}
 		};
 	}
 
-	function addEventListener(eventType, callback, useCapturing) {
+	function addEventListener(eventType, callback, useCapture) {
 		var element = this, events, event;
-		if (useCapturing) {
+		if (useCapture) {
 			throw new Error("Capturing phase is not supported");
 		}
 		if (!element._events) {
@@ -56,9 +54,9 @@ window.addEventListener || new function () {
 		}
 	}
 
-	function removeEventListener(eventType, callback, useCapturing) {
+	function removeEventListener(eventType, callback, useCapture) {
 		var element = this, events, event, index, callbacks;
-		if (useCapturing) {
+		if (useCapture) {
 			throw new Error("Capturing phase is not supported");
 		}
 		if (!element._events) {
@@ -93,6 +91,11 @@ window.addEventListener || new function () {
 		else {
 			this.fireEvent("on" + event.type, event);
 		}
+		//todo
+		//return boolean;
+		//The return value of dispatchEvent indicates whether any of the listeners
+		//which handled the event called preventDefault.
+		//If preventDefault was called the value is false, else the value is true.
 	}
 
 	function initEvent(type, bubbles, cancelable) {
@@ -116,6 +119,11 @@ window.addEventListener || new function () {
 
 	Object.assign(CustomEvent.prototype, {
 
+		type: "",
+		timeStamp: 0,
+		detail: null,
+		target: null,
+		currentTarget: null,
 		defaultPrevented: false,
 
 		preventDefault: preventDefault,
@@ -132,6 +140,8 @@ window.addEventListener || new function () {
 
 	Object.assign(Event.prototype, {
 
+		timeStamp: 0,
+		currentTarget: null,
 		defaultPrevented: false,
 
 		preventDefault: preventDefault,
@@ -211,10 +221,9 @@ window.addEventListener || new function () {
 	});
 
 	HTMLDocument.prototype.createEvent = function (group) {
-		if ("CustomEvent" == group) {
-			return new CustomEvent;
-		}
-		return this.createEventObject();
+		var event = "CustomEvent" == group ? new CustomEvent : this.createEventObject();
+		event.timeStamp = Date.now();
+		return event;
 	};
 
 };
