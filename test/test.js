@@ -13,17 +13,17 @@ catch (error) {
 	};
 }
 
-lib.event.when(document.body, "click").then(function () {
-	//console.log("request start");
+lib.event.when(document.body, "click").then(function () {console.log("WHEN");
+	console.log("request start");
 	return lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
 		var node = document.createElement("blockquote");
 		node.append(xhr.responseText);
 		document.body.append(node);
 	});
 }).then(function () {
-	//console.log("request done");
+	console.log("request done");
 });
-/*
+
 console.log("WeakMap tests:");
 
 var wm = new WeakMap;
@@ -136,12 +136,3 @@ Promise.race([
 		resolve();
 	})
 ]);
-*/
-
-document.body.addEventListener("click", function (e) {
-	console.log([e.pageX, e.pageY].join(", "));
-});
-
-var e = document.createEvent("MouseEvents");
-e.initMouseEvent("click", true, true, window, 1, 12, 345, 7, 220, false, false, true, false, 0, null);
-document.body.dispatchEvent(e);

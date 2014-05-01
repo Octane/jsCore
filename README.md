@@ -138,7 +138,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="Event.prototype">13</sup> –  global event constructors (`Event`, `CustomEvent`, etc.) not available, use `document.createEvent`
 
-<sup name="Event.prototype.initEvent">14</sup> – event methods (`initEvent`, `initMouseEvent`, ect.) just copy all function parameters to the instance of `Event`, the main purpose is to set the type of the event without `IE<9` check
+<sup name="Event.prototype.initEvent">14</sup> – event methods (`initEvent`, `initMouseEvent`, ect.) just copy all function parameters to the instance of `Event`, the main purpose is to set the type of the event without `IE8` check
 
 <sup name="XMLHttpRequest">15</sup> – `xhr.send` supports `FormData`
 
