@@ -317,7 +317,7 @@ example:
 ```javascript
 //single property
 var delay = lib.css.get(element, "animationDelay"); //animationDelay will be prefixed automatically
-if (delay > 0) {
+if (delay) {
     //do something
 }
 
