@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var WeakMap = WeakMap || new function () {
 
@@ -24,7 +24,7 @@ var WeakMap = WeakMap || new function () {
 
     function validKey(key) {
         if (Object(key) !== key) {
-            throw TypeError("Invalid value used as weak map key");
+            throw TypeError('Invalid value used as weak map key');
         }
         return key;
     }
@@ -52,7 +52,7 @@ var WeakMap = WeakMap || new function () {
             return Boolean(this._getPair(key));
         },
 
-        "delete": function (key) {
+        'delete': function (key) {
             var index = Array.findIndex(this, equalKey, validKey(key));
             if (-1 == index) {
                 return false;

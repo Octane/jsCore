@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 
@@ -9,7 +9,7 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 } : new function () {
 
     var id = 0, storage = {}, firstCall = true,
-        message = "setImmediatePolyfillMessage";
+        message = 'setImmediatePolyfillMessage';
 
     function fastApply(args) {
         var func = args[0];
@@ -27,7 +27,7 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     function callback(event) {
         var key, data;
         key = event.data;
-        if ("string" == typeof key && key.startsWith(message)) {
+        if ('string' == typeof key && key.startsWith(message)) {
             data = storage[key];
             if (data) {
                 fastApply(data);
@@ -43,9 +43,9 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
             storage[key] = arguments;
             if (firstCall) {
                 firstCall = false;
-                window.addEventListener("message", callback);
+                window.addEventListener('message', callback);
             }
-            window.postMessage(key, "*");
+            window.postMessage(key, '*');
             return id;
         },
 

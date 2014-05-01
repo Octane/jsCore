@@ -162,9 +162,9 @@ Class.Super //→ SuperClass
 
 `.Template()` is a very simple string templating tool (not to be confused with HTML templating)
 ```javascript
-var tmpl = new lib.Template("Hi, {NAME}");
-tmpl.match({name: "John"}) //→ "Hi, John"
-tmpl.match({name: "Luke"}) //→ "Hi, Luke"
+var tmpl = new lib.Template('Hi, {NAME}');
+tmpl.match({name: 'John'}) //→ 'Hi, John'
+tmpl.match({name: 'Luke'}) //→ 'Hi, Luke'
 ```
 
 ###lib.I18n()
@@ -178,23 +178,23 @@ i18n(message[, replacements]) //→ string
 ```
 example:
 ```javascript
-var ruRU = {currency: "руб."},
-    enUS = {currency: "$"},
+var ruRU = {currency: 'руб.'},
+    enUS = {currency: '$'},
     i18n = new lib.I18n;
 
-i18n.add("ru-RU", ruRU);
-i18n.add("en-US", enUS);
+i18n.add('ru-RU', ruRU);
+i18n.add('en-US', enUS);
 
-i18n.use("ru-RU");
-100 + i18n("currency") // → "100руб."
+i18n.use('ru-RU');
+100 + i18n('currency') // → '100руб.'
 
-i18n.use("en-US");
-100 + i18n("currency") // → "100$"
+i18n.use('en-US');
+100 + i18n('currency') // → '100$'
 ```
 `i18n()` function can take a list of replacements
 ```javascript
-var i18n = new lib.I18n("ru-Ru", {currency: "{COST} руб."});
-i18n("currency", {cost: 100}) // → "100 руб."
+var i18n = new lib.I18n('ru-Ru', {currency: '{COST} руб.'});
+i18n('currency', {cost: 100}) // → '100 руб.'
 ```
 ###lib.html
 
@@ -202,7 +202,7 @@ i18n("currency", {cost: 100}) // → "100 руб."
 
 `.parse()` converts a HTML code into a document fragment
 ```javascript
-var docFragment = lib.html.parse("<h1>Example</h1><p>...</p>");
+var docFragment = lib.html.parse('<h1>Example</h1><p>...</p>');
 document.body.append(docFragment);
 ```
 
@@ -210,14 +210,14 @@ document.body.append(docFragment);
 
 `.escape()` converts special HTML characters to mnemonics
 ```javascript
-lib.html.escape("<h1>Example</h1>") // → "&lt;h1&gt;Example&lt;/h1&gt;"
+lib.html.escape('<h1>Example</h1>') // → '&lt;h1&gt;Example&lt;/h1&gt;'
 ```
 
 ####lib.html.unescape()
 
 `.unescape()` converts HTML mnemonics to characters
 ```javascript
-lib.html.unescape("&lt;h1&gt;Example&lt;/h1&gt;") // → "<h1>Example</h1>"
+lib.html.unescape('&lt;h1&gt;Example&lt;/h1&gt;') // → '<h1>Example</h1>'
 ```
 
 ###lib.array
@@ -226,7 +226,7 @@ lib.html.unescape("&lt;h1&gt;Example&lt;/h1&gt;") // → "<h1>Example</h1>"
 
 `.count()` counts the actual number of elements
 ```javascript
-var iterable = [,"a",,"b",];
+var iterable = [,'a',,'b',];
 iterable.length //→ 4
 lib.array.count(iterable) //→ 2
 ```
@@ -257,7 +257,7 @@ lib.array.refine([1,,2]) //→ [1, 2]
 
 `.contains()` determines whether an element may be found within the array
 ```javascript
-lib.array.contains(["a", "b"], "a") //→ true
+lib.array.contains(['a', 'b'], 'a') //→ true
 ```
 
 ####lib.array.shuffle()
@@ -279,9 +279,9 @@ lib.array.range(5) //→ [0, 1, 2, 3, 4]
 
 `.remove()` removes the element from the array
 ```javascript
-var list = ["a", "b", "c"];
-lib.array.remove(list, "b");
-console.log(list) //→ ["a", "c"]
+var list = ['a', 'b', 'c'];
+lib.array.remove(list, 'b');
+console.log(list) //→ ['a', 'c']
 ```
 
 ###lib.is
@@ -303,7 +303,7 @@ lib.css.prefix(propertyName) //→ prefixedPropertyName
 ```
 example:
 ```javascript
-lib.css.prefix("animationName") //→ "WebkitAnimationName"
+lib.css.prefix('animationName') //→ 'WebkitAnimationName'
 ```
 
 ####lib.css.get()
@@ -316,13 +316,13 @@ lib.css.get(element, arrayOfPropertyNames) //→ object
 example:
 ```javascript
 //single property
-var delay = lib.css.get(element, "animationDelay"); //animationDelay will be prefixed automatically
+var delay = lib.css.get(element, 'animationDelay'); //animationDelay will be prefixed automatically
 if (delay) {
     //do something
 }
 
 //several properties
-var rect = lib.css.get(element, ["top", "left", "height", "width"]);
+var rect = lib.css.get(element, ['top', 'left', 'height', 'width']);
 if (parseInt(rect.width) > someValue) {
     //do something
 }
@@ -338,8 +338,8 @@ example:
 ```javascript
 lib.css.set(element, {
     //properties will be prefixed automatically
-    animationName: "someName",
-    animationDuration: "5s"
+    animationName: 'someName',
+    animationDuration: '5s'
 }).then(doSomething);
 ```
 
@@ -352,10 +352,10 @@ lib.css.getTransitionTime(style) //→ number (ms)
 
 ####Prefixed property names
 
-For quick access prepared prefixed CSS animation, transition and transform property names: `.animation`, ".animationName", ".transitionProperty", ".transform", etc.
+For quick access prepared prefixed CSS animation, transition and transform property names: `.animation`, `.animationName`, `.transitionProperty`, `.transform`, etc.
 ```javascript
 if (lib.css.animation) {
-    element.style[lib.css.animationDelay] = "5s";
+    element.style[lib.css.animationDelay] = '5s';
 }
 ```
 
@@ -394,8 +394,8 @@ for example, call `doSomething` after *3 seconds* of the transition:
 }
 ```
 ```javascript
-var element = document.query(".animated");
-lib.dom.addClass(element, "trans1", "trans2").then(doSomething);
+var element = document.query('.animated');
+lib.dom.addClass(element, 'trans1', 'trans2').then(doSomething);
 ```
 
 ###lib.event
@@ -408,7 +408,7 @@ lib.event.on(element[, selector], eventTypes, callback) //→ eventDetails
 ```
 for example, delegating events using the CSS selector:
 ```javascript
-lib.event.on(menuContainer, ".menu-item", "click", onMenuClick);
+lib.event.on(menuContainer, '.menu-item', 'click', onMenuClick);
 ```
 
 ####lib.event.off()
@@ -419,7 +419,7 @@ lib.event.off(eventDetails)
 ```
 example:
 ```javascript
-var eventDetails = lib.event.on(window, "focus blur", doSomething);
+var eventDetails = lib.event.on(window, 'focus blur', doSomething);
 lib.event.off(eventDetails);
 ```
 
@@ -431,7 +431,7 @@ lib.event.one(element[, selector], eventTypes, callback)
 ```
 example:
 ```javascript
-lib.event.one(window, "load", onLoad);
+lib.event.one(window, 'load', onLoad);
 ```
 
 ####lib.event.when()
@@ -442,21 +442,21 @@ lib.event.when(element[, selector], eventTypes) //→ promise
 ```
 example:
 ```javascript
-lib.event.when(document, "body", "click").then(doSomething);
+lib.event.when(document, 'body', 'click').then(doSomething);
 ```
 
 ####lib.event.preventDefault()
 
 `.preventDefault()` cancels the default action of the event
 ```javascript
-lib.event.on(someForm, "submit", lib.event.preventDefault);
+lib.event.on(someForm, 'submit', lib.event.preventDefault);
 ```
 
 ####lib.event.stopPropagation()
 
 `.stopPropagation()` prevents further propagation of the event
 ```javascript
-lib.event.on(someElement, "click", lib.event.stopPropagation);
+lib.event.on(someElement, 'click', lib.event.stopPropagation);
 ```
 
 ####lib.event.awaitTransitionEnd()
@@ -568,7 +568,7 @@ lib.request.script({
 
 `.toQueryParam()` converts key-value pairs into the query string
 ```javascript
-lib.request.toQueryParam("chr", "ю") //→ "chr=%D1%8E"
+lib.request.toQueryParam('chr', 'ю') //→ 'chr=%D1%8E'
 ```
 
 ####lib.request.toQueryString()
@@ -576,9 +576,9 @@ lib.request.toQueryParam("chr", "ю") //→ "chr=%D1%8E"
 `.toQueryString()` converts the object containing key-value pairs into the query string
 ```javascript
 lib.request.toQueryString({
-    chr1: "ю",
-    chr2: "я"
-}) //→ "chr1=%D1%8E&chr2=%D1%8F"
+    chr1: 'ю',
+    chr2: 'я'
+}) //→ 'chr1=%D1%8E&chr2=%D1%8F'
 ```
 
 ##License

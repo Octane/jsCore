@@ -31,7 +31,7 @@ window instanceof Object || Object.assign(window, new function () {
             }
             storage[id] = true;
             new function () {//avoid closure
-                var script = document.createElement("script");
+                var script = document.createElement('script');
                 script.onreadystatechange = onReadyStateChange;
                 document.appendChild(script);
             }

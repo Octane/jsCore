@@ -3,7 +3,7 @@
 //http://javascript.ru/forum/307534-post71.html
 (function () {
     var iterable = {
-        "0": true,
+        0: true,
         length: 1
     };
     Array.splice(iterable, 0, 1);

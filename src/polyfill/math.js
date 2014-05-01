@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 if (!Math.trunc) {
     Math.trunc = function (value) {

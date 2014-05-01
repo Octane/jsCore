@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = Promise || new function () {
 
@@ -204,7 +204,7 @@ var Promise = Promise || new function () {
 
         },
 
-        "catch": function (onRejected) {
+        'catch': function (onRejected) {
             return this.then(undefined, onRejected);
         }
 

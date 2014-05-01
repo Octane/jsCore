@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Set = Set || new function () {
 
@@ -26,7 +26,7 @@ var Set = Set || new function () {
             });
         },
 
-        "delete": function (value) {
+        'delete': function (value) {
             var index = Array.findIndex(this, function (val) {
                 return Object.is(value, val);
             });

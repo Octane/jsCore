@@ -1,7 +1,7 @@
 
 if (!Array.isArray) {
     Array.isArray = function (anything) {
-        return "[object Array]" == Object.prototype.toString.call(anything);
+        return '[object Array]' == Object.prototype.toString.call(anything);
     };
 }
 
@@ -100,7 +100,7 @@ if (!Array.prototype.reduce) {
         if (arguments.length < 2) {
             if (!length) {
                 throw new TypeError(
-                    "Reduce of empty array with no initial value"
+                    'Reduce of empty array with no initial value'
                 );
             }
             while (i < length) {
@@ -130,7 +130,7 @@ if (!Array.prototype.reduceRight) {
         if (arguments.length < 2) {
             if (!this.length) {
                 throw new TypeError(
-                    "Reduce of empty array with no initial value"
+                    'Reduce of empty array with no initial value'
                 );
             }
             while (i--) {

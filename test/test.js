@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 try {
     console.log;
@@ -6,25 +6,25 @@ try {
 catch (error) {
     window.console = {
         log: function () {
-            var pre = document.createElement("pre");
-            pre.append(Array.join(arguments, ", "));
+            var pre = document.createElement('pre');
+            pre.append(Array.join(arguments, ', '));
             document.body.append(pre);
         }
     };
 }
 
-lib.event.when(document.body, "click").then(function () {console.log("WHEN");
-    console.log("request start");
-    return lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
-        var node = document.createElement("blockquote");
+lib.event.when(document.body, 'click').then(function () {console.log('WHEN');
+    console.log('request start');
+    return lib.request.get('MIT-LICENSE.txt').then(function (xhr) {
+        var node = document.createElement('blockquote');
         node.append(xhr.responseText);
         document.body.append(node);
     });
 }).then(function () {
-    console.log("request done");
+    console.log('request done');
 });
 
-console.log("WeakMap tests:");
+console.log('WeakMap tests:');
 
 var wm = new WeakMap;
 
@@ -46,14 +46,14 @@ console.log(wm.delete_({}) === false);
 console.log(wm.delete_(objKey2) === true);
 console.log(wm.delete_(objKey2) === false);
 
-console.log("Map tests:");
+console.log('Map tests:');
 
 var m = new Map;
 
 m.set(objKey1, objValue1);
 m.set(objKey2, objValue2);
 m.set(objKey1, objValue3);
-m.set("key", "value");
+m.set('key', 'value');
 m.set(NaN, Infinity);
 
 console.log(m.has(objKey2));
@@ -63,7 +63,7 @@ console.log(m.delete_({}) === false);
 console.log(m.delete_(objKey2) === true);
 console.log(m.delete_(objKey2) === false);
 
-console.log("Set tests:");
+console.log('Set tests:');
 
 var s = new Set;
 
@@ -78,7 +78,7 @@ console.log(s.delete_(NaN) === true);
 console.log(s.size === 3);
 console.log(s.has(objValue1) === true);
 
-console.log("WeakSet tests:");
+console.log('WeakSet tests:');
 
 var ws = new WeakSet;
 
@@ -91,14 +91,14 @@ console.log(ws.has(objValue1) === true);
 console.log(ws.has(objValue2) === false);
 console.log(ws.delete_(objValue1) === true);
 
-console.log("CSS animation test");
+console.log('CSS animation test');
 
-window.addEventListener("load", function () {
-    var node = document.body.appendChild(document.createElement("div"));
-    node.classList.add("animated");
+window.addEventListener('load', function () {
+    var node = document.body.appendChild(document.createElement('div'));
+    node.classList.add('animated');
     window.requestAnimationFrame(function () {
-        lib.dom.addClass(node, "move").then(function (element) {
-            console.log("CSS animation done");
+        lib.dom.addClass(node, 'move').then(function (element) {
+            console.log('CSS animation done');
             return element;
         }).then(function (element) {
             element.remove();
@@ -106,33 +106,33 @@ window.addEventListener("load", function () {
     });
 });
 
-console.log("Promise tests");
+console.log('Promise tests');
 
 new Promise(function (resolve) {
-    console.log("call promise 1 resolver");
+    console.log('call promise 1 resolver');
     resolve();
 });
 new Promise(function (resolve) {
-    console.log("call promise 2 resolver");
+    console.log('call promise 2 resolver');
     resolve();
 });
 Promise.all([
     new Promise(function (resolve) {
-        console.log("call promise 3 resolver");
+        console.log('call promise 3 resolver');
         resolve();
     }),
     new Promise(function (resolve) {
-        console.log("call promise 4 resolver");
+        console.log('call promise 4 resolver');
         resolve();
     })
 ]);
 Promise.race([
     new Promise(function (resolve) {
-        console.log("call promise 5 resolver");
+        console.log('call promise 5 resolver');
         resolve();
     }),
     new Promise(function (resolve) {
-        console.log("call promise 6 resolver");
+        console.log('call promise 6 resolver');
         resolve();
     })
 ]);

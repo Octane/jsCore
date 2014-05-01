@@ -2,8 +2,8 @@
 window instanceof Object || new function () {
 
     var proto = CSSStyleDeclaration.prototype,
-        prefix = "progid:DXImageTransform.Microsoft.",
-        alpha = "Alpha(opacity={VALUE}, enabled={ENABLED})",
+        prefix = 'progid:DXImageTransform.Microsoft.',
+        alpha = 'Alpha(opacity={VALUE}, enabled={ENABLED})',
         opacityRegExp = /\bopacity\s*=\s*(\d+)/i,
         alphaRegExp = /alpha\s*\(.*?\)/i;
 
@@ -16,12 +16,12 @@ window instanceof Object || new function () {
     }
 
     function fixFontSmoothing(filter, value) {
-        return filter.replace("{ENABLED}", 1 != value);
+        return filter.replace('{ENABLED}', 1 != value);
     }
 
     function createAlphaFilter(value) {
         return fixFontSmoothing(
-            alpha.replace("{VALUE}", Math.trunc(value * 100)),
+            alpha.replace('{VALUE}', Math.trunc(value * 100)),
             value
         );
     }
@@ -31,10 +31,10 @@ window instanceof Object || new function () {
     }
 
     function hasAlphaFilter(filter) {
-        return filter.toLowerCase().contains("alpha");
+        return filter.toLowerCase().contains('alpha');
     }
 
-    Object.defineProperty(proto, "cssFloat", {
+    Object.defineProperty(proto, 'cssFloat', {
         get: function () {
             return this.styleFloat;
         },
@@ -43,9 +43,9 @@ window instanceof Object || new function () {
         }
     });
 
-    Object.defineProperty(proto, "opacity", {
+    Object.defineProperty(proto, 'opacity', {
         get: function () {
-            var opacity = "", filter = this.filter.trim();
+            var opacity = '', filter = this.filter.trim();
             if (filter) {
                 filter.replace(alphaRegExp, function (alpha) {
                     alpha.replace(opacityRegExp, function (str, value) {
@@ -66,7 +66,7 @@ window instanceof Object || new function () {
                 if (hasAlphaFilter(filter)) {
                     this.filter = changeAlphaFilter(filter, value);
                 } else {
-                    this.filter += " " + prefix + createAlphaFilter(value);
+                    this.filter += ' ' + prefix + createAlphaFilter(value);
                 }
             } else {
                 this.filter = prefix + createAlphaFilter(value);
@@ -78,7 +78,7 @@ window instanceof Object || new function () {
 
         getPropertyValue: function (property) {
             property = property.toLowerCase();
-            if ("float" == property) {
+            if ('float' == property) {
                 return this.styleFloat;
             }
             return this[toCamelCase(property)];
@@ -87,20 +87,20 @@ window instanceof Object || new function () {
         removeProperty: function (property) {
             var value;
             property = property.toLowerCase();
-            if ("float" == property) {
-                property = "styleFloat";
+            if ('float' == property) {
+                property = 'styleFloat';
                 value = this.styleFloat
             } else {
                 property = toCamelCase(property);
                 value = this[property];
             }
-            this[property] = "";
+            this[property] = '';
             return value;
         },
 
         setProperty: function (property, value) {
             property = property.toLowerCase();
-            if ("float" == property) {
+            if ('float' == property) {
                 this.styleFloat = value;
             }
             this[toCamelCase(property)] = value;

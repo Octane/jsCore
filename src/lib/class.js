@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 lib.classExtends = function (Class, SuperClass) {
     Class.prototype = Object.create(SuperClass.prototype);

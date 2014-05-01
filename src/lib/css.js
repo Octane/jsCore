@@ -1,15 +1,15 @@
-"use strict";
+'use strict';
 
 lib.css = {
 
     prefix: new function () {
 
         var cache = {},
-            prefixes = ["ms", "O", "Webkit", "Moz"],
+            prefixes = ['ms', 'O', 'Webkit', 'Moz'],
             properties = new function () {
                 var style = document.documentElement.style,
                     proto = style.constructor.prototype;
-                return "top" in proto ? proto : style;
+                return 'top' in proto ? proto : style;
             };
 
         return function (property) {
@@ -50,7 +50,7 @@ lib.css = {
     getAnimationNames: new function () {
         var separator = /,\s*/;
         function excludeNone(value) {
-            return "none" != value;
+            return 'none' != value;
         }
         return function (style) {
             var names = style[this.animationName];
@@ -66,18 +66,18 @@ lib.css = {
 /* useful prefixed CSS properties
  * example:
  * if (lib.css.animation) {
- *     element.style[lib.css.animationDuration] = "3s";
+ *     element.style[lib.css.animationDuration] = '3s';
  * }
  */
 new function () {
 
     var ns = lib.css, properties = {
             animation: [
-                "Delay", "Direction", "Duration", "FillMode", "IterationCount",
-                "Name", "PlayState", "TimingFunction"
+                'Delay', 'Direction', 'Duration', 'FillMode', 'IterationCount',
+                'Name', 'PlayState', 'TimingFunction'
             ],
-            transition: ["Delay", "Duration", "Property", "TimingFunction"],
-            transform:  ["Origin", "Style"]
+            transition: ['Delay', 'Duration', 'Property', 'TimingFunction'],
+            transform:  ['Origin', 'Style']
         };
 
     Object.keys(properties).forEach(function (composite) {
@@ -120,7 +120,7 @@ Object.assign(lib.css, {
     getTransitionTime: lib.css.transition ? new function () {
 
         function parseFloats(string) {
-            return string.split(",").map(function (string) {
+            return string.split(',').map(function (string) {
                 return Number.parseFloat(string) || 0;
             });
         }

@@ -1,16 +1,16 @@
 
-if (typeof Promise == "function") {
-    Promise.prototype.catch_ = Promise.prototype["catch"];
+if ('function' == typeof Promise) {
+    Promise.prototype.catch_ = Promise.prototype['catch'];
 }
-if (typeof Set == "function") {
-    Set.prototype.delete_ = Set.prototype["delete"];
+if ('function' == typeof Set) {
+    Set.prototype.delete_ = Set.prototype['delete'];
 }
-if (typeof Map == "function") {
-    Map.prototype.delete_ = Map.prototype["delete"];
+if ('function' == typeof Map) {
+    Map.prototype.delete_ = Map.prototype['delete'];
 }
-if (typeof WeakSet == "function") {
-    WeakSet.prototype.delete_ = WeakSet.prototype["delete"];
+if ('function' == typeof WeakSet) {
+    WeakSet.prototype.delete_ = WeakSet.prototype['delete'];
 }
-if (typeof WeakMap == "function") {
-    WeakMap.prototype.delete_ = WeakMap.prototype["delete"];
+if ('function' == typeof WeakMap) {
+    WeakMap.prototype.delete_ = WeakMap.prototype['delete'];
 }

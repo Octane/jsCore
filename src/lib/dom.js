@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
 lib.dom = {
 
     ready: function () {
-        if ("complete" == document.readyState) {
+        if ('complete' == document.readyState) {
             return Promise.resolve();
         }
-        return lib.event.when(document, "DOMContentLoaded");
+        return lib.event.when(document, 'DOMContentLoaded');
     }
 
 };
@@ -43,15 +43,15 @@ Object.assign(lib.dom, new function () {
     return {
 
         addClass: function () {
-            return apply("add", arguments);
+            return apply('add', arguments);
         },
 
         removeClass: function () {
-            return apply("remove", arguments);
+            return apply('remove', arguments);
         },
 
         toggleClass: function () {
-            return apply("toggle", arguments);
+            return apply('toggle', arguments);
         }
 
     };

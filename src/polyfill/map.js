@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Map = Map || new function () {
 
@@ -39,7 +39,7 @@ var Map = Map || new function () {
             return Boolean(this._getPair(key));
         },
 
-        "delete": function (key) {
+        'delete': function (key) {
             var index = Array.findIndex(this, function (pair) {
                 return Object.is(key, pair[KEY]);
             });

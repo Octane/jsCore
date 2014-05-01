@@ -1,11 +1,11 @@
 
 //IE8 Object.keys polyfill
-({toString: null}).propertyIsEnumerable("toString") || new function () {
+({toString: null}).propertyIsEnumerable('toString') || new function () {
 
     //IE8 DontEnum bug fix
     var hasBug = [
-            "constructor", "toString", "toLocaleString", "valueOf",
-            "hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
+            'constructor', 'toString', 'toLocaleString', 'valueOf',
+            'hasOwnProperty', 'propertyIsEnumerable', 'isPrototypeOf'
         ];
 
     Object.keys = function (object) {
@@ -31,7 +31,7 @@ if (!Object.create) {
     Object.create = function (prototype, properties) {
         if (properties) {
             throw new Error(
-                "Object.create implementation only accepts the 1st parameter"
+                'Object.create implementation only accepts the 1st parameter'
             );
         }
         function NOP() {}

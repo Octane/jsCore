@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 //IE9-11 Object.create bug fix
 //http://webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html

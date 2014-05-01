@@ -2,7 +2,7 @@
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
     //https://github.com/es-shims/es5-shim/issues/152
-    var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
+    var uid = 0, fakeDoc = new ActiveXObject('htmlfile'),
         proto = createObject().constructor.prototype;
 
     function createObject() {
@@ -19,7 +19,7 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
     function getPropertyValue(property) {
         property = property.toLowerCase();
-        if ("float" == property) {
+        if ('float' == property) {
             return this.cssFloat;
         }
         return this[toCamelCase(property)];
@@ -44,12 +44,12 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
     function createOpacityDesc(filters) {
         return {
             get: function () {
-                var alpha = filters["DXImageTransform.Microsoft.Alpha"] ||
+                var alpha = filters['DXImageTransform.Microsoft.Alpha'] ||
                             filters.alpha;
                 if (alpha) {
                     return String(alpha.opacity / 100);
                 }
-                return "1";
+                return '1';
             }
         };
     }
@@ -57,7 +57,7 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
     function getComputedStyle(element, pseudo) {
         if (pseudo) {
             throw new Error(
-                "getComputedStyle implementation only accepts the 1st parameter"
+                'getComputedStyle implementation only accepts the 1st parameter'
             );
         }
         var compStyle = element._compStyle, currStyle;
@@ -73,12 +73,12 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
             });
             Object.defineProperty(
                 compStyle,
-                "cssFloat",
+                'cssFloat',
                 createCSSFloatDesc(currStyle)
             );
             Object.defineProperty(
                 compStyle,
-                "opacity",
+                'opacity',
                 createOpacityDesc(element.filters)
             );
             compStyle.getPropertyValue = getPropertyValue;

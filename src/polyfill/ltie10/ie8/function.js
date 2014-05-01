@@ -4,14 +4,14 @@ Function.bind || (Function.prototype.bind = new function () {
     function newApply(Constructor, args) {
         var i = 0, len = args.length, argNames = [];
         while (i < len) {
-            argNames.push("arg" + i);
+            argNames.push('arg' + i);
             i++;
         }
-        argNames = argNames.join(",");
+        argNames = argNames.join(',');
         return Function(
-            "Constructor",
+            'Constructor',
             argNames,
-            "return new Constructor(" + argNames + ")"
+            'return new Constructor(' + argNames + ')'
         ).apply(window, [Constructor].concat(args));
     }
 
@@ -59,9 +59,9 @@ Function.bind || (Function.prototype.bind = new function () {
             }
             return targetFunc.apply(boundThis, args);
         }
-        if ("function" != typeof targetFunc) {
+        if ('function' != typeof targetFunc) {
             throw new TypeError(
-                "Function.prototype.bind called on non-function"
+                'Function.prototype.bind called on non-function'
             );
         }
         boundFunc._protoMagic = false;

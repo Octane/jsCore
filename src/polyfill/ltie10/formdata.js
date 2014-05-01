@@ -8,9 +8,9 @@ var FormData = FormData || function () {
      * (new FormData).append(name, fileValue[, fileName])
      *
      *    fileValue = {
-     *        name: "readme.txt",
-     *        type: "text/plain",
-     *        content: "…"
+     *        name: 'readme.txt',
+     *        type: 'text/plain',
+     *        content: '…'
      *    }
      */
 
@@ -25,7 +25,7 @@ var FormData = FormData || function () {
                 return generateKey();
             }
             return function () {
-                return "-------------------------" + generateKey();
+                return '-------------------------' + generateKey();
             };
         },
 
@@ -41,23 +41,23 @@ var FormData = FormData || function () {
                 if (field.disabled) {
                     return false;
                 }
-                if ("fieldset" == tag) {
+                if ('fieldset' == tag) {
                     return false;
                 }
-                if ("select" == tag && field.multiple) {
+                if ('select' == tag && field.multiple) {
                     return Array.some(field.options, isSelected);
                 }
-                if ("submit" == type || "reset" == type ||
-                    "button" == type || "file" == type) {
+                if ('submit' == type || 'reset' == type ||
+                    'button' == type || 'file'  == type) {
                     return false;
                 }
-                if (("radio" == type || "checkbox" == type) && field.checked) {
+                if (('radio' == type || 'checkbox' == type) && field.checked) {
                     return false;
                 }
                 return true;
             }
             function getValues(field) {
-                if ("select" == field.tagName.toLowerCase() && field.multiple) {
+                if ('select' == field.tagName.toLowerCase() && field.multiple) {
                     return Array.reduce(
                         field.options,
                         function (values, option) {
@@ -109,23 +109,23 @@ var FormData = FormData || function () {
         toString: function () {
             //source by François de Metz
             //https://github.com/francois2metz/html5-formdata
-            var boundary = this.boundary, body = "";
+            var boundary = this.boundary, body = '';
             Array.forEach(this, function (field) {
                 var name = field.name, value = field.value,
                     filename = field.fileName || value.name;
-                body += "--" + boundary + "\r\n";
+                body += '--' + boundary + '\r\n';
                 if (Object(value) === value) {
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"; filename="' + filename + '"\r\n';
-                    body += "Content-Type: " + value.type + "\r\n\r\n";
-                    body += value.content + "\r\n";
+                    body += 'Content-Type: ' + value.type + '\r\n\r\n';
+                    body += value.content + '\r\n';
                 } else {
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"\r\n\r\n';
-                    body += value + "\r\n";
+                    body += value + '\r\n';
                 }
             });
-            body += "--" + boundary + "--";
+            body += '--' + boundary + '--';
             return body;
         }
 
@@ -136,8 +136,8 @@ var FormData = FormData || function () {
         return function (data) {
             if (data instanceof FormData) {
                 this.setRequestHeader(
-                    "Content-Type",
-                    "multipart/form-data; boundary=" + data.boundary
+                    'Content-Type',
+                    'multipart/form-data; boundary=' + data.boundary
                 );
                 data = data.toString();
             }

@@ -33,7 +33,7 @@ window.addEventListener || new function () {
     function addEventListener(eventType, callback, useCapture) {
         var element = this, events, event;
         if (useCapture) {
-            throw new Error("Capturing phase is not supported");
+            throw new Error('Capturing phase is not supported');
         }
         if (!element._events) {
             element._events = {};
@@ -46,7 +46,7 @@ window.addEventListener || new function () {
             };
             event.listener = createEventListener(event.callbacks, element);
             events[eventType] = event;
-            this.attachEvent("on" + eventType, event.listener);
+            this.attachEvent('on' + eventType, event.listener);
         }
         if (-1 == event.callbacks.indexOf(callback)) {
             event.callbacks.push(callback);
@@ -56,7 +56,7 @@ window.addEventListener || new function () {
     function removeEventListener(eventType, callback, useCapture) {
         var element = this, events, event, index, callbacks;
         if (useCapture) {
-            throw new Error("Capturing phase is not supported");
+            throw new Error('Capturing phase is not supported');
         }
         if (!element._events) {
             return;
@@ -73,7 +73,7 @@ window.addEventListener || new function () {
         }
         callbacks.splice(index, 1);
         if (!callbacks.length) {
-            element.detachEvent("on" + eventType, event.listener);
+            element.detachEvent('on' + eventType, event.listener);
             delete events[eventType];
         }
     }
@@ -87,7 +87,7 @@ window.addEventListener || new function () {
                 events[event.type].listener(event);
             }
         } else {
-            this.fireEvent("on" + event.type, event);
+            this.fireEvent('on' + event.type, event);
         }
         return !event.defaultPrevented;
     }
@@ -139,7 +139,7 @@ window.addEventListener || new function () {
 
     Object.assign(CustomEvent.prototype, {
 
-        type: "",
+        type: '',
         timeStamp: 0,
         detail: null,
         target: null,
@@ -168,13 +168,13 @@ window.addEventListener || new function () {
 
     });
 
-    Object.defineProperty(Event.prototype, "target", {
+    Object.defineProperty(Event.prototype, 'target', {
         get: function () {
             return this.srcElement;
         }
     });
 
-    Object.defineProperty(Event.prototype, "relatedTarget", {
+    Object.defineProperty(Event.prototype, 'relatedTarget', {
         get: function () {
             if (this.fromElement === this.srcElement) {
                 return this.toElement;
@@ -194,13 +194,13 @@ window.addEventListener || new function () {
 
     HTMLDocument.prototype.createEvent = function (group) {
         var event;
-        if (group.startsWith("CustomEvent")) {
+        if (group.startsWith('CustomEvent')) {
             event = new CustomEvent;
         } else {
             event = this.createEventObject();
-            if (group.startsWith("UIEvent")) {
+            if (group.startsWith('UIEvent')) {
                 event.initUIEvent = initUIEvent;
-            } else if (group.startsWith("MouseEvent")) {
+            } else if (group.startsWith('MouseEvent')) {
                 event.initUIEvent = initUIEvent;
                 event.initMouseEvent = initMouseEvent;
             }
@@ -211,7 +211,7 @@ window.addEventListener || new function () {
 
 };
 
-"onload" in new XMLHttpRequest || new function () {
+'onload' in new XMLHttpRequest || new function () {
 
     var proto = XMLHttpRequest.prototype,
         abort = proto.abort,
@@ -231,10 +231,10 @@ window.addEventListener || new function () {
         },
 
         _fireEvent: function (eventType) {
-            var event = document.createEvent("CustomEvent");
+            var event = document.createEvent('CustomEvent');
             event.initEvent(eventType, false, false);
             this.dispatchEvent(event);
-            eventType = "on" + eventType;
+            eventType = 'on' + eventType;
             if (this[eventType]) {
                 window.setImmediate(function () {
                     event.target[eventType](event);
@@ -245,7 +245,7 @@ window.addEventListener || new function () {
         _onReadyStateChange: function () {
             if (this.readyState == this.DONE) {
                 this._unbind();
-                this._fireEvent("load");
+                this._fireEvent('load');
             }
         },
 
@@ -255,7 +255,7 @@ window.addEventListener || new function () {
             }
             catch (error) {
                 this._unbind();
-                this._fireEvent("error");
+                this._fireEvent('error');
             }
         },
 
@@ -266,35 +266,35 @@ window.addEventListener || new function () {
             }
             catch (error) {
                 this._unbind();
-                this._fireEvent("error");
+                this._fireEvent('error');
             }
         },
 
         abort: function () {
             abort.call(this);
-            this._fireEvent("abort");
+            this._fireEvent('abort');
         }
 
     });
 
 };
 
-"onload" in document.createElement("script") ||
-Object.defineProperty(HTMLScriptElement.prototype, "onload", {
+'onload' in document.createElement('script') ||
+Object.defineProperty(HTMLScriptElement.prototype, 'onload', {
 
     //Warning: don't use onreadystatechange with onload and onerror!
 
     set: function (callback) {
-        if ("function" == typeof callback) {
+        if ('function' == typeof callback) {
             this.onreadystatechange = function (event) {
-                if ("loaded" == this.readyState) {
+                if ('loaded' == this.readyState) {
                     this.onreadystatechange = null;
-                    event = document.createEvent("CustomEvent");
+                    event = document.createEvent('CustomEvent');
                     if (this.text) {
-                        event.initEvent("load", false, false);
+                        event.initEvent('load', false, false);
                         callback.call(this, event);
                     } else if (this.onerror) {
-                        event.initEvent("error", false, false);
+                        event.initEvent('error', false, false);
                         this.onerror(event);
                     }
                     this.onerror = null;

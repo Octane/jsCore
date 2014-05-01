@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 lib.event = {
 
-    //example: element.addEventListener("click", lib.event.preventDefault)
+    //example: element.addEventListener('click', lib.event.preventDefault)
     preventDefault: function (event) {
         event.preventDefault();
     },
@@ -47,7 +47,7 @@ lib.event = {
             selector = null;
         }
         if (selector) {
-            selector += "," + selector + " *";
+            selector += ',' + selector + ' *';
             listener = function (event) {
                 var target = event.target;
                 if (target.matches && target.matches(selector)) {
@@ -61,7 +61,7 @@ lib.event = {
         } else {
             listener = callback;
         }
-        if ("string" == typeof eventTypes) {
+        if ('string' == typeof eventTypes) {
             eventTypes = eventTypes.split(/[\s,]+/);
         }
         eventTypes.forEach(function (eventType) {
@@ -94,34 +94,34 @@ Object.assign(lib.event, new function () {
     return {
 
         animationEnd: {
-            animation: "animationend",
-            OAnimation: "oanimationend",
-            msAnimation: "MSAnimationEnd",
-            MozAnimation: "mozAnimationEnd",
-            WebkitAnimation: "webkitAnimationEnd"
+            animation: 'animationend',
+            OAnimation: 'oanimationend',
+            msAnimation: 'MSAnimationEnd',
+            MozAnimation: 'mozAnimationEnd',
+            WebkitAnimation: 'webkitAnimationEnd'
         }[animation],
 
         animationStart: {
-            animation: "animationstart",
-            OAnimation: "oanimationstart",
-            msAnimation: "MSAnimationStart",
-            MozAnimation: "mozAnimationStart",
-            WebkitAnimation: "webkitAnimationStart"
+            animation: 'animationstart',
+            OAnimation: 'oanimationstart',
+            msAnimation: 'MSAnimationStart',
+            MozAnimation: 'mozAnimationStart',
+            WebkitAnimation: 'webkitAnimationStart'
         }[animation],
 
         animationIteration: {
-            animation: "animationiteration",
-            OAnimation: "oanimationiteration",
-            msAnimation: "MSAnimationIteration",
-            MozAnimation: "mozAnimationIteration",
-            WebkitAnimation: "webkitAnimationIteration"
+            animation: 'animationiteration',
+            OAnimation: 'oanimationiteration',
+            msAnimation: 'MSAnimationIteration',
+            MozAnimation: 'mozAnimationIteration',
+            WebkitAnimation: 'webkitAnimationIteration'
         }[animation],
 
         transitionEnd: {
-            transition: "transitionend",
-            OTransition: "otransitionend",
-            MozTransition: "mozTransitionEnd",
-            WebkitTransition: "webkitTransitionEnd"
+            transition: 'transitionend',
+            OTransition: 'otransitionend',
+            MozTransition: 'mozTransitionEnd',
+            WebkitTransition: 'webkitTransitionEnd'
         }[lib.css.transition]
 
     };

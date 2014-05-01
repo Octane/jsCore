@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* jsCore JavaScript library v0.4.2
  * © 2014 Dmitry Korobkin
@@ -7,8 +7,8 @@
  */
 var HTMLElement = HTMLElement || Element;
 
-"textContent" in document.documentElement ||
-Object.defineProperty(HTMLElement.prototype, "textContent", {
+'textContent' in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, 'textContent', {
     get: function () {
         return this.innerText;
     },
@@ -27,19 +27,19 @@ Object.defineProperty(Text.prototype, "textContent", {
     }
 });
 
-"head" in document || Object.defineProperty(document, "head", {
+'head' in document || Object.defineProperty(document, 'head', {
     get: function () {
-        return this.query("head");
+        return this.query('head');
     }
 });
 
 //IE8 Object.keys polyfill
-({toString: null}).propertyIsEnumerable("toString") || new function () {
+({toString: null}).propertyIsEnumerable('toString') || new function () {
 
     //IE8 DontEnum bug fix
     var hasBug = [
-            "constructor", "toString", "toLocaleString", "valueOf",
-            "hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
+            'constructor', 'toString', 'toLocaleString', 'valueOf',
+            'hasOwnProperty', 'propertyIsEnumerable', 'isPrototypeOf'
         ];
 
     Object.keys = function (object) {
@@ -65,7 +65,7 @@ if (!Object.create) {
     Object.create = function (prototype, properties) {
         if (properties) {
             throw new Error(
-                "Object.create implementation only accepts the 1st parameter"
+                'Object.create implementation only accepts the 1st parameter'
             );
         }
         function NOP() {}
@@ -76,7 +76,7 @@ if (!Object.create) {
 
 if (!Array.isArray) {
     Array.isArray = function (anything) {
-        return "[object Array]" == Object.prototype.toString.call(anything);
+        return '[object Array]' == Object.prototype.toString.call(anything);
     };
 }
 
@@ -175,7 +175,7 @@ if (!Array.prototype.reduce) {
         if (arguments.length < 2) {
             if (!length) {
                 throw new TypeError(
-                    "Reduce of empty array with no initial value"
+                    'Reduce of empty array with no initial value'
                 );
             }
             while (i < length) {
@@ -205,7 +205,7 @@ if (!Array.prototype.reduceRight) {
         if (arguments.length < 2) {
             if (!this.length) {
                 throw new TypeError(
-                    "Reduce of empty array with no initial value"
+                    'Reduce of empty array with no initial value'
                 );
             }
             while (i--) {
@@ -231,14 +231,14 @@ Function.bind || (Function.prototype.bind = new function () {
     function newApply(Constructor, args) {
         var i = 0, len = args.length, argNames = [];
         while (i < len) {
-            argNames.push("arg" + i);
+            argNames.push('arg' + i);
             i++;
         }
-        argNames = argNames.join(",");
+        argNames = argNames.join(',');
         return Function(
-            "Constructor",
+            'Constructor',
             argNames,
-            "return new Constructor(" + argNames + ")"
+            'return new Constructor(' + argNames + ')'
         ).apply(window, [Constructor].concat(args));
     }
 
@@ -286,9 +286,9 @@ Function.bind || (Function.prototype.bind = new function () {
             }
             return targetFunc.apply(boundThis, args);
         }
-        if ("function" != typeof targetFunc) {
+        if ('function' != typeof targetFunc) {
             throw new TypeError(
-                "Function.prototype.bind called on non-function"
+                'Function.prototype.bind called on non-function'
             );
         }
         boundFunc._protoMagic = false;
@@ -303,14 +303,14 @@ if (!String.prototype.trim) {
          //http://perfectionkills.com/chr-deviations/
         //http://blog.stevenlevithan.com/archives/faster-trim-javascript/
         var whitespace, left, right;
-        whitespace = "\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000";
-        whitespace += "\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008";
-        whitespace += "\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF";
-        whitespace = "[" + whitespace + "]";
-        left = new RegExp("^" + whitespace + whitespace + "*");
-        right = new RegExp(whitespace + whitespace + "*$");
+        whitespace = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000';
+        whitespace += '\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008';
+        whitespace += '\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+        whitespace = '[' + whitespace + ']';
+        left = new RegExp('^' + whitespace + whitespace + '*');
+        right = new RegExp(whitespace + whitespace + '*$');
         return function () {
-            return this.replace(left, "").replace(right, "");
+            return this.replace(left, '').replace(right, '');
         };
     };
 }
@@ -483,13 +483,13 @@ if (!Number.MAX_SAFE_INTEGER) {
 
 if (!Number.isFinite) {
     Number.isFinite = function (value) {
-        return "number" == typeof value && isFinite(value);
+        return 'number' == typeof value && isFinite(value);
     };
 }
 
 if (!Number.isInteger) {
     Number.isInteger = function (value) {
-        return "number" == typeof value && isFinite(value) &&
+        return 'number' == typeof value && isFinite(value) &&
                value > -9007199254740992 && value < 9007199254740992 &&
                Math.floor(value) == value;
     };
@@ -497,7 +497,7 @@ if (!Number.isInteger) {
 
 if (!Number.isNaN) {
     Number.isNaN = function (value) {
-        return "number" == typeof value && isNaN(value);
+        return 'number' == typeof value && isNaN(value);
     };
 }
 
@@ -568,18 +568,18 @@ new function () {
     }
 
     implement(Array, createGenerics(Array.prototype, [
-        "concat", "every", "fill", "filter", "find",
-        "findIndex", "forEach", "indexOf", "join",
-        "lastIndexOf", "map", "pop", "push", "reduce",
-        "reduceRight", "reverse", "shift", "slice",
-        "some", "sort", "splice", "unshift"
+        'concat', 'every', 'fill', 'filter', 'find',
+        'findIndex', 'forEach', 'indexOf', 'join',
+        'lastIndexOf', 'map', 'pop', 'push', 'reduce',
+        'reduceRight', 'reverse', 'shift', 'slice',
+        'some', 'sort', 'splice', 'unshift'
     ]));
 
     implement(String, createGenerics(String.prototype, [
-        "charAt", "charCodeAt", "concat", "contains","endsWith",
-        "indexOf", "lastIndexOf", "match", "repeat", "replace",
-        "search", "slice", "split", "startsWith", "substr",
-        "substring", "toLowerCase", "toUpperCase", "trim"
+        'charAt', 'charCodeAt', 'concat', 'contains','endsWith',
+        'indexOf', 'lastIndexOf', 'match', 'repeat', 'replace',
+        'search', 'slice', 'split', 'startsWith', 'substr',
+        'substring', 'toLowerCase', 'toUpperCase', 'trim'
     ]));
 
 };
@@ -611,7 +611,7 @@ var Set = Set || new function () {
             });
         },
 
-        "delete": function (value) {
+        'delete': function (value) {
             var index = Array.findIndex(this, function (val) {
                 return Object.is(value, val);
             });
@@ -676,7 +676,7 @@ var Map = Map || new function () {
             return Boolean(this._getPair(key));
         },
 
-        "delete": function (key) {
+        'delete': function (key) {
             var index = Array.findIndex(this, function (pair) {
                 return Object.is(key, pair[KEY]);
             });
@@ -719,7 +719,7 @@ var WeakSet = WeakSet || new function () {
 
     function validValue(value) {
         if (Object(value) !== value) {
-            throw TypeError("Invalid value used in weak set");
+            throw TypeError('Invalid value used in weak set');
         }
         return value;
     }
@@ -736,7 +736,7 @@ var WeakSet = WeakSet || new function () {
             return -1 != Array.findIndex(this, equalValue, validValue(value));
         },
 
-        "delete": function (value) {
+        'delete': function (value) {
             var index = Array.findIndex(this, equalValue, validValue(value));
             if (-1 == index) {
                 return false;
@@ -780,7 +780,7 @@ var WeakMap = WeakMap || new function () {
 
     function validKey(key) {
         if (Object(key) !== key) {
-            throw TypeError("Invalid value used as weak map key");
+            throw TypeError('Invalid value used as weak map key');
         }
         return key;
     }
@@ -808,7 +808,7 @@ var WeakMap = WeakMap || new function () {
             return Boolean(this._getPair(key));
         },
 
-        "delete": function (key) {
+        'delete': function (key) {
             var index = Array.findIndex(this, equalKey, validKey(key));
             if (-1 == index) {
                 return false;
@@ -837,7 +837,7 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 } : new function () {
 
     var id = 0, storage = {}, firstCall = true,
-        message = "setImmediatePolyfillMessage";
+        message = 'setImmediatePolyfillMessage';
 
     function fastApply(args) {
         var func = args[0];
@@ -855,7 +855,7 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     function callback(event) {
         var key, data;
         key = event.data;
-        if ("string" == typeof key && key.startsWith(message)) {
+        if ('string' == typeof key && key.startsWith(message)) {
             data = storage[key];
             if (data) {
                 fastApply(data);
@@ -871,9 +871,9 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
             storage[key] = arguments;
             if (firstCall) {
                 firstCall = false;
-                window.addEventListener("message", callback);
+                window.addEventListener('message', callback);
             }
-            window.postMessage(key, "*");
+            window.postMessage(key, '*');
             return id;
         },
 
@@ -1090,7 +1090,7 @@ var Promise = Promise || new function () {
 
         },
 
-        "catch": function (onRejected) {
+        'catch': function (onRejected) {
             return this.then(undefined, onRejected);
         }
 
@@ -1137,8 +1137,8 @@ window.requestAnimationFrame || Object.assign(window, {
 
 function StaticDOMStringMap() {}
 
-"dataset" in document.documentElement ||
-Object.defineProperty(HTMLElement.prototype, "dataset", {
+'dataset' in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, 'dataset', {
 
     //simple implementation: the new property will not create an attribute
 
@@ -1166,7 +1166,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
         function fillDataset(dataset, attrs) {
             Array.forEach(attrs, function (attr) {
                 var attrName = attr.name.toLowerCase();
-                if (attrName.startsWith("data-")) {
+                if (attrName.startsWith('data-')) {
                     Object.defineProperty(
                         dataset,
                         attrToPropName(attrName),
@@ -1186,7 +1186,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
 });
 
 //Element traversal polyfill
-"children" in document.createDocumentFragment() || new function () {
+'children' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1, proto, api = {
 
@@ -1270,15 +1270,15 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
     ].forEach(function (Constructor) {
         proto = Constructor.prototype;
         [
-            "firstElementChild", "lastElementChild",
-            "childElementCount", "children"
+            'firstElementChild', 'lastElementChild',
+            'childElementCount', 'children'
         ].forEach(defineGetter);
     });
 
 };
 
 //DOM4 http://www.w3.org/TR/dom/#element
-"append" in document.createDocumentFragment() || new function () {
+'append' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1, api, proto = HTMLElement.prototype;
 
@@ -1290,7 +1290,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
         var length = nodes.length, i, node, fragment;
         if (1 == length) {
             node = nodes[0];
-            if ("string" == typeof node) {
+            if ('string' == typeof node) {
                 return document.createTextNode(node);
             }
             return node;
@@ -1300,7 +1300,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
         i = 0;
         while (i < length) {
             node = nodes[i];
-            if ("string" == typeof node) {
+            if ('string' == typeof node) {
                 node = document.createTextNode(node);
             }
             fragment.appendChild(node);
@@ -1399,15 +1399,15 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
     Object.keys(api).forEach(implement);
 
     proto = document.constructor.prototype;
-    ["query", "queryAll"].forEach(implement);
+    ['query', 'queryAll'].forEach(implement);
 
     proto = document.createDocumentFragment().constructor.prototype;
-    ["append", "prepend", "query", "queryAll", "matches"].forEach(implement);
+    ['append', 'prepend', 'query', 'queryAll', 'matches'].forEach(implement);
 
 };
 
-"classList" in document.documentElement ||
-Object.defineProperty(HTMLElement.prototype, "classList", {
+'classList' in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, 'classList', {
 
     get: new function () {
 
@@ -1483,7 +1483,7 @@ Object.defineProperty(HTMLElement.prototype, "classList", {
             },
 
             toString: function () {
-                return Array.join(this, " ");
+                return Array.join(this, ' ');
             }
 
         });
@@ -1508,8 +1508,8 @@ Object.defineProperty(HTMLElement.prototype, "classList", {
                 );
             }
             /*live update DOMTokenList
-            element.addEventListener("DOMAttrModified", function (event) {
-                if ("class" == event.attrName.toLowerCase()) {
+            element.addEventListener('DOMAttrModified', function (event) {
+                if ('class' == event.attrName.toLowerCase()) {
                     element._classList._update();
                 }
             }, false);*/
@@ -1530,9 +1530,9 @@ var FormData = FormData || function () {
      * (new FormData).append(name, fileValue[, fileName])
      *
      *    fileValue = {
-     *        name: "readme.txt",
-     *        type: "text/plain",
-     *        content: "…"
+     *        name: 'readme.txt',
+     *        type: 'text/plain',
+     *        content: '…'
      *    }
      */
 
@@ -1547,7 +1547,7 @@ var FormData = FormData || function () {
                 return generateKey();
             }
             return function () {
-                return "-------------------------" + generateKey();
+                return '-------------------------' + generateKey();
             };
         },
 
@@ -1563,23 +1563,23 @@ var FormData = FormData || function () {
                 if (field.disabled) {
                     return false;
                 }
-                if ("fieldset" == tag) {
+                if ('fieldset' == tag) {
                     return false;
                 }
-                if ("select" == tag && field.multiple) {
+                if ('select' == tag && field.multiple) {
                     return Array.some(field.options, isSelected);
                 }
-                if ("submit" == type || "reset" == type ||
-                    "button" == type || "file" == type) {
+                if ('submit' == type || 'reset' == type ||
+                    'button' == type || 'file'  == type) {
                     return false;
                 }
-                if (("radio" == type || "checkbox" == type) && field.checked) {
+                if (('radio' == type || 'checkbox' == type) && field.checked) {
                     return false;
                 }
                 return true;
             }
             function getValues(field) {
-                if ("select" == field.tagName.toLowerCase() && field.multiple) {
+                if ('select' == field.tagName.toLowerCase() && field.multiple) {
                     return Array.reduce(
                         field.options,
                         function (values, option) {
@@ -1631,23 +1631,23 @@ var FormData = FormData || function () {
         toString: function () {
             //source by François de Metz
             //https://github.com/francois2metz/html5-formdata
-            var boundary = this.boundary, body = "";
+            var boundary = this.boundary, body = '';
             Array.forEach(this, function (field) {
                 var name = field.name, value = field.value,
                     filename = field.fileName || value.name;
-                body += "--" + boundary + "\r\n";
+                body += '--' + boundary + '\r\n';
                 if (Object(value) === value) {
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"; filename="' + filename + '"\r\n';
-                    body += "Content-Type: " + value.type + "\r\n\r\n";
-                    body += value.content + "\r\n";
+                    body += 'Content-Type: ' + value.type + '\r\n\r\n';
+                    body += value.content + '\r\n';
                 } else {
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"\r\n\r\n';
-                    body += value + "\r\n";
+                    body += value + '\r\n';
                 }
             });
-            body += "--" + boundary + "--";
+            body += '--' + boundary + '--';
             return body;
         }
 
@@ -1658,8 +1658,8 @@ var FormData = FormData || function () {
         return function (data) {
             if (data instanceof FormData) {
                 this.setRequestHeader(
-                    "Content-Type",
-                    "multipart/form-data; boundary=" + data.boundary
+                    'Content-Type',
+                    'multipart/form-data; boundary=' + data.boundary
                 );
                 data = data.toString();
             }
@@ -1715,7 +1715,7 @@ new function () {
 //http://javascript.ru/forum/307534-post71.html
 (function () {
     var iterable = {
-        "0": true,
+        0: true,
         length: 1
     };
     Array.splice(iterable, 0, 1);
@@ -1736,12 +1736,12 @@ new function () {
 
 //IE8 dataset polyfill fix
 try {
-    Object.defineProperty({}, "test", {});
+    Object.defineProperty({}, 'test', {});
 }
 catch (error) {
     window.StaticDOMStringMap = new function () {
         //https://github.com/es-shims/es5-shim/issues/152
-        var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
+        var uid = 0, fakeDoc = new ActiveXObject('htmlfile'),
             proto = createObject().constructor.prototype;
         function createObject() {
             return fakeDoc.getElementsByName(uid++);
@@ -1756,11 +1756,11 @@ catch (error) {
 
 //IE8 children.length fix (exclude COMMENT_NODE)
 (function () {
-    var node = document.createElement("div");
-    node.appendChild(document.createComment("test"));
+    var node = document.createElement('div');
+    node.appendChild(document.createComment('test'));
     return node.children.length; //→ 1 in IE8
-}()) && Object.defineProperty(HTMLElement.prototype, "children", {
-    get: Object.getOwnPropertyDescriptor(HTMLDocument.prototype, "children").get
+}()) && Object.defineProperty(HTMLElement.prototype, 'children', {
+    get: Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'children').get
 });
 
 //IE8 setImmediate polyfill
@@ -1795,7 +1795,7 @@ window instanceof Object || Object.assign(window, new function () {
             }
             storage[id] = true;
             new function () {//avoid closure
-                var script = document.createElement("script");
+                var script = document.createElement('script');
                 script.onreadystatechange = onReadyStateChange;
                 document.appendChild(script);
             }
@@ -1844,7 +1844,7 @@ window.addEventListener || new function () {
     function addEventListener(eventType, callback, useCapture) {
         var element = this, events, event;
         if (useCapture) {
-            throw new Error("Capturing phase is not supported");
+            throw new Error('Capturing phase is not supported');
         }
         if (!element._events) {
             element._events = {};
@@ -1857,7 +1857,7 @@ window.addEventListener || new function () {
             };
             event.listener = createEventListener(event.callbacks, element);
             events[eventType] = event;
-            this.attachEvent("on" + eventType, event.listener);
+            this.attachEvent('on' + eventType, event.listener);
         }
         if (-1 == event.callbacks.indexOf(callback)) {
             event.callbacks.push(callback);
@@ -1867,7 +1867,7 @@ window.addEventListener || new function () {
     function removeEventListener(eventType, callback, useCapture) {
         var element = this, events, event, index, callbacks;
         if (useCapture) {
-            throw new Error("Capturing phase is not supported");
+            throw new Error('Capturing phase is not supported');
         }
         if (!element._events) {
             return;
@@ -1884,7 +1884,7 @@ window.addEventListener || new function () {
         }
         callbacks.splice(index, 1);
         if (!callbacks.length) {
-            element.detachEvent("on" + eventType, event.listener);
+            element.detachEvent('on' + eventType, event.listener);
             delete events[eventType];
         }
     }
@@ -1898,7 +1898,7 @@ window.addEventListener || new function () {
                 events[event.type].listener(event);
             }
         } else {
-            this.fireEvent("on" + event.type, event);
+            this.fireEvent('on' + event.type, event);
         }
         return !event.defaultPrevented;
     }
@@ -1950,7 +1950,7 @@ window.addEventListener || new function () {
 
     Object.assign(CustomEvent.prototype, {
 
-        type: "",
+        type: '',
         timeStamp: 0,
         detail: null,
         target: null,
@@ -1979,13 +1979,13 @@ window.addEventListener || new function () {
 
     });
 
-    Object.defineProperty(Event.prototype, "target", {
+    Object.defineProperty(Event.prototype, 'target', {
         get: function () {
             return this.srcElement;
         }
     });
 
-    Object.defineProperty(Event.prototype, "relatedTarget", {
+    Object.defineProperty(Event.prototype, 'relatedTarget', {
         get: function () {
             if (this.fromElement === this.srcElement) {
                 return this.toElement;
@@ -2005,13 +2005,13 @@ window.addEventListener || new function () {
 
     HTMLDocument.prototype.createEvent = function (group) {
         var event;
-        if (group.startsWith("CustomEvent")) {
+        if (group.startsWith('CustomEvent')) {
             event = new CustomEvent;
         } else {
             event = this.createEventObject();
-            if (group.startsWith("UIEvent")) {
+            if (group.startsWith('UIEvent')) {
                 event.initUIEvent = initUIEvent;
-            } else if (group.startsWith("MouseEvent")) {
+            } else if (group.startsWith('MouseEvent')) {
                 event.initUIEvent = initUIEvent;
                 event.initMouseEvent = initMouseEvent;
             }
@@ -2022,7 +2022,7 @@ window.addEventListener || new function () {
 
 };
 
-"onload" in new XMLHttpRequest || new function () {
+'onload' in new XMLHttpRequest || new function () {
 
     var proto = XMLHttpRequest.prototype,
         abort = proto.abort,
@@ -2042,10 +2042,10 @@ window.addEventListener || new function () {
         },
 
         _fireEvent: function (eventType) {
-            var event = document.createEvent("CustomEvent");
+            var event = document.createEvent('CustomEvent');
             event.initEvent(eventType, false, false);
             this.dispatchEvent(event);
-            eventType = "on" + eventType;
+            eventType = 'on' + eventType;
             if (this[eventType]) {
                 window.setImmediate(function () {
                     event.target[eventType](event);
@@ -2056,7 +2056,7 @@ window.addEventListener || new function () {
         _onReadyStateChange: function () {
             if (this.readyState == this.DONE) {
                 this._unbind();
-                this._fireEvent("load");
+                this._fireEvent('load');
             }
         },
 
@@ -2066,7 +2066,7 @@ window.addEventListener || new function () {
             }
             catch (error) {
                 this._unbind();
-                this._fireEvent("error");
+                this._fireEvent('error');
             }
         },
 
@@ -2077,35 +2077,35 @@ window.addEventListener || new function () {
             }
             catch (error) {
                 this._unbind();
-                this._fireEvent("error");
+                this._fireEvent('error');
             }
         },
 
         abort: function () {
             abort.call(this);
-            this._fireEvent("abort");
+            this._fireEvent('abort');
         }
 
     });
 
 };
 
-"onload" in document.createElement("script") ||
-Object.defineProperty(HTMLScriptElement.prototype, "onload", {
+'onload' in document.createElement('script') ||
+Object.defineProperty(HTMLScriptElement.prototype, 'onload', {
 
     //Warning: don't use onreadystatechange with onload and onerror!
 
     set: function (callback) {
-        if ("function" == typeof callback) {
+        if ('function' == typeof callback) {
             this.onreadystatechange = function (event) {
-                if ("loaded" == this.readyState) {
+                if ('loaded' == this.readyState) {
                     this.onreadystatechange = null;
-                    event = document.createEvent("CustomEvent");
+                    event = document.createEvent('CustomEvent');
                     if (this.text) {
-                        event.initEvent("load", false, false);
+                        event.initEvent('load', false, false);
                         callback.call(this, event);
                     } else if (this.onerror) {
-                        event.initEvent("error", false, false);
+                        event.initEvent('error', false, false);
                         this.onerror(event);
                     }
                     this.onerror = null;
@@ -2121,8 +2121,8 @@ Object.defineProperty(HTMLScriptElement.prototype, "onload", {
 window instanceof Object || new function () {
 
     var proto = CSSStyleDeclaration.prototype,
-        prefix = "progid:DXImageTransform.Microsoft.",
-        alpha = "Alpha(opacity={VALUE}, enabled={ENABLED})",
+        prefix = 'progid:DXImageTransform.Microsoft.',
+        alpha = 'Alpha(opacity={VALUE}, enabled={ENABLED})',
         opacityRegExp = /\bopacity\s*=\s*(\d+)/i,
         alphaRegExp = /alpha\s*\(.*?\)/i;
 
@@ -2135,12 +2135,12 @@ window instanceof Object || new function () {
     }
 
     function fixFontSmoothing(filter, value) {
-        return filter.replace("{ENABLED}", 1 != value);
+        return filter.replace('{ENABLED}', 1 != value);
     }
 
     function createAlphaFilter(value) {
         return fixFontSmoothing(
-            alpha.replace("{VALUE}", Math.trunc(value * 100)),
+            alpha.replace('{VALUE}', Math.trunc(value * 100)),
             value
         );
     }
@@ -2150,10 +2150,10 @@ window instanceof Object || new function () {
     }
 
     function hasAlphaFilter(filter) {
-        return filter.toLowerCase().contains("alpha");
+        return filter.toLowerCase().contains('alpha');
     }
 
-    Object.defineProperty(proto, "cssFloat", {
+    Object.defineProperty(proto, 'cssFloat', {
         get: function () {
             return this.styleFloat;
         },
@@ -2162,9 +2162,9 @@ window instanceof Object || new function () {
         }
     });
 
-    Object.defineProperty(proto, "opacity", {
+    Object.defineProperty(proto, 'opacity', {
         get: function () {
-            var opacity = "", filter = this.filter.trim();
+            var opacity = '', filter = this.filter.trim();
             if (filter) {
                 filter.replace(alphaRegExp, function (alpha) {
                     alpha.replace(opacityRegExp, function (str, value) {
@@ -2185,7 +2185,7 @@ window instanceof Object || new function () {
                 if (hasAlphaFilter(filter)) {
                     this.filter = changeAlphaFilter(filter, value);
                 } else {
-                    this.filter += " " + prefix + createAlphaFilter(value);
+                    this.filter += ' ' + prefix + createAlphaFilter(value);
                 }
             } else {
                 this.filter = prefix + createAlphaFilter(value);
@@ -2197,7 +2197,7 @@ window instanceof Object || new function () {
 
         getPropertyValue: function (property) {
             property = property.toLowerCase();
-            if ("float" == property) {
+            if ('float' == property) {
                 return this.styleFloat;
             }
             return this[toCamelCase(property)];
@@ -2206,20 +2206,20 @@ window instanceof Object || new function () {
         removeProperty: function (property) {
             var value;
             property = property.toLowerCase();
-            if ("float" == property) {
-                property = "styleFloat";
+            if ('float' == property) {
+                property = 'styleFloat';
                 value = this.styleFloat
             } else {
                 property = toCamelCase(property);
                 value = this[property];
             }
-            this[property] = "";
+            this[property] = '';
             return value;
         },
 
         setProperty: function (property, value) {
             property = property.toLowerCase();
-            if ("float" == property) {
+            if ('float' == property) {
                 this.styleFloat = value;
             }
             this[toCamelCase(property)] = value;
@@ -2232,7 +2232,7 @@ window instanceof Object || new function () {
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
     //https://github.com/es-shims/es5-shim/issues/152
-    var uid = 0, fakeDoc = new ActiveXObject("htmlfile"),
+    var uid = 0, fakeDoc = new ActiveXObject('htmlfile'),
         proto = createObject().constructor.prototype;
 
     function createObject() {
@@ -2249,7 +2249,7 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
     function getPropertyValue(property) {
         property = property.toLowerCase();
-        if ("float" == property) {
+        if ('float' == property) {
             return this.cssFloat;
         }
         return this[toCamelCase(property)];
@@ -2274,12 +2274,12 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
     function createOpacityDesc(filters) {
         return {
             get: function () {
-                var alpha = filters["DXImageTransform.Microsoft.Alpha"] ||
+                var alpha = filters['DXImageTransform.Microsoft.Alpha'] ||
                             filters.alpha;
                 if (alpha) {
                     return String(alpha.opacity / 100);
                 }
-                return "1";
+                return '1';
             }
         };
     }
@@ -2287,7 +2287,7 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
     function getComputedStyle(element, pseudo) {
         if (pseudo) {
             throw new Error(
-                "getComputedStyle implementation only accepts the 1st parameter"
+                'getComputedStyle implementation only accepts the 1st parameter'
             );
         }
         var compStyle = element._compStyle, currStyle;
@@ -2303,12 +2303,12 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
             });
             Object.defineProperty(
                 compStyle,
-                "cssFloat",
+                'cssFloat',
                 createCSSFloatDesc(currStyle)
             );
             Object.defineProperty(
                 compStyle,
-                "opacity",
+                'opacity',
                 createOpacityDesc(element.filters)
             );
             compStyle.getPropertyValue = getPropertyValue;
@@ -2325,20 +2325,20 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
 });
 
-if (typeof Promise == "function") {
-    Promise.prototype.catch_ = Promise.prototype["catch"];
+if ('function' == typeof Promise) {
+    Promise.prototype.catch_ = Promise.prototype['catch'];
 }
-if (typeof Set == "function") {
-    Set.prototype.delete_ = Set.prototype["delete"];
+if ('function' == typeof Set) {
+    Set.prototype.delete_ = Set.prototype['delete'];
 }
-if (typeof Map == "function") {
-    Map.prototype.delete_ = Map.prototype["delete"];
+if ('function' == typeof Map) {
+    Map.prototype.delete_ = Map.prototype['delete'];
 }
-if (typeof WeakSet == "function") {
-    WeakSet.prototype.delete_ = WeakSet.prototype["delete"];
+if ('function' == typeof WeakSet) {
+    WeakSet.prototype.delete_ = WeakSet.prototype['delete'];
 }
-if (typeof WeakMap == "function") {
-    WeakMap.prototype.delete_ = WeakMap.prototype["delete"];
+if ('function' == typeof WeakMap) {
+    WeakMap.prototype.delete_ = WeakMap.prototype['delete'];
 }
 
 
@@ -2357,7 +2357,7 @@ Object.assign(lib, {
     },
 
     isHTML: function (string) {
-        return string.startsWith("<") && string.endsWith(">");
+        return string.startsWith('<') && string.endsWith('>');
     },
 
     isObject: function (anything) {
@@ -2499,7 +2499,7 @@ lib.date = {
 lib.html = {
 
     parse: function (string) {
-        var node = document.createElement("div"),
+        var node = document.createElement('div'),
             frag = document.createDocumentFragment();
         node.innerHTML = string;
         while (node.hasChildNodes()) {
@@ -2509,13 +2509,13 @@ lib.html = {
     },
 
     escape: function (string) {
-        var node = document.createElement("div");
+        var node = document.createElement('div');
         node.appendChild(document.createTextNode(string));
         return node.innerHTML;
     },
 
     unescape: function (string) {
-        var node = document.createElement("div");
+        var node = document.createElement('div');
         node.innerHTML = string;
         return node.textContent;
     }
@@ -2523,17 +2523,20 @@ lib.html = {
 };
 
 
-//example: new lib.Template("Hi, {NAME}").match({name: "John"}) → "Hi, John"
+//example: new lib.Template('Hi, {NAME}').match({name: 'John'}) → 'Hi, John'
 lib.Template = new function () {
 
     function Template(template) {
-        this.template = Array.join(template, "");
+        this.template = template;
     }
 
     Template.match = function (template, replacements) {
+        if (Array.isArray(template)) {
+            template = template.join('');
+        }
         return Object.keys(replacements).reduceRight(function (template, key) {
             var value = replacements[key];
-            return template.split("{" + key.toUpperCase() + "}").join(value);
+            return template.split('{' + key.toUpperCase() + '}').join(value);
         }, template);
     };
 
@@ -2584,11 +2587,11 @@ lib.css = {
     prefix: new function () {
 
         var cache = {},
-            prefixes = ["ms", "O", "Webkit", "Moz"],
+            prefixes = ['ms', 'O', 'Webkit', 'Moz'],
             properties = new function () {
                 var style = document.documentElement.style,
                     proto = style.constructor.prototype;
-                return "top" in proto ? proto : style;
+                return 'top' in proto ? proto : style;
             };
 
         return function (property) {
@@ -2629,7 +2632,7 @@ lib.css = {
     getAnimationNames: new function () {
         var separator = /,\s*/;
         function excludeNone(value) {
-            return "none" != value;
+            return 'none' != value;
         }
         return function (style) {
             var names = style[this.animationName];
@@ -2645,18 +2648,18 @@ lib.css = {
 /* useful prefixed CSS properties
  * example:
  * if (lib.css.animation) {
- *     element.style[lib.css.animationDuration] = "3s";
+ *     element.style[lib.css.animationDuration] = '3s';
  * }
  */
 new function () {
 
     var ns = lib.css, properties = {
             animation: [
-                "Delay", "Direction", "Duration", "FillMode", "IterationCount",
-                "Name", "PlayState", "TimingFunction"
+                'Delay', 'Direction', 'Duration', 'FillMode', 'IterationCount',
+                'Name', 'PlayState', 'TimingFunction'
             ],
-            transition: ["Delay", "Duration", "Property", "TimingFunction"],
-            transform:  ["Origin", "Style"]
+            transition: ['Delay', 'Duration', 'Property', 'TimingFunction'],
+            transform:  ['Origin', 'Style']
         };
 
     Object.keys(properties).forEach(function (composite) {
@@ -2699,7 +2702,7 @@ Object.assign(lib.css, {
     getTransitionTime: lib.css.transition ? new function () {
 
         function parseFloats(string) {
-            return string.split(",").map(function (string) {
+            return string.split(',').map(function (string) {
                 return Number.parseFloat(string) || 0;
             });
         }
@@ -2733,7 +2736,7 @@ Object.assign(lib.css, {
 
 lib.event = {
 
-    //example: element.addEventListener("click", lib.event.preventDefault)
+    //example: element.addEventListener('click', lib.event.preventDefault)
     preventDefault: function (event) {
         event.preventDefault();
     },
@@ -2778,7 +2781,7 @@ lib.event = {
             selector = null;
         }
         if (selector) {
-            selector += "," + selector + " *";
+            selector += ',' + selector + ' *';
             listener = function (event) {
                 var target = event.target;
                 if (target.matches && target.matches(selector)) {
@@ -2792,7 +2795,7 @@ lib.event = {
         } else {
             listener = callback;
         }
-        if ("string" == typeof eventTypes) {
+        if ('string' == typeof eventTypes) {
             eventTypes = eventTypes.split(/[\s,]+/);
         }
         eventTypes.forEach(function (eventType) {
@@ -2825,34 +2828,34 @@ Object.assign(lib.event, new function () {
     return {
 
         animationEnd: {
-            animation: "animationend",
-            OAnimation: "oanimationend",
-            msAnimation: "MSAnimationEnd",
-            MozAnimation: "mozAnimationEnd",
-            WebkitAnimation: "webkitAnimationEnd"
+            animation: 'animationend',
+            OAnimation: 'oanimationend',
+            msAnimation: 'MSAnimationEnd',
+            MozAnimation: 'mozAnimationEnd',
+            WebkitAnimation: 'webkitAnimationEnd'
         }[animation],
 
         animationStart: {
-            animation: "animationstart",
-            OAnimation: "oanimationstart",
-            msAnimation: "MSAnimationStart",
-            MozAnimation: "mozAnimationStart",
-            WebkitAnimation: "webkitAnimationStart"
+            animation: 'animationstart',
+            OAnimation: 'oanimationstart',
+            msAnimation: 'MSAnimationStart',
+            MozAnimation: 'mozAnimationStart',
+            WebkitAnimation: 'webkitAnimationStart'
         }[animation],
 
         animationIteration: {
-            animation: "animationiteration",
-            OAnimation: "oanimationiteration",
-            msAnimation: "MSAnimationIteration",
-            MozAnimation: "mozAnimationIteration",
-            WebkitAnimation: "webkitAnimationIteration"
+            animation: 'animationiteration',
+            OAnimation: 'oanimationiteration',
+            msAnimation: 'MSAnimationIteration',
+            MozAnimation: 'mozAnimationIteration',
+            WebkitAnimation: 'webkitAnimationIteration'
         }[animation],
 
         transitionEnd: {
-            transition: "transitionend",
-            OTransition: "otransitionend",
-            MozTransition: "mozTransitionEnd",
-            WebkitTransition: "webkitTransitionEnd"
+            transition: 'transitionend',
+            OTransition: 'otransitionend',
+            MozTransition: 'mozTransitionEnd',
+            WebkitTransition: 'webkitTransitionEnd'
         }[lib.css.transition]
 
     };
@@ -2956,10 +2959,10 @@ Object.assign(lib.event, new function () {
 lib.dom = {
 
     ready: function () {
-        if ("complete" == document.readyState) {
+        if ('complete' == document.readyState) {
             return Promise.resolve();
         }
-        return lib.event.when(document, "DOMContentLoaded");
+        return lib.event.when(document, 'DOMContentLoaded');
     }
 
 };
@@ -2996,15 +2999,15 @@ Object.assign(lib.dom, new function () {
     return {
 
         addClass: function () {
-            return apply("add", arguments);
+            return apply('add', arguments);
         },
 
         removeClass: function () {
-            return apply("remove", arguments);
+            return apply('remove', arguments);
         },
 
         toggleClass: function () {
-            return apply("toggle", arguments);
+            return apply('toggle', arguments);
         }
 
     };
@@ -3027,14 +3030,14 @@ lib.request = new function () {
     };
 
     function toQueryParam(key, value) {
-        return encodeURIComponent(key) + "=" + encodeURIComponent(value);
+        return encodeURIComponent(key) + '=' + encodeURIComponent(value);
     }
 
     function toQueryString(object) {
         return Object.keys(object).reduce(function (result, key) {
             result.push(toQueryParam(key, object[key]));
             return result;
-        }, []).join("&");
+        }, []).join('&');
     }
 
     function unbind(xhr) {
@@ -3058,36 +3061,36 @@ lib.request = new function () {
          *     headers: Object
          * }
         */
-        var method = (params.method || "GET").toUpperCase(),
+        var method = (params.method || 'GET').toUpperCase(),
             url = params.url || window.location.href,
             data = params.data,
-            userName = params.userName || "",
-            password = params.password || "",
+            userName = params.userName || '',
+            password = params.password || '',
             timeout = params.timeout || 0,
             async = false !== params.async,
             caching = false !== params.caching,
             credentials = true === params.credentials,
             mimeType = params.mimeType,
             headers = {
-                "X-Requested-With": "XMLHttpRequest"
+                'X-Requested-With': 'XMLHttpRequest'
             };
 
         if (Object(data) === data) {
             if (data instanceof FormData) {
-                headers["Content-Type"] = "multipart/form-data";
+                headers['Content-Type'] = 'multipart/form-data';
             } else {
                 data = toQueryString(data);
             }
         }
-        if ("POST" == method) {
-            headers["Content-Type"] = headers["Content-Type"] ||
-            "application/x-www-form-urlencoded; charset=UTF-8";
+        if ('POST' == method) {
+            headers['Content-Type'] = headers['Content-Type'] ||
+            'application/x-www-form-urlencoded; charset=UTF-8';
         } else {
             if (!caching) {
-                url += "?no-cache=" + getRndQueryVal();
+                url += '?no-cache=' + getRndQueryVal();
             }
-            if ("string" == typeof data) {
-                url += (caching ? "?" : "&") + data;
+            if ('string' == typeof data) {
+                url += (caching ? '?' : '&') + data;
             }
             data = null;
         }
@@ -3111,7 +3114,7 @@ lib.request = new function () {
             }
             function onTimeout() {
                 unbind(this);
-                reject(new Error("time is out"));
+                reject(new Error('time is out'));
             }
 
             new function () {//avoid closure
@@ -3145,15 +3148,15 @@ lib.request = new function () {
         toQueryString: toQueryString,
 
         get: function (params) {
-            if ("string" == typeof params) {
+            if ('string' == typeof params) {
                 params = {url: params};
             }
-            params.method = "GET";
+            params.method = 'GET';
             return request(params);
         },
 
         post: function (params) {
-            params.method = "POST";
+            params.method = 'POST';
             return request(params);
         },
 
@@ -3175,7 +3178,7 @@ lib.request = new function () {
              * }
             */
             var url, data, caching;
-            if ("string" == typeof params) {
+            if ('string' == typeof params) {
                 params = {url: params};
             }
             url = params.url || window.location.href;
@@ -3185,14 +3188,14 @@ lib.request = new function () {
                 data = toQueryString(data);
             }
             if (!caching) {
-                url += "?no-cache=" + getRndQueryVal();
+                url += '?no-cache=' + getRndQueryVal();
             }
-            if ("string" == typeof data) {
-                url += (caching ? "?" : "&") + data;
+            if ('string' == typeof data) {
+                url += (caching ? '?' : '&') + data;
             }
             return new Promise(function (resolve, reject) {
                 document.head.appendChild(
-                    Object.assign(document.createElement("script"), {
+                    Object.assign(document.createElement('script'), {
                         onload: function () {
                             unbind(this);
                             this.remove();
@@ -3201,7 +3204,7 @@ lib.request = new function () {
                         onerror: function () {
                             unbind(this);
                             this.remove();
-                            reject(new Error("Could not load script"));
+                            reject(new Error('Could not load script'));
                         },
                         async: true,
                         defer: true,

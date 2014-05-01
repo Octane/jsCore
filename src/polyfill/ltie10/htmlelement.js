@@ -1,6 +1,6 @@
 
-"classList" in document.documentElement ||
-Object.defineProperty(HTMLElement.prototype, "classList", {
+'classList' in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, 'classList', {
 
     get: new function () {
 
@@ -76,7 +76,7 @@ Object.defineProperty(HTMLElement.prototype, "classList", {
             },
 
             toString: function () {
-                return Array.join(this, " ");
+                return Array.join(this, ' ');
             }
 
         });
@@ -101,8 +101,8 @@ Object.defineProperty(HTMLElement.prototype, "classList", {
                 );
             }
             /*live update DOMTokenList
-            element.addEventListener("DOMAttrModified", function (event) {
-                if ("class" == event.attrName.toLowerCase()) {
+            element.addEventListener('DOMAttrModified', function (event) {
+                if ('class' == event.attrName.toLowerCase()) {
                     element._classList._update();
                 }
             }, false);*/

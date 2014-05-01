@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {

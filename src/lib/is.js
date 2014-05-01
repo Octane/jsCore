@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 Object.assign(lib, {
 
@@ -12,7 +12,7 @@ Object.assign(lib, {
     },
 
     isHTML: function (string) {
-        return string.startsWith("<") && string.endsWith(">");
+        return string.startsWith('<') && string.endsWith('>');
     },
 
     isObject: function (anything) {

@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 function StaticDOMStringMap() {}
 
-"dataset" in document.documentElement ||
-Object.defineProperty(HTMLElement.prototype, "dataset", {
+'dataset' in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, 'dataset', {
 
     //simple implementation: the new property will not create an attribute
 
@@ -31,7 +31,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
         function fillDataset(dataset, attrs) {
             Array.forEach(attrs, function (attr) {
                 var attrName = attr.name.toLowerCase();
-                if (attrName.startsWith("data-")) {
+                if (attrName.startsWith('data-')) {
                     Object.defineProperty(
                         dataset,
                         attrToPropName(attrName),
@@ -51,7 +51,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
 });
 
 //Element traversal polyfill
-"children" in document.createDocumentFragment() || new function () {
+'children' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1, proto, api = {
 
@@ -135,15 +135,15 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
     ].forEach(function (Constructor) {
         proto = Constructor.prototype;
         [
-            "firstElementChild", "lastElementChild",
-            "childElementCount", "children"
+            'firstElementChild', 'lastElementChild',
+            'childElementCount', 'children'
         ].forEach(defineGetter);
     });
 
 };
 
 //DOM4 http://www.w3.org/TR/dom/#element
-"append" in document.createDocumentFragment() || new function () {
+'append' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1, api, proto = HTMLElement.prototype;
 
@@ -155,7 +155,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
         var length = nodes.length, i, node, fragment;
         if (1 == length) {
             node = nodes[0];
-            if ("string" == typeof node) {
+            if ('string' == typeof node) {
                 return document.createTextNode(node);
             }
             return node;
@@ -165,7 +165,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
         i = 0;
         while (i < length) {
             node = nodes[i];
-            if ("string" == typeof node) {
+            if ('string' == typeof node) {
                 node = document.createTextNode(node);
             }
             fragment.appendChild(node);
@@ -264,9 +264,9 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
     Object.keys(api).forEach(implement);
 
     proto = document.constructor.prototype;
-    ["query", "queryAll"].forEach(implement);
+    ['query', 'queryAll'].forEach(implement);
 
     proto = document.createDocumentFragment().constructor.prototype;
-    ["append", "prepend", "query", "queryAll", "matches"].forEach(implement);
+    ['append', 'prepend', 'query', 'queryAll', 'matches'].forEach(implement);
 
 };

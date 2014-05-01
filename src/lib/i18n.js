@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 lib.I18n = new function () {
 

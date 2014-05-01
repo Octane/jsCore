@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* jsCore JavaScript library v0.4.2
  * © 2014 Dmitry Korobkin

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var WeakSet = WeakSet || new function () {
 
@@ -17,7 +17,7 @@ var WeakSet = WeakSet || new function () {
 
     function validValue(value) {
         if (Object(value) !== value) {
-            throw TypeError("Invalid value used in weak set");
+            throw TypeError('Invalid value used in weak set');
         }
         return value;
     }
@@ -34,7 +34,7 @@ var WeakSet = WeakSet || new function () {
             return -1 != Array.findIndex(this, equalValue, validValue(value));
         },
 
-        "delete": function (value) {
+        'delete': function (value) {
             var index = Array.findIndex(this, equalValue, validValue(value));
             if (-1 == index) {
                 return false;

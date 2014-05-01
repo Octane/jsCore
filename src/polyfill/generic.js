@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 //Array and String generic methods polyfill
 new function () {
@@ -38,18 +38,18 @@ new function () {
     }
 
     implement(Array, createGenerics(Array.prototype, [
-        "concat", "every", "fill", "filter", "find",
-        "findIndex", "forEach", "indexOf", "join",
-        "lastIndexOf", "map", "pop", "push", "reduce",
-        "reduceRight", "reverse", "shift", "slice",
-        "some", "sort", "splice", "unshift"
+        'concat', 'every', 'fill', 'filter', 'find',
+        'findIndex', 'forEach', 'indexOf', 'join',
+        'lastIndexOf', 'map', 'pop', 'push', 'reduce',
+        'reduceRight', 'reverse', 'shift', 'slice',
+        'some', 'sort', 'splice', 'unshift'
     ]));
 
     implement(String, createGenerics(String.prototype, [
-        "charAt", "charCodeAt", "concat", "contains","endsWith",
-        "indexOf", "lastIndexOf", "match", "repeat", "replace",
-        "search", "slice", "split", "startsWith", "substr",
-        "substring", "toLowerCase", "toUpperCase", "trim"
+        'charAt', 'charCodeAt', 'concat', 'contains','endsWith',
+        'indexOf', 'lastIndexOf', 'match', 'repeat', 'replace',
+        'search', 'slice', 'split', 'startsWith', 'substr',
+        'substring', 'toLowerCase', 'toUpperCase', 'trim'
     ]));
 
 };

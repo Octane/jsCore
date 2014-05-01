@@ -1,6 +1,6 @@
 
-"head" in document || Object.defineProperty(document, "head", {
+'head' in document || Object.defineProperty(document, 'head', {
     get: function () {
-        return this.query("head");
+        return this.query('head');
     }
 });
