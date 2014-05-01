@@ -57,9 +57,8 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
     function getComputedStyle(element, pseudo) {
         if (pseudo) {
-            throw new Error(
-                'getComputedStyle implementation only accepts the 1st parameter'
-            );
+            throw new Error('getComputedStyle implementation ' +
+                            'only accepts the 1st parameter');
         }
         var compStyle = element._compStyle,
             currStyle;

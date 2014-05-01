@@ -64,9 +64,8 @@ if (!Object.create) {
     //Warning: Object.create(null) instanceof Object → true
     Object.create = function (prototype, properties) {
         if (properties) {
-            throw new Error(
-                'Object.create implementation only accepts the 1st parameter'
-            );
+            throw new Error('Object.create implementation ' +
+                            'only accepts the 1st parameter');
         }
         function NOP() {}
         NOP.prototype = prototype;
@@ -184,9 +183,8 @@ if (!Array.prototype.reduce) {
             i = 0;
         if (arguments.length < 2) {
             if (!length) {
-                throw new TypeError(
-                    'Reduce of empty array with no initial value'
-                );
+                throw new TypeError('Reduce of empty array ' +
+                                    'with no initial value');
             }
             while (i < length) {
                 if (i in this) {
@@ -215,9 +213,8 @@ if (!Array.prototype.reduceRight) {
             i = this.length;
         if (arguments.length < 2) {
             if (!this.length) {
-                throw new TypeError(
-                    'Reduce of empty array with no initial value'
-                );
+                throw new TypeError('Reduce of empty array ' +
+                                    'with no initial value');
             }
             while (i--) {
                 if (i in this) {
@@ -303,9 +300,8 @@ Function.bind || (Function.prototype.bind = new function () {
             return targetFunc.apply(boundThis, args);
         }
         if ('function' != typeof targetFunc) {
-            throw new TypeError(
-                'Function.prototype.bind called on non-function'
-            );
+            throw new TypeError('Function.prototype.bind ' +
+                                'called on non-function');
         }
         boundFunc._protoMagic = false;
         return boundFunc;
@@ -2054,14 +2050,13 @@ window.addEventListener || new function () {
         }
     });
 
-    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].forEach(
-        function (eventTarget) {
+    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].
+        forEach(function (eventTarget) {
             var proto = eventTarget.prototype;
             proto.dispatchEvent = dispatchEvent;
             proto.addEventListener = addEventListener;
             proto.removeEventListener = removeEventListener;
-        }
-    );
+        });
 
     HTMLDocument.prototype.createEvent = function (group) {
         var event;
@@ -2348,9 +2343,8 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
     function getComputedStyle(element, pseudo) {
         if (pseudo) {
-            throw new Error(
-                'getComputedStyle implementation only accepts the 1st parameter'
-            );
+            throw new Error('getComputedStyle implementation ' +
+                            'only accepts the 1st parameter');
         }
         var compStyle = element._compStyle,
             currStyle;

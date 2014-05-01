@@ -30,9 +30,8 @@ if (!Object.create) {
     //Warning: Object.create(null) instanceof Object → true
     Object.create = function (prototype, properties) {
         if (properties) {
-            throw new Error(
-                'Object.create implementation only accepts the 1st parameter'
-            );
+            throw new Error('Object.create implementation ' +
+                            'only accepts the 1st parameter');
         }
         function NOP() {}
         NOP.prototype = prototype;

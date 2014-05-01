@@ -65,9 +65,8 @@ Function.bind || (Function.prototype.bind = new function () {
             return targetFunc.apply(boundThis, args);
         }
         if ('function' != typeof targetFunc) {
-            throw new TypeError(
-                'Function.prototype.bind called on non-function'
-            );
+            throw new TypeError('Function.prototype.bind ' +
+                                'called on non-function');
         }
         boundFunc._protoMagic = false;
         return boundFunc;

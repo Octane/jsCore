@@ -191,14 +191,13 @@ window.addEventListener || new function () {
         }
     });
 
-    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].forEach(
-        function (eventTarget) {
+    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].
+        forEach(function (eventTarget) {
             var proto = eventTarget.prototype;
             proto.dispatchEvent = dispatchEvent;
             proto.addEventListener = addEventListener;
             proto.removeEventListener = removeEventListener;
-        }
-    );
+        });
 
     HTMLDocument.prototype.createEvent = function (group) {
         var event;
