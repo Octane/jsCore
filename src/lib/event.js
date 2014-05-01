@@ -27,8 +27,7 @@ lib.event = {
             lib.event.off(details);
             if (callback.handleEvent) {
                 callback.handleEvent(event);
-            }
-            else {
+            } else {
                 callback.call(element, event);
             }
         }
@@ -54,14 +53,12 @@ lib.event = {
                 if (target.matches && target.matches(selector)) {
                     if (callback.handleEvent) {
                         callback.handleEvent(event);
-                    }
-                    else {
+                    } else {
                         callback.call(element, event);
                     }
                 }
             };
-        }
-        else {
+        } else {
             listener = callback;
         }
         if ("string" == typeof eventTypes) {

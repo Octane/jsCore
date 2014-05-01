@@ -59,19 +59,16 @@ window instanceof Object || new function () {
             var filter = this.filter.trim();
             if (!value || value > 1) {
                 value = 1;
-            }
-            else if (value < 0) {
+            } else if (value < 0) {
                 value = 0;
             }
             if (filter) {
                 if (hasAlphaFilter(filter)) {
                     this.filter = changeAlphaFilter(filter, value);
-                }
-                else {
+                } else {
                     this.filter += " " + prefix + createAlphaFilter(value);
                 }
-            }
-            else {
+            } else {
                 this.filter = prefix + createAlphaFilter(value);
             }
         }
@@ -93,8 +90,7 @@ window instanceof Object || new function () {
             if ("float" == property) {
                 property = "styleFloat";
                 value = this.styleFloat
-            }
-            else {
+            } else {
                 property = toCamelCase(property);
                 value = this[property];
             }

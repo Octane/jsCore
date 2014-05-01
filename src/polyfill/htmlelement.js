@@ -75,8 +75,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
             var node = this;
             do {
                 node = node.nextSibling;
-            }
-            while (node && ELEMENT_NODE != node.nodeType);
+            } while (node && ELEMENT_NODE != node.nodeType);
             return node;
         },
 
@@ -84,8 +83,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
             var node = this;
             do {
                 node = node.previousSibling;
-            }
-            while (node && ELEMENT_NODE != node.nodeType);
+            } while (node && ELEMENT_NODE != node.nodeType);
             return node;
         },
 
@@ -193,8 +191,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
                 nextSibling = this.nextSibling;
                 if (nextSibling) {
                     parentNode.insertBefore(nodes, nextSibling);
-                }
-                else {
+                } else {
                     parentNode.appendChild(nodes);
                 }
             }

@@ -186,8 +186,7 @@ if (!Array.prototype.reduce) {
                 }
                 i++;
             }
-        }
-        else {
+        } else {
             currentValue = initialValue;
         }
         while (i < length) {
@@ -215,8 +214,7 @@ if (!Array.prototype.reduceRight) {
                     break;
                 }
             }
-        }
-        else {
+        } else {
             currentValue = initialValue;
         }
         while (i--) {
@@ -254,8 +252,7 @@ Function.bind || (Function.prototype.bind = new function () {
                 NOP.prototype = this;
                 NOP.prototype.constructor = targetFunc;
                 return new NOP;
-            }
-            else {
+            } else {
                 args = boundArgs.concat(Array.from(arguments));
                 len = args.length;
             }
@@ -437,8 +434,7 @@ if (!Array.prototype.fill) {
         }
         if (start < 0) {
             i = Math.max(length + start, 0);
-        }
-        else {
+        } else {
             i = Math.min(start, length);
         }
         while (i < length && i < end) {
@@ -540,9 +536,12 @@ new function () {
     function fastApply(method, args) {
         var target = args[0];
         switch (args.length) {
-            case 1: return method.call(target);
-            case 2: return method.call(target, args[1]);
-            case 3: return method.call(target, args[1], args[2]);
+            case 1:
+                return method.call(target);
+            case 2:
+                return method.call(target, args[1]);
+            case 3:
+                return method.call(target, args[1], args[2]);
         }
         return method.apply(target, Array.prototype.slice.call(args, 1));
     }
@@ -664,8 +663,7 @@ var Map = Map || new function () {
             var pair = this._getPair(key);
             if (pair) {
                 pair[VALUE] = value;
-            }
-            else {
+            } else {
                 this.size = Array.push(this, [key, value]);
             }
         },
@@ -797,8 +795,7 @@ var WeakMap = WeakMap || new function () {
             var pair = this._getPair(key);
             if (pair) {
                 pair[VALUE] = value;
-            }
-            else {
+            } else {
                 Array.push(this, [key, value]);
             }
         },
@@ -845,9 +842,12 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     function fastApply(args) {
         var func = args[0];
         switch (args.length) {
-            case 1: return func();
-            case 2: return func(args[1]);
-            case 3: return func(args[1], args[2]);
+            case 1:
+                return func();
+            case 2:
+                return func(args[1]);
+            case 3:
+                return func(args[1], args[2]);
         }
         return func.apply(window, Array.prototype.slice.call(args, 1));
     }
@@ -1029,8 +1029,7 @@ var Promise = Promise || new function () {
                         if (promise._fulfilled) {
                             if (isPromise(promise._value)) {
                                 promise._value.then(fulfillQueue, rejectQueue);
-                            }
-                            else {
+                            } else {
                                 fulfillQueue(promise._value);
                             }
                         }
@@ -1056,8 +1055,7 @@ var Promise = Promise || new function () {
                         if (promise._rejected) {
                             if (isPromise(promise._reason)) {
                                 promise._reason.then(fulfillQueue, rejectQueue);
-                            }
-                            else {
+                            } else {
                                 fulfillQueue(promise._value);
                             }
                         }
@@ -1072,14 +1070,11 @@ var Promise = Promise || new function () {
                 if (promise._pending) {
                     promise._pending = false;
                     promise._resolver(onFulfilledCaller, onRejectedCaller);
-                }
-                else if (promise._fulfilled) {
+                } else if (promise._fulfilled) {
                     onFulfilledCaller(promise._value);
-                }
-                else if (promise._rejected) {
+                } else if (promise._rejected) {
                     onRejectedCaller(promise._reason);
-                }
-                else {
+                } else {
                     promise._enqueue(onFulfilled, onRejected);
                 }
             }
@@ -1215,8 +1210,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
             var node = this;
             do {
                 node = node.nextSibling;
-            }
-            while (node && ELEMENT_NODE != node.nodeType);
+            } while (node && ELEMENT_NODE != node.nodeType);
             return node;
         },
 
@@ -1224,8 +1218,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
             var node = this;
             do {
                 node = node.previousSibling;
-            }
-            while (node && ELEMENT_NODE != node.nodeType);
+            } while (node && ELEMENT_NODE != node.nodeType);
             return node;
         },
 
@@ -1333,8 +1326,7 @@ Object.defineProperty(HTMLElement.prototype, "dataset", {
                 nextSibling = this.nextSibling;
                 if (nextSibling) {
                     parentNode.insertBefore(nodes, nextSibling);
-                }
-                else {
+                } else {
                     parentNode.appendChild(nodes);
                 }
             }
@@ -1649,8 +1641,7 @@ var FormData = FormData || function () {
                     body += name + '"; filename="' + filename + '"\r\n';
                     body += "Content-Type: " + value.type + "\r\n\r\n";
                     body += value.content + "\r\n";
-                }
-                else {
+                } else {
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"\r\n\r\n';
                     body += value + "\r\n";
@@ -1704,8 +1695,7 @@ new function () {
             //NodeList instanceof Object → false in IE8
             if (Object(iterable) instanceof Object) {
                 array = iterable;
-            }
-            else {
+            } else {
                 array = toArray(iterable);
             }
             //[1].slice(0, undefined) → [] in IE8
@@ -1781,9 +1771,12 @@ window instanceof Object || Object.assign(window, new function () {
     function fastApply(args) {
         var func = args[0];
         switch (args.length) {
-            case 1: return func();
-            case 2: return func(args[1]);
-            case 3: return func(args[1], args[2]);
+            case 1:
+                return func();
+            case 2:
+                return func(args[1]);
+            case 3:
+                return func(args[1], args[2]);
         }
         return func.apply(window, Array.prototype.slice.call(args, 1));
     }
@@ -1840,8 +1833,7 @@ window.addEventListener || new function () {
                 callback = list[i];
                 if (callback.handleEvent) {
                     callback.handleEvent(event);
-                }
-                else {
+                } else {
                     callback.call(element, event);
                 }
                 i++;
@@ -1905,8 +1897,7 @@ window.addEventListener || new function () {
             if (events && events[event.type]) {
                 events[event.type].listener(event);
             }
-        }
-        else {
+        } else {
             this.fireEvent("on" + event.type, event);
         }
         return !event.defaultPrevented;
@@ -2016,13 +2007,11 @@ window.addEventListener || new function () {
         var event;
         if (group.startsWith("CustomEvent")) {
             event = new CustomEvent;
-        }
-        else {
+        } else {
             event = this.createEventObject();
             if (group.startsWith("UIEvent")) {
                 event.initUIEvent = initUIEvent;
-            }
-            else if (group.startsWith("MouseEvent")) {
+            } else if (group.startsWith("MouseEvent")) {
                 event.initUIEvent = initUIEvent;
                 event.initMouseEvent = initMouseEvent;
             }
@@ -2115,16 +2104,14 @@ Object.defineProperty(HTMLScriptElement.prototype, "onload", {
                     if (this.text) {
                         event.initEvent("load", false, false);
                         callback.call(this, event);
-                    }
-                    else if (this.onerror) {
+                    } else if (this.onerror) {
                         event.initEvent("error", false, false);
                         this.onerror(event);
                     }
                     this.onerror = null;
                 }
             };
-        }
-        else {
+        } else {
             this.onreadystatechange = null;
         }
     }
@@ -2191,19 +2178,16 @@ window instanceof Object || new function () {
             var filter = this.filter.trim();
             if (!value || value > 1) {
                 value = 1;
-            }
-            else if (value < 0) {
+            } else if (value < 0) {
                 value = 0;
             }
             if (filter) {
                 if (hasAlphaFilter(filter)) {
                     this.filter = changeAlphaFilter(filter, value);
-                }
-                else {
+                } else {
                     this.filter += " " + prefix + createAlphaFilter(value);
                 }
-            }
-            else {
+            } else {
                 this.filter = prefix + createAlphaFilter(value);
             }
         }
@@ -2225,8 +2209,7 @@ window instanceof Object || new function () {
             if ("float" == property) {
                 property = "styleFloat";
                 value = this.styleFloat
-            }
-            else {
+            } else {
                 property = toCamelCase(property);
                 value = this[property];
             }
@@ -2434,8 +2417,7 @@ lib.array = {
                 if (!func.call(boundThis, iterable[i])) {
                     return false;
                 }
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -2776,8 +2758,7 @@ lib.event = {
             lib.event.off(details);
             if (callback.handleEvent) {
                 callback.handleEvent(event);
-            }
-            else {
+            } else {
                 callback.call(element, event);
             }
         }
@@ -2803,14 +2784,12 @@ lib.event = {
                 if (target.matches && target.matches(selector)) {
                     if (callback.handleEvent) {
                         callback.handleEvent(event);
-                    }
-                    else {
+                    } else {
                         callback.call(element, event);
                     }
                 }
             };
-        }
-        else {
+        } else {
             listener = callback;
         }
         if ("string" == typeof eventTypes) {
@@ -3096,16 +3075,14 @@ lib.request = new function () {
         if (Object(data) === data) {
             if (data instanceof FormData) {
                 headers["Content-Type"] = "multipart/form-data";
-            }
-            else {
+            } else {
                 data = toQueryString(data);
             }
         }
         if ("POST" == method) {
             headers["Content-Type"] = headers["Content-Type"] ||
             "application/x-www-form-urlencoded; charset=UTF-8";
-        }
-        else {
+        } else {
             if (!caching) {
                 url += "?no-cache=" + getRndQueryVal();
             }
@@ -3124,8 +3101,7 @@ lib.request = new function () {
                 unbind(this);
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this);
-                }
-                else {
+                } else {
                     reject(new Error(this.statusText));
                 }
             }

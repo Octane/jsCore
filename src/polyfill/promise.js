@@ -143,8 +143,7 @@ var Promise = Promise || new function () {
                         if (promise._fulfilled) {
                             if (isPromise(promise._value)) {
                                 promise._value.then(fulfillQueue, rejectQueue);
-                            }
-                            else {
+                            } else {
                                 fulfillQueue(promise._value);
                             }
                         }
@@ -170,8 +169,7 @@ var Promise = Promise || new function () {
                         if (promise._rejected) {
                             if (isPromise(promise._reason)) {
                                 promise._reason.then(fulfillQueue, rejectQueue);
-                            }
-                            else {
+                            } else {
                                 fulfillQueue(promise._value);
                             }
                         }
@@ -186,14 +184,11 @@ var Promise = Promise || new function () {
                 if (promise._pending) {
                     promise._pending = false;
                     promise._resolver(onFulfilledCaller, onRejectedCaller);
-                }
-                else if (promise._fulfilled) {
+                } else if (promise._fulfilled) {
                     onFulfilledCaller(promise._value);
-                }
-                else if (promise._rejected) {
+                } else if (promise._rejected) {
                     onRejectedCaller(promise._reason);
-                }
-                else {
+                } else {
                     promise._enqueue(onFulfilled, onRejected);
                 }
             }

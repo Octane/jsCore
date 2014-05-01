@@ -22,8 +22,7 @@ window.addEventListener || new function () {
                 callback = list[i];
                 if (callback.handleEvent) {
                     callback.handleEvent(event);
-                }
-                else {
+                } else {
                     callback.call(element, event);
                 }
                 i++;
@@ -87,8 +86,7 @@ window.addEventListener || new function () {
             if (events && events[event.type]) {
                 events[event.type].listener(event);
             }
-        }
-        else {
+        } else {
             this.fireEvent("on" + event.type, event);
         }
         return !event.defaultPrevented;
@@ -198,13 +196,11 @@ window.addEventListener || new function () {
         var event;
         if (group.startsWith("CustomEvent")) {
             event = new CustomEvent;
-        }
-        else {
+        } else {
             event = this.createEventObject();
             if (group.startsWith("UIEvent")) {
                 event.initUIEvent = initUIEvent;
-            }
-            else if (group.startsWith("MouseEvent")) {
+            } else if (group.startsWith("MouseEvent")) {
                 event.initUIEvent = initUIEvent;
                 event.initMouseEvent = initMouseEvent;
             }
@@ -297,16 +293,14 @@ Object.defineProperty(HTMLScriptElement.prototype, "onload", {
                     if (this.text) {
                         event.initEvent("load", false, false);
                         callback.call(this, event);
-                    }
-                    else if (this.onerror) {
+                    } else if (this.onerror) {
                         event.initEvent("error", false, false);
                         this.onerror(event);
                     }
                     this.onerror = null;
                 }
             };
-        }
-        else {
+        } else {
             this.onreadystatechange = null;
         }
     }

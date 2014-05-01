@@ -23,8 +23,7 @@ new function () {
             //NodeList instanceof Object → false in IE8
             if (Object(iterable) instanceof Object) {
                 array = iterable;
-            }
-            else {
+            } else {
                 array = toArray(iterable);
             }
             //[1].slice(0, undefined) → [] in IE8

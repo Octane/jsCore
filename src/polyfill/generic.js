@@ -6,9 +6,12 @@ new function () {
     function fastApply(method, args) {
         var target = args[0];
         switch (args.length) {
-            case 1: return method.call(target);
-            case 2: return method.call(target, args[1]);
-            case 3: return method.call(target, args[1], args[2]);
+            case 1:
+                return method.call(target);
+            case 2:
+                return method.call(target, args[1]);
+            case 3:
+                return method.call(target, args[1], args[2]);
         }
         return method.apply(target, Array.prototype.slice.call(args, 1));
     }

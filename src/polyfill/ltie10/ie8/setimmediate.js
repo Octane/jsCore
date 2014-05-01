@@ -7,9 +7,12 @@ window instanceof Object || Object.assign(window, new function () {
     function fastApply(args) {
         var func = args[0];
         switch (args.length) {
-            case 1: return func();
-            case 2: return func(args[1]);
-            case 3: return func(args[1], args[2]);
+            case 1:
+                return func();
+            case 2:
+                return func(args[1]);
+            case 3:
+                return func(args[1], args[2]);
         }
         return func.apply(window, Array.prototype.slice.call(args, 1));
     }

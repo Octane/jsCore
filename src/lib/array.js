@@ -39,8 +39,7 @@ lib.array = {
                 if (!func.call(boundThis, iterable[i])) {
                     return false;
                 }
-            }
-            else {
+            } else {
                 return false;
             }
         }

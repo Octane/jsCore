@@ -63,16 +63,14 @@ lib.request = new function () {
         if (Object(data) === data) {
             if (data instanceof FormData) {
                 headers["Content-Type"] = "multipart/form-data";
-            }
-            else {
+            } else {
                 data = toQueryString(data);
             }
         }
         if ("POST" == method) {
             headers["Content-Type"] = headers["Content-Type"] ||
             "application/x-www-form-urlencoded; charset=UTF-8";
-        }
-        else {
+        } else {
             if (!caching) {
                 url += "?no-cache=" + getRndQueryVal();
             }
@@ -91,8 +89,7 @@ lib.request = new function () {
                 unbind(this);
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this);
-                }
-                else {
+                } else {
                     reject(new Error(this.statusText));
                 }
             }

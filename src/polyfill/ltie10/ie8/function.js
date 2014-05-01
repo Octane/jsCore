@@ -25,8 +25,7 @@ Function.bind || (Function.prototype.bind = new function () {
                 NOP.prototype = this;
                 NOP.prototype.constructor = targetFunc;
                 return new NOP;
-            }
-            else {
+            } else {
                 args = boundArgs.concat(Array.from(arguments));
                 len = args.length;
             }

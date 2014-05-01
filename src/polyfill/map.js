@@ -26,8 +26,7 @@ var Map = Map || new function () {
             var pair = this._getPair(key);
             if (pair) {
                 pair[VALUE] = value;
-            }
-            else {
+            } else {
                 this.size = Array.push(this, [key, value]);
             }
         },

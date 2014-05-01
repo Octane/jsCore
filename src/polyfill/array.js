@@ -62,8 +62,7 @@ if (!Array.prototype.fill) {
         }
         if (start < 0) {
             i = Math.max(length + start, 0);
-        }
-        else {
+        } else {
             i = Math.min(start, length);
         }
         while (i < length && i < end) {

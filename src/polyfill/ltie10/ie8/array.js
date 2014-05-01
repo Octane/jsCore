@@ -111,8 +111,7 @@ if (!Array.prototype.reduce) {
                 }
                 i++;
             }
-        }
-        else {
+        } else {
             currentValue = initialValue;
         }
         while (i < length) {
@@ -140,8 +139,7 @@ if (!Array.prototype.reduceRight) {
                     break;
                 }
             }
-        }
-        else {
+        } else {
             currentValue = initialValue;
         }
         while (i--) {

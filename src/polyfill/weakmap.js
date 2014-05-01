@@ -39,8 +39,7 @@ var WeakMap = WeakMap || new function () {
             var pair = this._getPair(key);
             if (pair) {
                 pair[VALUE] = value;
-            }
-            else {
+            } else {
                 Array.push(this, [key, value]);
             }
         },

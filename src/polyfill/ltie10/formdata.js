@@ -119,8 +119,7 @@ var FormData = FormData || function () {
                     body += name + '"; filename="' + filename + '"\r\n';
                     body += "Content-Type: " + value.type + "\r\n\r\n";
                     body += value.content + "\r\n";
-                }
-                else {
+                } else {
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"\r\n\r\n';
                     body += value + "\r\n";
