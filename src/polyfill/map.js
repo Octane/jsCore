@@ -2,7 +2,8 @@
 
 var Map = Map || new function () {
 
-    var KEY = 0, VALUE = 1;
+    var KEY = 0,
+        VALUE = 1;
 
     function Map() {
         if (arguments.length) {

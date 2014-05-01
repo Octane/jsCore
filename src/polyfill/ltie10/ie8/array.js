@@ -7,7 +7,8 @@ if (!Array.isArray) {
 
 if (!Array.prototype.forEach) {
     Array.prototype.forEach = function (func, boundThis) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 func.call(boundThis, this[i], i, this);
@@ -19,7 +20,9 @@ if (!Array.prototype.forEach) {
 
 if (!Array.prototype.map) {
     Array.prototype.map = function (func, boundThis) {
-        var i = 0, length = this.length, result = [];
+        var result = [],
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 result[i] = func.call(boundThis, this[i], i, this);
@@ -32,7 +35,8 @@ if (!Array.prototype.map) {
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (anything) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && this[i] === anything) {
                 return i;
@@ -57,7 +61,9 @@ if (!Array.prototype.lastIndexOf) {
 
 if (!Array.prototype.filter) {
     Array.prototype.filter = function (func, boundThis) {
-        var i = 0, length = this.length, result = [];
+        var result = [],
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && func.call(boundThis, this[i], i, this)) {
                 result.push(this[i]);
@@ -70,7 +76,8 @@ if (!Array.prototype.filter) {
 
 if (!Array.prototype.every) {
     Array.prototype.every = function (func, boundThis) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && !func.call(boundThis, this[i], i, this)) {
                 return false;
@@ -83,7 +90,8 @@ if (!Array.prototype.every) {
 
 if (!Array.prototype.some) {
     Array.prototype.some = function (func, boundThis) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && func.call(boundThis, this[i], i, this)) {
                 return true;
@@ -96,7 +104,9 @@ if (!Array.prototype.some) {
 
 if (!Array.prototype.reduce) {
     Array.prototype.reduce = function (func, initialValue) {
-        var i = 0, length = this.length, currentValue;
+        var currentValue,
+            length = this.length,
+            i = 0;
         if (arguments.length < 2) {
             if (!length) {
                 throw new TypeError(
@@ -126,7 +136,8 @@ if (!Array.prototype.reduce) {
 
 if (!Array.prototype.reduceRight) {
     Array.prototype.reduceRight = function (func, initialValue) {
-        var i = this.length, currentValue;
+        var currentValue,
+            i = this.length;
         if (arguments.length < 2) {
             if (!this.length) {
                 throw new TypeError(

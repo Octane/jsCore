@@ -1,4 +1,5 @@
-var fs = require('fs'), strict = "'use strict';",
+var fs = require('fs'),
+    strict = "'use strict';",
     noIE8 = -1 != process.argv.indexOf('--no_ie8');
 
 try {

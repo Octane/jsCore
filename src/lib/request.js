@@ -162,7 +162,10 @@ lib.request = new function () {
              *     caching: Boolean
              * }
             */
-            var url, data, caching;
+            var url,
+                data,
+                caching;
+
             if ('string' == typeof params) {
                 params = {url: params};
             }

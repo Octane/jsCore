@@ -11,7 +11,8 @@
 }()) && new function () {
     var splice = Array.splice;
     Array.splice = function (iterable, start, deleteCount) {
-        var deltedItems = splice.apply(Array, arguments), length;
+        var deltedItems = splice.apply(Array, arguments),
+            length;
         if (!(iterable instanceof Array)) {
             length = iterable.length;
             while (deleteCount--) {

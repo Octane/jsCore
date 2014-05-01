@@ -26,14 +26,14 @@ lib.event.when(document.body, 'click').then(function () {console.log('WHEN');
 
 console.log('WeakMap tests:');
 
-var wm = new WeakMap;
+var wm = new WeakMap,
 
-var objKey1 = {};
-var objKey2 = {};
+    objKey1 = {},
+    objKey2 = {},
 
-var objValue1 = {};
-var objValue2 = {};
-var objValue3 = {};
+    objValue1 = {},
+    objValue2 = {},
+    objValue3 = {};
 
 wm.set(objKey1, objValue1);
 wm.set(objKey2, objValue2);

@@ -16,15 +16,19 @@ lib.array = {
     },
 
     unique: function (iterable) {
-        var anything, array = [], i = 0, j = 0, length = iterable.length;
+        var result = [],
+            anything,
+            length = iterable.length,
+            i = 0,
+            j = 0;
         while (i < length) {
             anything = iterable[i];
-            if (-1 == array.indexOf(anything)) {
-                array[j++] = anything;
+            if (-1 == result.indexOf(anything)) {
+                result[j++] = anything;
             }
             i++;
         }
-        return array;
+        return result;
     },
 
     //Array.every ignores missing indexes and
@@ -56,27 +60,30 @@ lib.array = {
     },
 
     range: function (i, end) {
-        var array = [];
+        var result = [];
         if (!(1 in arguments)) {
             end = i;
             i = 0;
         }
         while (i < end) {
-            array.push(i);
+            result.push(i);
             i++;
         }
-        return array;
+        return result;
     },
 
     shuffle: function (iterable) {
-        var array = Array.from(iterable), i = array.length, j, tmp;
+        var result = Array.from(iterable),
+            i = result.length,
+            j,
+            tmp;
         while (i--) {
             j = Math.floor(Math.random() * (i + 1));
-            tmp = array[j];
-            array[j] = array[i];
-            array[i] = tmp;
+            tmp = result[j];
+            result[j] = result[i];
+            result[i] = tmp;
         }
-        return array;
+        return result;
     },
 
     remove: function (iterable, anything) {

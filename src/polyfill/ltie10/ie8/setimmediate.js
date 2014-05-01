@@ -2,7 +2,8 @@
 //IE8 setImmediate polyfill
 window instanceof Object || Object.assign(window, new function () {
 
-    var uid = 0, storage = {};
+    var uid = 0,
+        storage = {};
 
     function fastApply(args) {
         var func = args[0];
@@ -20,7 +21,8 @@ window instanceof Object || Object.assign(window, new function () {
     return {
 
         setImmediate: function () {
-            var args = arguments, id = uid++;
+            var args = arguments,
+                id = uid++;
             function onReadyStateChange() {
                 this.onreadystatechange = null;
                 document.removeChild(this);

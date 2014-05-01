@@ -13,7 +13,9 @@ lib.css = {
             };
 
         return function (property) {
-            var i, name, prefixed;
+            var prefixed,
+                name,
+                i;
             if (property in cache) {
                 return cache[property];
             }
@@ -37,7 +39,8 @@ lib.css = {
     },
 
     get: function (element, properties) {
-        var prefix = this.prefix, style = window.getComputedStyle(element);
+        var style = window.getComputedStyle(element),
+            prefix = this.prefix;
         if (Array.isArray(properties)) {
             return properties.reduce(function (result, property) {
                 result[property] = style[prefix(property)];
@@ -71,7 +74,8 @@ lib.css = {
  */
 new function () {
 
-    var ns = lib.css, properties = {
+    var ns = lib.css,
+        properties = {
             animation: [
                 'Delay', 'Direction', 'Duration', 'FillMode', 'IterationCount',
                 'Name', 'PlayState', 'TimingFunction'
@@ -126,8 +130,10 @@ Object.assign(lib.css, {
         }
 
         function calcTransitionTime(delay, duration) {
-            var length = Math.max(duration.length, delay.length),
-                i = 0, time, maxTime = 0;
+            var maxTime = 0,
+                time,
+                length = Math.max(duration.length, delay.length),
+                i = 0;
             while (i < length) {
                 time = (delay[i] || 0) + (duration[i] || 0);
                 if (time > maxTime) {

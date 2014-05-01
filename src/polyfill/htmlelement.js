@@ -53,70 +53,75 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 //Element traversal polyfill
 'children' in document.createDocumentFragment() || new function () {
 
-    var ELEMENT_NODE = 1, proto, api = {
+    var ELEMENT_NODE = 1,
+        proto,
+        api = {
 
-        firstElementChild: function () {
-            var node = this.firstChild;
-            while (node && ELEMENT_NODE != node.nodeType) {
-                node = node.nextSibling;
-            }
-            return node;
-        },
-
-        lastElementChild: function () {
-            var node = this.lastChild;
-            while (node && ELEMENT_NODE != node.nodeType) {
-                node = node.previousSibling;
-            }
-            return node;
-        },
-
-        nextElementSibling: function () {
-            var node = this;
-            do {
-                node = node.nextSibling;
-            } while (node && ELEMENT_NODE != node.nodeType);
-            return node;
-        },
-
-        previousElementSibling: function () {
-            var node = this;
-            do {
-                node = node.previousSibling;
-            } while (node && ELEMENT_NODE != node.nodeType);
-            return node;
-        },
-
-        childElementCount: function () {
-            return this.children.length;
-        },
-
-        children: new function () {
-
-            function StaticHTMLCollection() {}
-
-            StaticHTMLCollection.prototype.item = function (index) {
-                return this[index] || null;
-            };
-
-            return function () {
-                var i = 0, node, nodes = this.childNodes,
-                    j = 0, length = nodes.length,
-                    elements = new StaticHTMLCollection;
-                while (i < length) {
-                    node = nodes[i];
-                    if (ELEMENT_NODE == node.nodeType) {
-                        elements[j++] = node;
-                    }
-                    i++;
+            firstElementChild: function () {
+                var node = this.firstChild;
+                while (node && ELEMENT_NODE != node.nodeType) {
+                    node = node.nextSibling;
                 }
-                elements.length = j;
-                return elements;
-            };
+                return node;
+            },
 
-        }
+            lastElementChild: function () {
+                var node = this.lastChild;
+                while (node && ELEMENT_NODE != node.nodeType) {
+                    node = node.previousSibling;
+                }
+                return node;
+            },
 
-    };
+            nextElementSibling: function () {
+                var node = this;
+                do {
+                    node = node.nextSibling;
+                } while (node && ELEMENT_NODE != node.nodeType);
+                return node;
+            },
+
+            previousElementSibling: function () {
+                var node = this;
+                do {
+                    node = node.previousSibling;
+                } while (node && ELEMENT_NODE != node.nodeType);
+                return node;
+            },
+
+            childElementCount: function () {
+                return this.children.length;
+            },
+
+            children: new function () {
+
+                function StaticHTMLCollection() {}
+
+                StaticHTMLCollection.prototype.item = function (index) {
+                    return this[index] || null;
+                };
+
+                return function () {
+                    var elements = new StaticHTMLCollection,
+                        node,
+                        nodes = this.childNodes,
+                        length = nodes.length,
+                        i = 0,
+                        j = 0;
+                    while (i < length) {
+                        node = nodes[i];
+                        if (ELEMENT_NODE == node.nodeType) {
+                            elements[j++] = node;
+                        }
+                        i++;
+                    }
+                    elements.length = j;
+                    return elements;
+                };
+
+            }
+
+        };
 
     function defineGetter(key) {
         if (!(key in proto)) {
@@ -145,14 +150,101 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 //DOM4 http://www.w3.org/TR/dom/#element
 'append' in document.createDocumentFragment() || new function () {
 
-    var ELEMENT_NODE = 1, api, proto = HTMLElement.prototype;
+    var ELEMENT_NODE = 1,
+        proto = HTMLElement.prototype,
+        api  = {
+
+            before: function (/* ...nodes */) {
+                //todo IE8 removedNode.parentNode ≠ null
+                var parentNode = this.parentNode;
+                if (parentNode) {
+                    parentNode.insertBefore(mutationMacro(arguments), this);
+                }
+            },
+
+            after: function (/* ...nodes */) {
+                var parentNode = this.parentNode,
+                    nextSibling,
+                    nodes;
+                if (parentNode) {
+                    nodes = mutationMacro(arguments);
+                    nextSibling = this.nextSibling;
+                    if (nextSibling) {
+                        parentNode.insertBefore(nodes, nextSibling);
+                    } else {
+                        parentNode.appendChild(nodes);
+                    }
+                }
+            },
+
+            replace: function (/* ...nodes */) {
+                var parentNode = this.parentNode;
+                if (parentNode) {
+                    parentNode.replaceChild(mutationMacro(arguments), this);
+                }
+            },
+
+            remove: function () {
+                var parentNode = this.parentNode;
+                if (parentNode) {
+                    parentNode.removeChild(this);
+                }
+            },
+
+            append: function (/* ...nodes */) {
+                this.appendChild(mutationMacro(arguments));
+            },
+
+            prepend: function () {
+                this.insertBefore(mutationMacro(arguments), this.firstChild);
+            },
+
+            query: function (selector) {
+                return this.querySelector(selector);
+            },
+
+            queryAll: function (selector) {
+                return this.querySelectorAll(selector);
+            },
+
+            matches: [
+                proto.matchesSelector,
+                proto.oMatchesSelector,
+                proto.msMatchesSelector,
+                proto.mozMatchesSelector,
+                proto.webkitMatchesSelector,
+                function (selector) {
+                    var contains,
+                        root;
+                    if (this === document) {
+                        //if documentFragment.constructor ≡ document.constructor
+                        return false;
+                    }
+                    root = this.parentNode;
+                    if (root) {
+                        if (ELEMENT_NODE == root.nodeType) {
+                            root = root.ownerDocument;
+                        }
+                        return isContains(root, this, selector);
+                    }
+                    root = document.createDocumentFragment();
+                    root.appendChild(this);
+                    contains = isContains(root, this, selector);
+                    root.removeChild(this);
+                }
+            ].find(Boolean)
+
+        };
 
     function isContains(root, element, selector) {
         return -1 != Array.indexOf(root.querySelectorAll(selector), element);
     }
 
     function mutationMacro(nodes) {
-        var length = nodes.length, i, node, fragment;
+        var node,
+            fragment,
+            length = nodes.length,
+            i;
         if (1 == length) {
             node = nodes[0];
             if ('string' == typeof node) {
@@ -173,87 +265,6 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
         }
         return fragment;
     }
-
-    api = {
-
-        before: function (/* ...nodes */) {
-            //todo IE8 removedNode.parentNode ≠ null
-            var parentNode = this.parentNode;
-            if (parentNode) {
-                parentNode.insertBefore(mutationMacro(arguments), this);
-            }
-        },
-
-        after: function (/* ...nodes */) {
-            var parentNode = this.parentNode, nextSibling, nodes;
-            if (parentNode) {
-                nodes = mutationMacro(arguments);
-                nextSibling = this.nextSibling;
-                if (nextSibling) {
-                    parentNode.insertBefore(nodes, nextSibling);
-                } else {
-                    parentNode.appendChild(nodes);
-                }
-            }
-        },
-
-        replace: function (/* ...nodes */) {
-            var parentNode = this.parentNode;
-            if (parentNode) {
-                parentNode.replaceChild(mutationMacro(arguments), this);
-            }
-        },
-
-        remove: function () {
-            var parentNode = this.parentNode;
-            if (parentNode) {
-                parentNode.removeChild(this);
-            }
-        },
-
-        append: function (/* ...nodes */) {
-            this.appendChild(mutationMacro(arguments));
-        },
-
-        prepend: function () {
-            this.insertBefore(mutationMacro(arguments), this.firstChild);
-        },
-
-        query: function (selector) {
-            return this.querySelector(selector);
-        },
-
-        queryAll: function (selector) {
-            return this.querySelectorAll(selector);
-        },
-
-        matches: [
-            proto.matchesSelector,
-            proto.oMatchesSelector,
-            proto.msMatchesSelector,
-            proto.mozMatchesSelector,
-            proto.webkitMatchesSelector,
-            function (selector) {
-                var root, contains;
-                if (this === document) {
-                    //if documentFragment.constructor ≡ document.constructor
-                    return false;
-                }
-                root = this.parentNode;
-                if (root) {
-                    if (ELEMENT_NODE == root.nodeType) {
-                        root = root.ownerDocument;
-                    }
-                    return isContains(root, this, selector);
-                }
-                root = document.createDocumentFragment();
-                root.appendChild(this);
-                contains = isContains(root, this, selector);
-                root.removeChild(this);
-            }
-        ].find(Boolean)
-
-    };
 
     function implement(key) {
         if (!(key in proto)) {

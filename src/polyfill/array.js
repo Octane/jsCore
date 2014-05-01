@@ -21,7 +21,9 @@ if (!Array.of) {
 
 if (!Array.prototype.find) {
     Array.prototype.find = function (func, boundThis) {
-        var i = 0, length = this.length, value;
+        var value,
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 value = this[i];
@@ -37,7 +39,9 @@ if (!Array.prototype.find) {
 
 if (!Array.prototype.findIndex) {
     Array.prototype.findIndex = function (func, boundThis) {
-        var i = 0, length = this.length, value;
+        var value,
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 value = this[i];
@@ -53,7 +57,8 @@ if (!Array.prototype.findIndex) {
 
 if (!Array.prototype.fill) {
     Array.prototype.fill = function (value, start, end) {
-        var i, length = this.length;
+        var length = this.length,
+            i;
         if (!(1 in arguments)) {
             start = 0;
         }

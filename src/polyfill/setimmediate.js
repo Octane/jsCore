@@ -8,7 +8,9 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 
 } : new function () {
 
-    var id = 0, storage = {}, firstCall = true,
+    var id = 0,
+        storage = {},
+        firstCall = true,
         message = 'setImmediatePolyfillMessage';
 
     function fastApply(args) {
@@ -25,8 +27,8 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     }
 
     function callback(event) {
-        var key, data;
-        key = event.data;
+        var data,
+            key = event.data;
         if ('string' == typeof key && key.startsWith(message)) {
             data = storage[key];
             if (data) {

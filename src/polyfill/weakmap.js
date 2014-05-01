@@ -7,7 +7,8 @@ var WeakMap = WeakMap || new function () {
     //which means that they do not prevent garbage collection in case
     //there would be no other reference to the object.
 
-    var KEY = 0, VALUE = 1;
+    var KEY = 0,
+        VALUE = 1;
 
     function WeakMap() {
         if (arguments.length) {

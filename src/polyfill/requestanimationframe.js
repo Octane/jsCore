@@ -7,8 +7,10 @@ window.requestAnimationFrame || Object.assign(window, {
         window.mozRequestAnimationFrame,
         window.webkitRequestAnimationFrame,
         new function () {
-            var fps = 60, delay = 1000 / fps, navigationStart, prevCallTime;
-            navigationStart = prevCallTime = Date.now();
+            var fps = 60,
+                delay = 1000 / fps,
+                navigationStart = Date.now(),
+                prevCallTime = navigationStart;
             return function (callback) {
                 var curCallTime = Date.now(),
                     timeout = Math.max(0, delay - (curCallTime - prevCallTime)),

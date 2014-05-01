@@ -2,13 +2,15 @@
 Function.bind || (Function.prototype.bind = new function () {
 
     function newApply(Constructor, args) {
-        var i = 0, len = args.length, argNames = [];
+        var argNames = [],
+            len = args.length,
+            i = 0;
         while (i < len) {
             argNames.push('arg' + i);
             i++;
         }
         argNames = argNames.join(',');
-        return Function(
+        return new Function(
             'Constructor',
             argNames,
             'return new Constructor(' + argNames + ')'
@@ -16,9 +18,12 @@ Function.bind || (Function.prototype.bind = new function () {
     }
 
     return function (boundThis) {
-        var targetFunc = this, boundArgs = Array.slice(arguments, 1);
+        var boundArgs = Array.slice(arguments, 1),
+            targetFunc = this;
         function boundFunc() {
-            var args, len, proto;
+            var proto,
+                args,
+                len;
             function NOP() {}
             if (boundFunc._protoMagic) {
                 boundFunc._protoMagic = false;

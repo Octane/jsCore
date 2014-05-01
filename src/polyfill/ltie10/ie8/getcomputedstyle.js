@@ -2,7 +2,8 @@
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
     //https://github.com/es-shims/es5-shim/issues/152
-    var uid = 0, fakeDoc = new ActiveXObject('htmlfile'),
+    var uid = 0,
+        fakeDoc = new ActiveXObject('htmlfile'),
         proto = createObject().constructor.prototype;
 
     function createObject() {
@@ -60,7 +61,8 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
                 'getComputedStyle implementation only accepts the 1st parameter'
             );
         }
-        var compStyle = element._compStyle, currStyle;
+        var compStyle = element._compStyle,
+            currStyle;
         if (!compStyle) {
             compStyle = element._compStyle = createObject();
             currStyle = element.currentStyle;

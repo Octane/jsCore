@@ -11,9 +11,10 @@ if (!String.prototype.startsWith) {
 
 if (!String.prototype.endsWith) {
     String.prototype.endsWith = function (string, position) {
+        var lastIndex;
         position = position || this.length;
         position = position - string.length;
-        var lastIndex = this.lastIndexOf(string);
+        lastIndex = this.lastIndexOf(string);
         return -1 != lastIndex && lastIndex == position;
     };
 }

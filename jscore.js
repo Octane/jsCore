@@ -82,7 +82,8 @@ if (!Array.isArray) {
 
 if (!Array.prototype.forEach) {
     Array.prototype.forEach = function (func, boundThis) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 func.call(boundThis, this[i], i, this);
@@ -94,7 +95,9 @@ if (!Array.prototype.forEach) {
 
 if (!Array.prototype.map) {
     Array.prototype.map = function (func, boundThis) {
-        var i = 0, length = this.length, result = [];
+        var result = [],
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 result[i] = func.call(boundThis, this[i], i, this);
@@ -107,7 +110,8 @@ if (!Array.prototype.map) {
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (anything) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && this[i] === anything) {
                 return i;
@@ -132,7 +136,9 @@ if (!Array.prototype.lastIndexOf) {
 
 if (!Array.prototype.filter) {
     Array.prototype.filter = function (func, boundThis) {
-        var i = 0, length = this.length, result = [];
+        var result = [],
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && func.call(boundThis, this[i], i, this)) {
                 result.push(this[i]);
@@ -145,7 +151,8 @@ if (!Array.prototype.filter) {
 
 if (!Array.prototype.every) {
     Array.prototype.every = function (func, boundThis) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && !func.call(boundThis, this[i], i, this)) {
                 return false;
@@ -158,7 +165,8 @@ if (!Array.prototype.every) {
 
 if (!Array.prototype.some) {
     Array.prototype.some = function (func, boundThis) {
-        var i = 0, length = this.length;
+        var length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this && func.call(boundThis, this[i], i, this)) {
                 return true;
@@ -171,7 +179,9 @@ if (!Array.prototype.some) {
 
 if (!Array.prototype.reduce) {
     Array.prototype.reduce = function (func, initialValue) {
-        var i = 0, length = this.length, currentValue;
+        var currentValue,
+            length = this.length,
+            i = 0;
         if (arguments.length < 2) {
             if (!length) {
                 throw new TypeError(
@@ -201,7 +211,8 @@ if (!Array.prototype.reduce) {
 
 if (!Array.prototype.reduceRight) {
     Array.prototype.reduceRight = function (func, initialValue) {
-        var i = this.length, currentValue;
+        var currentValue,
+            i = this.length;
         if (arguments.length < 2) {
             if (!this.length) {
                 throw new TypeError(
@@ -229,13 +240,15 @@ if (!Array.prototype.reduceRight) {
 Function.bind || (Function.prototype.bind = new function () {
 
     function newApply(Constructor, args) {
-        var i = 0, len = args.length, argNames = [];
+        var argNames = [],
+            len = args.length,
+            i = 0;
         while (i < len) {
             argNames.push('arg' + i);
             i++;
         }
         argNames = argNames.join(',');
-        return Function(
+        return new Function(
             'Constructor',
             argNames,
             'return new Constructor(' + argNames + ')'
@@ -243,9 +256,12 @@ Function.bind || (Function.prototype.bind = new function () {
     }
 
     return function (boundThis) {
-        var targetFunc = this, boundArgs = Array.slice(arguments, 1);
+        var boundArgs = Array.slice(arguments, 1),
+            targetFunc = this;
         function boundFunc() {
-            var args, len, proto;
+            var proto,
+                args,
+                len;
             function NOP() {}
             if (boundFunc._protoMagic) {
                 boundFunc._protoMagic = false;
@@ -302,7 +318,9 @@ if (!String.prototype.trim) {
         //https://github.com/kriskowal/es5-shim/
          //http://perfectionkills.com/chr-deviations/
         //http://blog.stevenlevithan.com/archives/faster-trim-javascript/
-        var whitespace, left, right;
+        var whitespace,
+            right,
+            left;
         whitespace = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000';
         whitespace += '\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008';
         whitespace += '\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
@@ -393,7 +411,9 @@ if (!Array.of) {
 
 if (!Array.prototype.find) {
     Array.prototype.find = function (func, boundThis) {
-        var i = 0, length = this.length, value;
+        var value,
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 value = this[i];
@@ -409,7 +429,9 @@ if (!Array.prototype.find) {
 
 if (!Array.prototype.findIndex) {
     Array.prototype.findIndex = function (func, boundThis) {
-        var i = 0, length = this.length, value;
+        var value,
+            length = this.length,
+            i = 0;
         while (i < length) {
             if (i in this) {
                 value = this[i];
@@ -425,7 +447,8 @@ if (!Array.prototype.findIndex) {
 
 if (!Array.prototype.fill) {
     Array.prototype.fill = function (value, start, end) {
-        var i, length = this.length;
+        var length = this.length,
+            i;
         if (!(1 in arguments)) {
             start = 0;
         }
@@ -457,9 +480,10 @@ if (!String.prototype.startsWith) {
 
 if (!String.prototype.endsWith) {
     String.prototype.endsWith = function (string, position) {
+        var lastIndex;
         position = position || this.length;
         position = position - string.length;
-        var lastIndex = this.lastIndexOf(string);
+        lastIndex = this.lastIndexOf(string);
         return -1 != lastIndex && lastIndex == position;
     };
 }
@@ -639,7 +663,8 @@ var Set = Set || new function () {
 
 var Map = Map || new function () {
 
-    var KEY = 0, VALUE = 1;
+    var KEY = 0,
+        VALUE = 1;
 
     function Map() {
         if (arguments.length) {
@@ -763,7 +788,8 @@ var WeakMap = WeakMap || new function () {
     //which means that they do not prevent garbage collection in case
     //there would be no other reference to the object.
 
-    var KEY = 0, VALUE = 1;
+    var KEY = 0,
+        VALUE = 1;
 
     function WeakMap() {
         if (arguments.length) {
@@ -836,7 +862,9 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 
 } : new function () {
 
-    var id = 0, storage = {}, firstCall = true,
+    var id = 0,
+        storage = {},
+        firstCall = true,
         message = 'setImmediatePolyfillMessage';
 
     function fastApply(args) {
@@ -853,8 +881,8 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     }
 
     function callback(event) {
-        var key, data;
-        key = event.data;
+        var data,
+            key = event.data;
         if ('string' == typeof key && key.startsWith(message)) {
             data = storage[key];
             if (data) {
@@ -997,7 +1025,8 @@ var Promise = Promise || new function () {
 
         then: function (onFulfilled, onRejected) {
 
-            var promise = this, settled;
+            var promise = this,
+                settled;
 
             function fulfillQueue(value) {
                 promise._value = value;
@@ -1108,8 +1137,10 @@ window.requestAnimationFrame || Object.assign(window, {
         window.mozRequestAnimationFrame,
         window.webkitRequestAnimationFrame,
         new function () {
-            var fps = 60, delay = 1000 / fps, navigationStart, prevCallTime;
-            navigationStart = prevCallTime = Date.now();
+            var fps = 60,
+                delay = 1000 / fps,
+                navigationStart = Date.now(),
+                prevCallTime = navigationStart;
             return function (callback) {
                 var curCallTime = Date.now(),
                     timeout = Math.max(0, delay - (curCallTime - prevCallTime)),
@@ -1188,70 +1219,75 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 //Element traversal polyfill
 'children' in document.createDocumentFragment() || new function () {
 
-    var ELEMENT_NODE = 1, proto, api = {
+    var ELEMENT_NODE = 1,
+        proto,
+        api = {
 
-        firstElementChild: function () {
-            var node = this.firstChild;
-            while (node && ELEMENT_NODE != node.nodeType) {
-                node = node.nextSibling;
-            }
-            return node;
-        },
-
-        lastElementChild: function () {
-            var node = this.lastChild;
-            while (node && ELEMENT_NODE != node.nodeType) {
-                node = node.previousSibling;
-            }
-            return node;
-        },
-
-        nextElementSibling: function () {
-            var node = this;
-            do {
-                node = node.nextSibling;
-            } while (node && ELEMENT_NODE != node.nodeType);
-            return node;
-        },
-
-        previousElementSibling: function () {
-            var node = this;
-            do {
-                node = node.previousSibling;
-            } while (node && ELEMENT_NODE != node.nodeType);
-            return node;
-        },
-
-        childElementCount: function () {
-            return this.children.length;
-        },
-
-        children: new function () {
-
-            function StaticHTMLCollection() {}
-
-            StaticHTMLCollection.prototype.item = function (index) {
-                return this[index] || null;
-            };
-
-            return function () {
-                var i = 0, node, nodes = this.childNodes,
-                    j = 0, length = nodes.length,
-                    elements = new StaticHTMLCollection;
-                while (i < length) {
-                    node = nodes[i];
-                    if (ELEMENT_NODE == node.nodeType) {
-                        elements[j++] = node;
-                    }
-                    i++;
+            firstElementChild: function () {
+                var node = this.firstChild;
+                while (node && ELEMENT_NODE != node.nodeType) {
+                    node = node.nextSibling;
                 }
-                elements.length = j;
-                return elements;
-            };
+                return node;
+            },
 
-        }
+            lastElementChild: function () {
+                var node = this.lastChild;
+                while (node && ELEMENT_NODE != node.nodeType) {
+                    node = node.previousSibling;
+                }
+                return node;
+            },
 
-    };
+            nextElementSibling: function () {
+                var node = this;
+                do {
+                    node = node.nextSibling;
+                } while (node && ELEMENT_NODE != node.nodeType);
+                return node;
+            },
+
+            previousElementSibling: function () {
+                var node = this;
+                do {
+                    node = node.previousSibling;
+                } while (node && ELEMENT_NODE != node.nodeType);
+                return node;
+            },
+
+            childElementCount: function () {
+                return this.children.length;
+            },
+
+            children: new function () {
+
+                function StaticHTMLCollection() {}
+
+                StaticHTMLCollection.prototype.item = function (index) {
+                    return this[index] || null;
+                };
+
+                return function () {
+                    var elements = new StaticHTMLCollection,
+                        node,
+                        nodes = this.childNodes,
+                        length = nodes.length,
+                        i = 0,
+                        j = 0;
+                    while (i < length) {
+                        node = nodes[i];
+                        if (ELEMENT_NODE == node.nodeType) {
+                            elements[j++] = node;
+                        }
+                        i++;
+                    }
+                    elements.length = j;
+                    return elements;
+                };
+
+            }
+
+        };
 
     function defineGetter(key) {
         if (!(key in proto)) {
@@ -1280,14 +1316,101 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 //DOM4 http://www.w3.org/TR/dom/#element
 'append' in document.createDocumentFragment() || new function () {
 
-    var ELEMENT_NODE = 1, api, proto = HTMLElement.prototype;
+    var ELEMENT_NODE = 1,
+        proto = HTMLElement.prototype,
+        api  = {
+
+            before: function (/* ...nodes */) {
+                //todo IE8 removedNode.parentNode ≠ null
+                var parentNode = this.parentNode;
+                if (parentNode) {
+                    parentNode.insertBefore(mutationMacro(arguments), this);
+                }
+            },
+
+            after: function (/* ...nodes */) {
+                var parentNode = this.parentNode,
+                    nextSibling,
+                    nodes;
+                if (parentNode) {
+                    nodes = mutationMacro(arguments);
+                    nextSibling = this.nextSibling;
+                    if (nextSibling) {
+                        parentNode.insertBefore(nodes, nextSibling);
+                    } else {
+                        parentNode.appendChild(nodes);
+                    }
+                }
+            },
+
+            replace: function (/* ...nodes */) {
+                var parentNode = this.parentNode;
+                if (parentNode) {
+                    parentNode.replaceChild(mutationMacro(arguments), this);
+                }
+            },
+
+            remove: function () {
+                var parentNode = this.parentNode;
+                if (parentNode) {
+                    parentNode.removeChild(this);
+                }
+            },
+
+            append: function (/* ...nodes */) {
+                this.appendChild(mutationMacro(arguments));
+            },
+
+            prepend: function () {
+                this.insertBefore(mutationMacro(arguments), this.firstChild);
+            },
+
+            query: function (selector) {
+                return this.querySelector(selector);
+            },
+
+            queryAll: function (selector) {
+                return this.querySelectorAll(selector);
+            },
+
+            matches: [
+                proto.matchesSelector,
+                proto.oMatchesSelector,
+                proto.msMatchesSelector,
+                proto.mozMatchesSelector,
+                proto.webkitMatchesSelector,
+                function (selector) {
+                    var contains,
+                        root;
+                    if (this === document) {
+                        //if documentFragment.constructor ≡ document.constructor
+                        return false;
+                    }
+                    root = this.parentNode;
+                    if (root) {
+                        if (ELEMENT_NODE == root.nodeType) {
+                            root = root.ownerDocument;
+                        }
+                        return isContains(root, this, selector);
+                    }
+                    root = document.createDocumentFragment();
+                    root.appendChild(this);
+                    contains = isContains(root, this, selector);
+                    root.removeChild(this);
+                }
+            ].find(Boolean)
+
+        };
 
     function isContains(root, element, selector) {
         return -1 != Array.indexOf(root.querySelectorAll(selector), element);
     }
 
     function mutationMacro(nodes) {
-        var length = nodes.length, i, node, fragment;
+        var node,
+            fragment,
+            length = nodes.length,
+            i;
         if (1 == length) {
             node = nodes[0];
             if ('string' == typeof node) {
@@ -1308,87 +1431,6 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
         }
         return fragment;
     }
-
-    api = {
-
-        before: function (/* ...nodes */) {
-            //todo IE8 removedNode.parentNode ≠ null
-            var parentNode = this.parentNode;
-            if (parentNode) {
-                parentNode.insertBefore(mutationMacro(arguments), this);
-            }
-        },
-
-        after: function (/* ...nodes */) {
-            var parentNode = this.parentNode, nextSibling, nodes;
-            if (parentNode) {
-                nodes = mutationMacro(arguments);
-                nextSibling = this.nextSibling;
-                if (nextSibling) {
-                    parentNode.insertBefore(nodes, nextSibling);
-                } else {
-                    parentNode.appendChild(nodes);
-                }
-            }
-        },
-
-        replace: function (/* ...nodes */) {
-            var parentNode = this.parentNode;
-            if (parentNode) {
-                parentNode.replaceChild(mutationMacro(arguments), this);
-            }
-        },
-
-        remove: function () {
-            var parentNode = this.parentNode;
-            if (parentNode) {
-                parentNode.removeChild(this);
-            }
-        },
-
-        append: function (/* ...nodes */) {
-            this.appendChild(mutationMacro(arguments));
-        },
-
-        prepend: function () {
-            this.insertBefore(mutationMacro(arguments), this.firstChild);
-        },
-
-        query: function (selector) {
-            return this.querySelector(selector);
-        },
-
-        queryAll: function (selector) {
-            return this.querySelectorAll(selector);
-        },
-
-        matches: [
-            proto.matchesSelector,
-            proto.oMatchesSelector,
-            proto.msMatchesSelector,
-            proto.mozMatchesSelector,
-            proto.webkitMatchesSelector,
-            function (selector) {
-                var root, contains;
-                if (this === document) {
-                    //if documentFragment.constructor ≡ document.constructor
-                    return false;
-                }
-                root = this.parentNode;
-                if (root) {
-                    if (ELEMENT_NODE == root.nodeType) {
-                        root = root.ownerDocument;
-                    }
-                    return isContains(root, this, selector);
-                }
-                root = document.createDocumentFragment();
-                root.appendChild(this);
-                contains = isContains(root, this, selector);
-                root.removeChild(this);
-            }
-        ].find(Boolean)
-
-    };
 
     function implement(key) {
         if (!(key in proto)) {
@@ -1556,7 +1598,8 @@ var FormData = FormData || function () {
                 return option.selected;
             }
             function assertField(field) {
-                var type = field.type, tag = field.nodeName.toLowerCase();
+                var tag = field.nodeName.toLowerCase(),
+                    type = field.type;
                 if (!field.name) {
                     return false;
                 }
@@ -1631,9 +1674,11 @@ var FormData = FormData || function () {
         toString: function () {
             //source by François de Metz
             //https://github.com/francois2metz/html5-formdata
-            var boundary = this.boundary, body = '';
+            var boundary = this.boundary,
+                body = '';
             Array.forEach(this, function (field) {
-                var name = field.name, value = field.value,
+                var name = field.name,
+                    value = field.value,
                     filename = field.fileName || value.name;
                 body += '--' + boundary + '\r\n';
                 if (Object(value) === value) {
@@ -1677,12 +1722,14 @@ new function () {
     var slice = Array.prototype.slice;
 
     function toArray(iterable) {
-        var i = 0, length = iterable.length, array = [];
+        var result = [],
+            length = iterable.length,
+            i = 0;
         while (i < length) {
-            array[i] = iterable[i];
+            result[i] = iterable[i];
             i++;
         }
-        return array;
+        return result;
     }
 
     try {
@@ -1691,21 +1738,22 @@ new function () {
     }
     catch (error) {
         Array.slice = function (iterable, start, end) {
-            var array, length = arguments.length;
+            var result,
+                length = arguments.length;
             //NodeList instanceof Object → false in IE8
             if (Object(iterable) instanceof Object) {
-                array = iterable;
+                result = iterable;
             } else {
-                array = toArray(iterable);
+                result = toArray(iterable);
             }
             //[1].slice(0, undefined) → [] in IE8
             if (1 == length || 2 == length && 0 == start) {
-                return array == iterable ? slice.call(array, 0) : array;
+                return result == iterable ? slice.call(result, 0) : result;
             }
             if (2 == length) {
-                return slice.call(array, start);
+                return slice.call(result, start);
             }
-            return slice.call(array, start, end);
+            return slice.call(result, start, end);
         };
     }
 
@@ -1723,7 +1771,8 @@ new function () {
 }()) && new function () {
     var splice = Array.splice;
     Array.splice = function (iterable, start, deleteCount) {
-        var deltedItems = splice.apply(Array, arguments), length;
+        var deltedItems = splice.apply(Array, arguments),
+            length;
         if (!(iterable instanceof Array)) {
             length = iterable.length;
             while (deleteCount--) {
@@ -1741,7 +1790,8 @@ try {
 catch (error) {
     window.StaticDOMStringMap = new function () {
         //https://github.com/es-shims/es5-shim/issues/152
-        var uid = 0, fakeDoc = new ActiveXObject('htmlfile'),
+        var uid = 0,
+            fakeDoc = new ActiveXObject('htmlfile'),
             proto = createObject().constructor.prototype;
         function createObject() {
             return fakeDoc.getElementsByName(uid++);
@@ -1766,7 +1816,8 @@ catch (error) {
 //IE8 setImmediate polyfill
 window instanceof Object || Object.assign(window, new function () {
 
-    var uid = 0, storage = {};
+    var uid = 0,
+        storage = {};
 
     function fastApply(args) {
         var func = args[0];
@@ -1784,7 +1835,8 @@ window instanceof Object || Object.assign(window, new function () {
     return {
 
         setImmediate: function () {
-            var args = arguments, id = uid++;
+            var args = arguments,
+                id = uid++;
             function onReadyStateChange() {
                 this.onreadystatechange = null;
                 document.removeChild(this);
@@ -1823,8 +1875,10 @@ window.addEventListener || new function () {
 
     function createEventListener(callbacks, element) {
         return function (event) {
-            var i = 0, list = callbacks.slice(0),
-                length = list.length, callback;
+            var callback,
+                list = callbacks.slice(0),
+                length = list.length,
+                i = 0;
             if (!(event instanceof CustomEvent)) {
                 fixEvent(event);
             }
@@ -1842,7 +1896,9 @@ window.addEventListener || new function () {
     }
 
     function addEventListener(eventType, callback, useCapture) {
-        var element = this, events, event;
+        var element = this,
+            events,
+            event;
         if (useCapture) {
             throw new Error('Capturing phase is not supported');
         }
@@ -1865,7 +1921,11 @@ window.addEventListener || new function () {
     }
 
     function removeEventListener(eventType, callback, useCapture) {
-        var element = this, events, event, index, callbacks;
+        var element = this,
+            callbacks,
+            events,
+            event,
+            index;
         if (useCapture) {
             throw new Error('Capturing phase is not supported');
         }
@@ -2164,7 +2224,8 @@ window instanceof Object || new function () {
 
     Object.defineProperty(proto, 'opacity', {
         get: function () {
-            var opacity = '', filter = this.filter.trim();
+            var opacity = '',
+                filter = this.filter.trim();
             if (filter) {
                 filter.replace(alphaRegExp, function (alpha) {
                     alpha.replace(opacityRegExp, function (str, value) {
@@ -2232,7 +2293,8 @@ window instanceof Object || new function () {
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
     //https://github.com/es-shims/es5-shim/issues/152
-    var uid = 0, fakeDoc = new ActiveXObject('htmlfile'),
+    var uid = 0,
+        fakeDoc = new ActiveXObject('htmlfile'),
         proto = createObject().constructor.prototype;
 
     function createObject() {
@@ -2290,7 +2352,8 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
                 'getComputedStyle implementation only accepts the 1st parameter'
             );
         }
-        var compStyle = element._compStyle, currStyle;
+        var compStyle = element._compStyle,
+            currStyle;
         if (!compStyle) {
             compStyle = element._compStyle = createObject();
             currStyle = element.currentStyle;
@@ -2394,15 +2457,19 @@ lib.array = {
     },
 
     unique: function (iterable) {
-        var anything, array = [], i = 0, j = 0, length = iterable.length;
+        var result = [],
+            anything,
+            length = iterable.length,
+            i = 0,
+            j = 0;
         while (i < length) {
             anything = iterable[i];
-            if (-1 == array.indexOf(anything)) {
-                array[j++] = anything;
+            if (-1 == result.indexOf(anything)) {
+                result[j++] = anything;
             }
             i++;
         }
-        return array;
+        return result;
     },
 
     //Array.every ignores missing indexes and
@@ -2434,27 +2501,30 @@ lib.array = {
     },
 
     range: function (i, end) {
-        var array = [];
+        var result = [];
         if (!(1 in arguments)) {
             end = i;
             i = 0;
         }
         while (i < end) {
-            array.push(i);
+            result.push(i);
             i++;
         }
-        return array;
+        return result;
     },
 
     shuffle: function (iterable) {
-        var array = Array.from(iterable), i = array.length, j, tmp;
+        var result = Array.from(iterable),
+            i = result.length,
+            j,
+            tmp;
         while (i--) {
             j = Math.floor(Math.random() * (i + 1));
-            tmp = array[j];
-            array[j] = array[i];
-            array[i] = tmp;
+            tmp = result[j];
+            result[j] = result[i];
+            result[i] = tmp;
         }
-        return array;
+        return result;
     },
 
     remove: function (iterable, anything) {
@@ -2595,7 +2665,9 @@ lib.css = {
             };
 
         return function (property) {
-            var i, name, prefixed;
+            var prefixed,
+                name,
+                i;
             if (property in cache) {
                 return cache[property];
             }
@@ -2619,7 +2691,8 @@ lib.css = {
     },
 
     get: function (element, properties) {
-        var prefix = this.prefix, style = window.getComputedStyle(element);
+        var style = window.getComputedStyle(element),
+            prefix = this.prefix;
         if (Array.isArray(properties)) {
             return properties.reduce(function (result, property) {
                 result[property] = style[prefix(property)];
@@ -2653,7 +2726,8 @@ lib.css = {
  */
 new function () {
 
-    var ns = lib.css, properties = {
+    var ns = lib.css,
+        properties = {
             animation: [
                 'Delay', 'Direction', 'Duration', 'FillMode', 'IterationCount',
                 'Name', 'PlayState', 'TimingFunction'
@@ -2708,8 +2782,10 @@ Object.assign(lib.css, {
         }
 
         function calcTransitionTime(delay, duration) {
-            var length = Math.max(duration.length, delay.length),
-                i = 0, time, maxTime = 0;
+            var maxTime = 0,
+                time,
+                length = Math.max(duration.length, delay.length),
+                i = 0;
             while (i < length) {
                 time = (delay[i] || 0) + (duration[i] || 0);
                 if (time > maxTime) {
@@ -3177,7 +3253,10 @@ lib.request = new function () {
              *     caching: Boolean
              * }
             */
-            var url, data, caching;
+            var url,
+                data,
+                caching;
+
             if ('string' == typeof params) {
                 params = {url: params};
             }

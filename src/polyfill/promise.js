@@ -111,7 +111,8 @@ var Promise = Promise || new function () {
 
         then: function (onFulfilled, onRejected) {
 
-            var promise = this, settled;
+            var promise = this,
+                settled;
 
             function fulfillQueue(value) {
                 promise._value = value;

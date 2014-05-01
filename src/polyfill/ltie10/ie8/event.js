@@ -12,8 +12,10 @@ window.addEventListener || new function () {
 
     function createEventListener(callbacks, element) {
         return function (event) {
-            var i = 0, list = callbacks.slice(0),
-                length = list.length, callback;
+            var callback,
+                list = callbacks.slice(0),
+                length = list.length,
+                i = 0;
             if (!(event instanceof CustomEvent)) {
                 fixEvent(event);
             }
@@ -31,7 +33,9 @@ window.addEventListener || new function () {
     }
 
     function addEventListener(eventType, callback, useCapture) {
-        var element = this, events, event;
+        var element = this,
+            events,
+            event;
         if (useCapture) {
             throw new Error('Capturing phase is not supported');
         }
@@ -54,7 +58,11 @@ window.addEventListener || new function () {
     }
 
     function removeEventListener(eventType, callback, useCapture) {
-        var element = this, events, event, index, callbacks;
+        var element = this,
+            callbacks,
+            events,
+            event,
+            index;
         if (useCapture) {
             throw new Error('Capturing phase is not supported');
         }

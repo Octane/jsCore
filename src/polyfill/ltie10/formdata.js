@@ -34,7 +34,8 @@ var FormData = FormData || function () {
                 return option.selected;
             }
             function assertField(field) {
-                var type = field.type, tag = field.nodeName.toLowerCase();
+                var tag = field.nodeName.toLowerCase(),
+                    type = field.type;
                 if (!field.name) {
                     return false;
                 }
@@ -109,9 +110,11 @@ var FormData = FormData || function () {
         toString: function () {
             //source by François de Metz
             //https://github.com/francois2metz/html5-formdata
-            var boundary = this.boundary, body = '';
+            var boundary = this.boundary,
+                body = '';
             Array.forEach(this, function (field) {
-                var name = field.name, value = field.value,
+                var name = field.name,
+                    value = field.value,
                     filename = field.fileName || value.name;
                 body += '--' + boundary + '\r\n';
                 if (Object(value) === value) {
