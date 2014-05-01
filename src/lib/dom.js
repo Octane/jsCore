@@ -14,8 +14,10 @@ lib.dom = {
 //addClass, removeClass and toggleClass
 Object.assign(lib.dom, new function () {
 
-    var promise = lib.css.animation || lib.css.transition ? function (element, method, classes) {
-            var animations = window.getComputedStyle(element)[lib.css.animationName];
+    var promise = lib.css.animation || lib.css.transition ?
+        function (element, method, classes) {
+            var style = window.getComputedStyle(element),
+                animations = lib.css.getAnimationNames(style);
             if (changeClasses(element, method, classes)) {
                 return lib.event.awaitTransAnimEnd(element, animations);
             }

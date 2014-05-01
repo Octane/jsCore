@@ -45,6 +45,20 @@ lib.css = {
             }, {});
         }
         return style[prefix(properties)];
+    },
+
+    getAnimationNames: new function () {
+        var separator = /,\s*/;
+        function excludeNone(value) {
+            return "none" != value;
+        }
+        return function (style) {
+            var names = style[this.animationName];
+            if (names) {
+                return names.split(separator).filter(excludeNone);
+            }
+            return [];
+        };
     }
 
 };
@@ -58,7 +72,10 @@ lib.css = {
 new function () {
 
     var ns = lib.css, properties = {
-            animation: ["Delay", "Direction", "Duration", "FillMode", "IterationCount", "Name", "PlayState", "TimingFunction"],
+            animation: [
+                "Delay", "Direction", "Duration", "FillMode", "IterationCount",
+                "Name", "PlayState", "TimingFunction"
+            ],
             transition: ["Delay", "Duration", "Property", "TimingFunction"],
             transform:  ["Origin", "Style"]
         };
@@ -87,7 +104,8 @@ Object.assign(lib.css, {
 
         if (lib.css.transition || lib.css.animation) {
             return function (element, properties) {
-                var animations = window.getComputedStyle(element)[this.animationName];
+                var style = window.getComputedStyle(element),
+                    animations = this.getAnimationNames(style);
                 changeStyle(element.style, properties);
                 return lib.event.awaitTransAnimEnd(element, animations);
             };

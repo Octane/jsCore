@@ -120,9 +120,9 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
   }"
 ```
 
-<sup name="Array.slice">5</sup> – `Array.slice` supports array-like DOM objects in IE8
+<sup name="Array.slice">5</sup> – `Array.slice()` supports array-like DOM objects in IE8
 
-<sup name="Array.splice">6</sup> – `Array.splice` fixes a [bug with array-like objects](http://javascript.ru/forum/307534-post71.html) in IE8
+<sup name="Array.splice">6</sup> – `Array.splice()` fixes a [bug with array-like objects](http://javascript.ru/forum/307534-post71.html) in IE8
 
 <sup name="HTMLElement.prototype.children">7</sup> – `element.children` fixes a bug with comment nodes in IE8
 
@@ -130,23 +130,23 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="HTMLElement.prototype.dataset">9</sup> – `element.dataset` doesn't add attribute when you add a new property
 
-<sup name="HTMLScriptElement.prototype.onload">10</sup> – don't use `script.onload` and `script.onerror` with `script.onreadystatechange`
+<sup name="HTMLScriptElement.prototype.onload">10</sup> – don't use `script.onload()` and `script.onerror()` with `script.onreadystatechange()`
 
-<sup name="document.createEvent">11</sup> – `document.createEvent` supports `"CustomEvent"`
+<sup name="document.createEvent">11</sup> – `document.createEvent()` supports `CustomEvent`
 
-<sup name="FormData">12</sup> – `FormData` doesn't support `<input type="file">`, but if you know file contents, it can be added using `append`
+<sup name="FormData">12</sup> – `FormData()` doesn't support `<input type="file">`, but if you know file contents, it can be added using `.append()`
 
-<sup name="Event.prototype">13</sup> –  global event constructors (`Event`, `CustomEvent`, etc.) not available, use `document.createEvent`
+<sup name="Event.prototype">13</sup> –  global event constructors (`Event()`, `CustomEvent()`, etc.) not available, use `document.createEvent()`
 
-<sup name="Event.prototype.initEvent">14</sup> – event methods (`initEvent`, `initMouseEvent`, ect.) just copy all function parameters to the instance of `Event`, the main purpose is to set the type of the event without `IE8` check
+<sup name="Event.prototype.initEvent">14</sup> – event methods (`.initEvent()`, `.initMouseEvent()`, ect.) just copy all function parameters to the instance of `Event()`, the main purpose is to set the type of the event without `IE8` check
 
-<sup name="XMLHttpRequest">15</sup> – `xhr.send` supports `FormData`
+<sup name="XMLHttpRequest">15</sup> – `xhr.send()` supports `FormData()`
 
-<sup name="Promise">16</sup> – `Promise` doesn't support [thenable](https://github.com/promises-aplus/promises-spec#terminology)-objects
+<sup name="Promise">16</sup> – `Promise()` doesn't support [thenable](https://github.com/promises-aplus/promises-spec#terminology)-objects
 
-<sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called `catch`, use `catch_`
+<sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called "catch", use `.catch_()`
 
-<sup name="Set.prototype.delete">18</sup> – IE8 doesn't allow to use a method called `delete`, use `delete_`
+<sup name="Set.prototype.delete">18</sup> – IE8 doesn't allow to use a method called "delete", use `.delete_()`
 
 ##lib
 

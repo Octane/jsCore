@@ -2,7 +2,7 @@
 
 lib.event = {
 
-    //example: element.addEventListener("click", lib.event.preventDefault, false)
+    //example: element.addEventListener("click", lib.event.preventDefault)
     preventDefault: function (event) {
         event.preventDefault();
     },
@@ -22,20 +22,22 @@ lib.event = {
     },
 
     one: function (element, selector, eventTypes, callback) {
-        if (arguments.length == 3) {
-            callback = eventTypes;
-            eventTypes = selector;
-            selector = null;
-        }
-        var eventDetails = lib.event.on(element, selector, eventTypes, function (event) {
-            lib.event.off(eventDetails);
+        var details;
+        function listener(event) {
+            lib.event.off(details);
             if (callback.handleEvent) {
                 callback.handleEvent(event);
             }
             else {
                 callback.call(element, event);
             }
-        });
+        }
+        if (arguments.length == 3) {
+            callback = eventTypes;
+            eventTypes = selector;
+            selector = null;
+        }
+        details = lib.event.on(element, selector, eventTypes, listener);
     },
 
     on: function (element, selector, eventTypes, callback) {
@@ -77,7 +79,10 @@ lib.event = {
 
     off: function (eventDetails) {
         eventDetails.eventTypes.forEach(function (eventType) {
-            eventDetails.element.removeEventListener(eventType, eventDetails.callback);
+            eventDetails.element.removeEventListener(
+                eventType,
+                eventDetails.callback
+            );
         });
     }
 
@@ -131,22 +136,12 @@ Object.assign(lib.event, new function () {
 
     var transition = lib.css.transition,
         animationName = lib.css.animationName,
-        animationEnd = lib.event.animationEnd,
-        separator = /,\s*/;
-
-    function getAnimationNames(element, style) {
-        return (style || window.getComputedStyle(element))[animationName].split(separator);
-    }
+        animationEnd = lib.event.animationEnd;
 
     function getNewAnimationNames(oldNames, newNames) {
-        if (!newNames || oldNames == newNames) {
-            return [];
-        }
-        newNames = newNames.split(separator);
         if (!oldNames) {
             return newNames;
         }
-        oldNames = oldNames.split(separator);
         return newNames.reduce(function (names, name) {
             if (-1 == oldNames.indexOf(name)) {
                 names.push(name);
@@ -165,13 +160,16 @@ Object.assign(lib.event, new function () {
 
     function awaitAnimationEnd(element, animations) {
         if (!animations) {
-            animations = getAnimationNames(element);
+            animations = lib.css.getAnimationNames(element);
         }
         if (animations.length) {
             return new Promise(function (resolve) {
                 function onAnimationEnd(event) {
                     if (!dequeue(animations, event.animationName)) {
-                        element.removeEventListener(animationEnd, onAnimationEnd);
+                        element.removeEventListener(
+                            animationEnd,
+                            onAnimationEnd
+                        );
                         resolve(element);
                     }
                 }
@@ -182,7 +180,11 @@ Object.assign(lib.event, new function () {
     }
 
     function awaitTransitionEnd(element, style) {
-        var delay = lib.css.getTransitionTime(style || window.getComputedStyle(element));
+        var delay;
+        if (!style) {
+            style = window.getComputedStyle(element);
+        }
+        delay = lib.css.getTransitionTime(style);
         if (delay) {
             return new Promise(function (resolve) {
                 window.setTimeout(function () {
@@ -194,9 +196,11 @@ Object.assign(lib.event, new function () {
     }
 
     function awaitTransAnimEnd(element, prevAnimations) {
-        var style = window.getComputedStyle(element);
+        var style = window.getComputedStyle(element),
+            animations = lib.css.getAnimationNames(style);
+        animations = getNewAnimationNames(prevAnimations, animations);
         return Promise.all([
-            awaitAnimationEnd(element, getNewAnimationNames(prevAnimations, style[animationName])),
+            awaitAnimationEnd(element, animations),
             awaitTransitionEnd(element, style)
         ]).then(function () {
             return element;
@@ -213,7 +217,8 @@ Object.assign(lib.event, new function () {
 
         awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
 
-        awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
+        awaitTransAnimEnd: animationName || transition ?
+                           awaitTransAnimEnd : fallback
 
     };
 
