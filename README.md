@@ -90,7 +90,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `CSSStyleDeclaration.prototype` | `.getPropertyValue()`, `.removeProperty()`, `.setProperty()`, `.cssFloat`, `.opacity`
 `document` | `.head`, `.createEvent()`<sup>[11](#document.createEvent)</sup>
 `FormData.prototype` | `.append()`
-`Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMutationEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initKeyEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`<sup>[14](#Event.prototype.initEvent)</sup>
+`Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`
 `XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`, `.addEventListener()`, `.removeEventListener()`, `.dispatchEvent()`
 `Date` generics | `.now()`
 `Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`

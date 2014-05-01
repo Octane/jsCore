@@ -1767,18 +1767,18 @@ window.addEventListener || new function () {
 		if (!event.timeStamp) {
 			event.timeStamp = Date.now();
 		}
-		return event;
 	}
 
 	function createEventListener(callbacks, element) {
 		return function (event) {
-			var i = 0, length = callbacks.length, callback;
+			var i = 0, list = callbacks.slice(0),
+				length = list.length, callback;
 			if (!(event instanceof CustomEvent)) {
-				event = fixEvent(event);
+				fixEvent(event);
 			}
 			event.currentTarget = element;
 			while (i < length) {
-				callback = callbacks[i];
+				callback = list[i];
 				if (callback.handleEvent) {
 					callback.handleEvent(event);
 				}
@@ -1861,6 +1861,30 @@ window.addEventListener || new function () {
 		});
 	}
 
+	function initUIEvent(type, bubbles, cancelable, view, detail) {
+		this.initEvent(type, bubbles, cancelable);
+		Object.assign(this, {
+			view: view,
+			detail: detail
+		});
+	}
+
+	function initMouseEvent(type, bubbles, cancelable, view, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
+		this.initUIEvent(type, bubbles, cancelable, view, detail);
+		Object.assign(this, {
+			screenX: screenX,
+			screenY: screenY,
+			clientX: clientX,
+			clientY: clientY,
+			ctrlKey: ctrlKey,
+			altKey: altKey,
+			shiftKey: shiftKey,
+			metaKey: metaKey,
+			button: button,
+			fromElement: relatedTarget
+		});
+	}
+
 	function preventDefault() {
 		this.defaultPrevented = true;
 		this.returnValue = false;
@@ -1883,9 +1907,7 @@ window.addEventListener || new function () {
 
 		preventDefault: preventDefault,
 		stopPropagation: stopPropagation,
-
 		initEvent: initEvent,
-
 		initCustomEvent: function (type, bubbles, cancelable, detail) {
 			this.initEvent(type, bubbles, cancelable);
 			this.detail = detail;
@@ -1901,58 +1923,7 @@ window.addEventListener || new function () {
 
 		preventDefault: preventDefault,
 		stopPropagation: stopPropagation,
-
-		initEvent: initEvent,
-
-		initUIEvent: function (type, bubbles, cancelable, windowObject, detail) {
-			this.initEvent(type, bubbles, cancelable);
-			Object.assign(this, {
-				windowObject: windowObject,
-				detail: detail
-			});
-		},
-
-		initKeyEvent: function (type, bubbles, cancelable, windowObject, ctrlKey, altKey, shiftKey, metaKey, keyCode, charCode) {
-			this.initEvent(type, bubbles, cancelable);
-			Object.assign(this, {
-				windowObject: windowObject,
-				ctrlKey: ctrlKey,
-				altKey: altKey,
-				shiftKey: shiftKey,
-				metaKey: metaKey,
-				keyCode: keyCode,
-				charCode: charCode
-			});
-		},
-
-		initMouseEvent: function (type, bubbles, cancelable, windowObject, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
-			this.initEvent(type, bubbles, cancelable);
-			Object.assign(this, {
-				windowObject: windowObject,
-				detail: detail,
-				screenX: screenX,
-				screenY: screenY,
-				clientX: clientX,
-				clientY: clientY,
-				ctrlKey: ctrlKey,
-				altKey: altKey,
-				shiftKey: shiftKey,
-				metaKey: metaKey,
-				button: button,
-				fromElement: relatedTarget
-			});
-		},
-
-		initMutationEvent: function (type, bubbles, cancelable, relatedNode, prevValue, newValue, attrName, attrChange) {
-			this.initEvent(type, bubbles, cancelable);
-			Object.assign(this, {
-				relatedNode: relatedNode,
-				prevValue: prevValue,
-				newValue: newValue,
-				attrName: attrName,
-				attrChange: attrChange
-			});
-		}
+		initEvent: initEvent
 
 	});
 
@@ -1976,7 +1947,20 @@ window.addEventListener || new function () {
 	});
 
 	HTMLDocument.prototype.createEvent = function (group) {
-		var event = "CustomEvent" == group ? new CustomEvent : this.createEventObject();
+		var event;
+		if (group.startsWith("CustomEvent")) {
+			event = new CustomEvent;
+		}
+		else {
+			event = this.createEventObject();
+			if (group.startsWith("UIEvent")) {
+				event.initUIEvent = initUIEvent;
+			}
+			else if (group.startsWith("MouseEvent")) {
+				event.initUIEvent = initUIEvent;
+				event.initMouseEvent = initMouseEvent;
+			}
+		}
 		event.timeStamp = Date.now();
 		return event;
 	};

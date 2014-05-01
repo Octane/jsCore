@@ -2,6 +2,7 @@
 
 ##v0.4.2
 
+ - remove `.initKeyEvent()` and `.initMutationEvent()`
  - fix: `.dispatchEvent()` must return a value
  - fix: bug in `.stopPropagation()`
 
