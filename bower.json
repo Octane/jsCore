@@ -1,31 +1,31 @@
 {
-	"name": "jsCore",
-	"main": "jscore.js",
-	"version": "0.4.2",
-	"description": "Complex JavaScript polyfill and set of methods",
-	"keywords": [
-		"browser",
-		"client",
-		"javascript",
-		"jscore",
-		"library",
-		"polyfill"
-	],
-	"authors": [
-		"Dmitry Korobkin <dmitry.korobkin@gmail.com>"
-	],
-	"license": "MIT",
-	"homepage": "https://github.com/Octane/jsCore",
-	"ignore": [
-		".gitignore",
-		"bower.json",
-		"build.js",
-		"changelog.md",
-		"favicon.ico",
-		"index.html",
-		"jscore_logo.png",
-		"MIT-LICENSE.txt",
-		"src",
-		"test"
-	]
+    "name": "jsCore",
+    "main": "jscore.js",
+    "version": "0.4.2",
+    "description": "Complex JavaScript polyfill and set of methods",
+    "keywords": [
+        "browser",
+        "client",
+        "javascript",
+        "jscore",
+        "library",
+        "polyfill"
+    ],
+    "authors": [
+        "Dmitry Korobkin <dmitry.korobkin@gmail.com>"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/Octane/jsCore",
+    "ignore": [
+        ".gitignore",
+        "bower.json",
+        "build.js",
+        "changelog.md",
+        "favicon.ico",
+        "index.html",
+        "jscore_logo.png",
+        "MIT-LICENSE.txt",
+        "src",
+        "test"
+    ]
 }

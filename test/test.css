@@ -1,40 +1,40 @@
 body {
-	background-color: #ecf0f1;
-	font-family: sans-serif;
+    background-color: #ecf0f1;
+    font-family: sans-serif;
 }
 .animated {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	width: 20px;
-	height: 20px;
-	background: #3cf;
-	transition: all 3s;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background: #3cf;
+    transition: all 3s;
 }
 .move {
-	width: 300px;
-	-webkit-animation: move-top 5s, move-left 1s;
-	-webkit-animation-fill-mode: both;
-	animation: move-top 5s, move-left 1s;
-	animation-fill-mode: both;
+    width: 300px;
+    -webkit-animation: move-top 5s, move-left 1s;
+    -webkit-animation-fill-mode: both;
+    animation: move-top 5s, move-left 1s;
+    animation-fill-mode: both;
 }
 @keyframes move-top {
-	100% {
-		top: 0;
-	}
+    100% {
+        top: 0;
+    }
 }
 @keyframes move-left {
-	100% {
-		left: 0;
-	}
+    100% {
+        left: 0;
+    }
 }
 @-webkit-keyframes move-top {
-	100% {
-		top: 0;
-	}
+    100% {
+        top: 0;
+    }
 }
 @-webkit-keyframes move-left {
-	100% {
-		left: 0;
-	}
+    100% {
+        left: 0;
+    }
 }

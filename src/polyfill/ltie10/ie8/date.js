@@ -1,6 +1,6 @@
 
 if (!Date.now) {
-	Date.now = function () {
-		return (new Date).getTime();
-	};
+    Date.now = function () {
+        return (new Date).getTime();
+    };
 }

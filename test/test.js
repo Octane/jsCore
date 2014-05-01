@@ -1,27 +1,27 @@
 "use strict";
 
 try {
-	console.log;
+    console.log;
 }
 catch (error) {
-	window.console = {
-		log: function () {
-			var pre = document.createElement("pre");
-			pre.append(Array.join(arguments, ", "));
-			document.body.append(pre);
-		}
-	};
+    window.console = {
+        log: function () {
+            var pre = document.createElement("pre");
+            pre.append(Array.join(arguments, ", "));
+            document.body.append(pre);
+        }
+    };
 }
 
 lib.event.when(document.body, "click").then(function () {console.log("WHEN");
-	console.log("request start");
-	return lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
-		var node = document.createElement("blockquote");
-		node.append(xhr.responseText);
-		document.body.append(node);
-	});
+    console.log("request start");
+    return lib.request.get("MIT-LICENSE.txt").then(function (xhr) {
+        var node = document.createElement("blockquote");
+        node.append(xhr.responseText);
+        document.body.append(node);
+    });
 }).then(function () {
-	console.log("request done");
+    console.log("request done");
 });
 
 console.log("WeakMap tests:");
@@ -94,45 +94,45 @@ console.log(ws.delete_(objValue1) === true);
 console.log("CSS animation test");
 
 window.addEventListener("load", function () {
-	var node = document.body.appendChild(document.createElement("div"));
-	node.classList.add("animated");
-	window.requestAnimationFrame(function () {
-		lib.dom.addClass(node, "move").then(function (element) {
-			console.log("CSS animation done");
-			return element;
-		}).then(function (element) {
-			element.remove();
-		});
-	});
+    var node = document.body.appendChild(document.createElement("div"));
+    node.classList.add("animated");
+    window.requestAnimationFrame(function () {
+        lib.dom.addClass(node, "move").then(function (element) {
+            console.log("CSS animation done");
+            return element;
+        }).then(function (element) {
+            element.remove();
+        });
+    });
 });
 
 console.log("Promise tests");
 
 new Promise(function (resolve) {
-	console.log("call promise 1 resolver");
-	resolve();
+    console.log("call promise 1 resolver");
+    resolve();
 });
 new Promise(function (resolve) {
-	console.log("call promise 2 resolver");
-	resolve();
+    console.log("call promise 2 resolver");
+    resolve();
 });
 Promise.all([
-	new Promise(function (resolve) {
-		console.log("call promise 3 resolver");
-		resolve();
-	}),
-	new Promise(function (resolve) {
-		console.log("call promise 4 resolver");
-		resolve();
-	})
+    new Promise(function (resolve) {
+        console.log("call promise 3 resolver");
+        resolve();
+    }),
+    new Promise(function (resolve) {
+        console.log("call promise 4 resolver");
+        resolve();
+    })
 ]);
 Promise.race([
-	new Promise(function (resolve) {
-		console.log("call promise 5 resolver");
-		resolve();
-	}),
-	new Promise(function (resolve) {
-		console.log("call promise 6 resolver");
-		resolve();
-	})
+    new Promise(function (resolve) {
+        console.log("call promise 5 resolver");
+        resolve();
+    }),
+    new Promise(function (resolve) {
+        console.log("call promise 6 resolver");
+        resolve();
+    })
 ]);
