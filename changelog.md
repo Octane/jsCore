@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.4.3
+
+ -
+
 ##v0.4.2
 
  - remove `.initKeyEvent()` and `.initMutationEvent()`
