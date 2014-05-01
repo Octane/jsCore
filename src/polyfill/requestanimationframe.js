@@ -10,9 +10,9 @@ window.requestAnimationFrame || Object.assign(window, {
             var fps = 60, delay = 1000 / fps, navigationStart, prevCallTime;
             navigationStart = prevCallTime = Date.now();
             return function (callback) {
-                var currCallTime = Date.now(),
-                    timeout = Math.max(0, delay - (currCallTime - prevCallTime)),
-                    timeToCall = currCallTime + timeout;
+                var curCallTime = Date.now(),
+                    timeout = Math.max(0, delay - (curCallTime - prevCallTime)),
+                    timeToCall = curCallTime + timeout;
                 prevCallTime = timeToCall;
                 return window.setTimeout(function () {
                     callback(timeToCall - navigationStart);

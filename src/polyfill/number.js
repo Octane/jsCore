@@ -12,7 +12,9 @@ if (!Number.isFinite) {
 
 if (!Number.isInteger) {
     Number.isInteger = function (value) {
-        return "number" == typeof value && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) == value;
+        return "number" == typeof value && isFinite(value) &&
+               value > -9007199254740992 && value < 9007199254740992 &&
+               Math.floor(value) == value;
     };
 }
 

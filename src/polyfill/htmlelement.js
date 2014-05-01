@@ -2,7 +2,8 @@
 
 function StaticDOMStringMap() {}
 
-"dataset" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "dataset", {
+"dataset" in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, "dataset", {
 
     //simple implementation: the new property will not create an attribute
 
@@ -31,7 +32,11 @@ function StaticDOMStringMap() {}
             Array.forEach(attrs, function (attr) {
                 var attrName = attr.name.toLowerCase();
                 if (attrName.startsWith("data-")) {
-                    Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
+                    Object.defineProperty(
+                        dataset,
+                        attrToPropName(attrName),
+                        attrToPropDesc(attr)
+                    );
                 }
             });
             return dataset;
@@ -97,8 +102,9 @@ function StaticDOMStringMap() {}
             };
 
             return function () {
-                var i = 0, node, nodes = this.childNodes, length = nodes.length,
-                    j = 0, elements = new StaticHTMLCollection;
+                var i = 0, node, nodes = this.childNodes,
+                    j = 0, length = nodes.length,
+                    elements = new StaticHTMLCollection;
                 while (i < length) {
                     node = nodes[i];
                     if (ELEMENT_NODE == node.nodeType) {
