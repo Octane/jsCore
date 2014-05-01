@@ -110,7 +110,9 @@ window.addEventListener || new function () {
         });
     }
 
-    function initMouseEvent(type, bubbles, cancelable, view, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
+    function initMouseEvent(type, bubbles, cancelable, view, detail, screenX,
+                            screenY, clientX, clientY, ctrlKey, altKey,
+                            shiftKey, metaKey, button, relatedTarget) {
         this.initUIEvent(type, bubbles, cancelable, view, detail);
         Object.assign(this, {
             screenX: screenX,
@@ -176,16 +178,21 @@ window.addEventListener || new function () {
 
     Object.defineProperty(Event.prototype, "relatedTarget", {
         get: function () {
-            return this.fromElement === this.target ? this.toElement : this.fromElement;
+            if (this.fromElement === this.srcElement) {
+                return this.toElement;
+            }
+            return this.fromElement;
         }
     });
 
-    [Window, HTMLDocument, HTMLElement, XMLHttpRequest].forEach(function (eventTarget) {
-        var proto = eventTarget.prototype;
-        proto.dispatchEvent = dispatchEvent;
-        proto.addEventListener = addEventListener;
-        proto.removeEventListener = removeEventListener;
-    });
+    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].forEach(
+        function (eventTarget) {
+            var proto = eventTarget.prototype;
+            proto.dispatchEvent = dispatchEvent;
+            proto.addEventListener = addEventListener;
+            proto.removeEventListener = removeEventListener;
+        }
+    );
 
     HTMLDocument.prototype.createEvent = function (group) {
         var event;
@@ -276,7 +283,8 @@ window.addEventListener || new function () {
 
 };
 
-"onload" in document.createElement("script") || Object.defineProperty(HTMLScriptElement.prototype, "onload", {
+"onload" in document.createElement("script") ||
+Object.defineProperty(HTMLScriptElement.prototype, "onload", {
 
     //Warning: don't use onreadystatechange with onload and onerror!
 

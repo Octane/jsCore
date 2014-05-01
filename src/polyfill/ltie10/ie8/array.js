@@ -99,7 +99,9 @@ if (!Array.prototype.reduce) {
         var i = 0, length = this.length, currentValue;
         if (arguments.length < 2) {
             if (!length) {
-                throw new TypeError("Reduce of empty array with no initial value");
+                throw new TypeError(
+                    "Reduce of empty array with no initial value"
+                );
             }
             while (i < length) {
                 if (i in this) {
@@ -128,7 +130,9 @@ if (!Array.prototype.reduceRight) {
         var i = this.length, currentValue;
         if (arguments.length < 2) {
             if (!this.length) {
-                throw new TypeError("Reduce of empty array with no initial value");
+                throw new TypeError(
+                    "Reduce of empty array with no initial value"
+                );
             }
             while (i--) {
                 if (i in this) {

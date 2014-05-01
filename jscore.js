@@ -7,7 +7,8 @@
  */
 var HTMLElement = HTMLElement || Element;
 
-"textContent" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "textContent", {
+"textContent" in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, "textContent", {
     get: function () {
         return this.innerText;
     },
@@ -16,7 +17,8 @@ var HTMLElement = HTMLElement || Element;
     }
 });
 
-"textContent" in document.createTextNode("test") || Object.defineProperty(Text.prototype, "textContent", {
+"textContent" in document.createTextNode("test") ||
+Object.defineProperty(Text.prototype, "textContent", {
     get: function () {
         return this.nodeValue;
     },
@@ -35,7 +37,6 @@ var HTMLElement = HTMLElement || Element;
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
     //IE8 DontEnum bug fix
-    //https://developer.mozilla.org/en-US/docs/ECMAScript_DontEnum_attribute#JScript_DontEnum_Bug
     var hasBug = [
             "constructor", "toString", "toLocaleString", "valueOf",
             "hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
@@ -60,10 +61,12 @@ var HTMLElement = HTMLElement || Element;
 };
 
 if (!Object.create) {
-    //Warning: Object.create(null) instanceof Object → true, and it doesn't fix!
+    //Warning: Object.create(null) instanceof Object → true
     Object.create = function (prototype, properties) {
         if (properties) {
-            throw new Error("Object.create implementation only accepts the first parameter");
+            throw new Error(
+                "Object.create implementation only accepts the 1st parameter"
+            );
         }
         function NOP() {}
         NOP.prototype = prototype;
@@ -171,7 +174,9 @@ if (!Array.prototype.reduce) {
         var i = 0, length = this.length, currentValue;
         if (arguments.length < 2) {
             if (!length) {
-                throw new TypeError("Reduce of empty array with no initial value");
+                throw new TypeError(
+                    "Reduce of empty array with no initial value"
+                );
             }
             while (i < length) {
                 if (i in this) {
@@ -200,7 +205,9 @@ if (!Array.prototype.reduceRight) {
         var i = this.length, currentValue;
         if (arguments.length < 2) {
             if (!this.length) {
-                throw new TypeError("Reduce of empty array with no initial value");
+                throw new TypeError(
+                    "Reduce of empty array with no initial value"
+                );
             }
             while (i--) {
                 if (i in this) {
@@ -221,63 +228,90 @@ if (!Array.prototype.reduceRight) {
     };
 }
 
-if (!Function.prototype.bind) {
+Function.bind || (Function.prototype.bind = new function () {
 
-    Function.prototype.bind = new function () {
-
-        function newApply(Constructor, args) {
-            var i = 0, len = args.length, argNames = [];
-            while (i < len) {
-                argNames.push("arg" + i);
-                i++;
-            }
-            argNames = argNames.join(",");
-            return Function("Constructor", argNames, "return new Constructor(" + argNames + ")").apply(window, [Constructor].concat(args));
+    function newApply(Constructor, args) {
+        var i = 0, len = args.length, argNames = [];
+        while (i < len) {
+            argNames.push("arg" + i);
+            i++;
         }
+        argNames = argNames.join(",");
+        return Function(
+            "Constructor",
+            argNames,
+            "return new Constructor(" + argNames + ")"
+        ).apply(window, [Constructor].concat(args));
+    }
 
-        return function (boundThis) {
-            if (typeof this != "function") {
-                throw new TypeError("Function.prototype.bind called on non-function");
+    return function (boundThis) {
+        var targetFunc = this, boundArgs = Array.slice(arguments, 1);
+        function boundFunc() {
+            var args, len, proto;
+            function NOP() {}
+            if (boundFunc._protoMagic) {
+                boundFunc._protoMagic = false;
+                NOP.prototype = this;
+                NOP.prototype.constructor = targetFunc;
+                return new NOP;
             }
-            var targetFunc = this, boundArgs = Array.slice(arguments, 1);
-            function boundFunc() {
-                var allArgs, len;
-                function NOP() {}
-                if (boundFunc._protoMagic) {
-                    boundFunc._protoMagic = false;
-                    NOP.prototype = this;
-                    NOP.prototype.constructor = targetFunc;
-                    return new NOP;
-                }
-                else {
-                    allArgs = boundArgs.concat(Array.from(arguments));
-                    len = allArgs.length;
-                }
-                if (this && this.constructor == boundFunc) {
-                    boundFunc._protoMagic = true;
-                    NOP.prototype = len > 1 ? newApply(targetFunc, allArgs) : (len ? new targetFunc(allArgs[0]) : new targetFunc);
-                    boundFunc.prototype = new NOP;
-                    boundFunc.prototype.constructor = boundFunc;
-                    return new boundFunc;
-                }
-                return len > 1 ? targetFunc.apply(boundThis, allArgs) : (len ? targetFunc.call(boundThis, allArgs[0]) : targetFunc.call(boundThis));
+            else {
+                args = boundArgs.concat(Array.from(arguments));
+                len = args.length;
             }
-            boundFunc._protoMagic = false;
-            return boundFunc;
-        };
-
+            if (this instanceof boundFunc) {
+                boundFunc._protoMagic = true;
+                switch (len) {
+                    case 0:
+                        proto = new targetFunc;
+                        break;
+                    case 1:
+                        proto = new targetFunc(args[0]);
+                        break;
+                    case 2:
+                        proto = new targetFunc(args[0], args[1]);
+                        break;
+                    default:
+                        proto = newApply(targetFunc, args);
+                }
+                NOP.prototype = proto;
+                boundFunc.prototype = new NOP;
+                boundFunc.prototype.constructor = boundFunc;
+                return new boundFunc;
+            }
+            switch (len) {
+                case 0:
+                    return targetFunc.call(boundThis);
+                case 1:
+                    return targetFunc.call(boundThis, args[0]);
+                case 2:
+                    return targetFunc.call(boundThis, args[0], args[1]);
+            }
+            return targetFunc.apply(boundThis, args);
+        }
+        if ("function" != typeof targetFunc) {
+            throw new TypeError(
+                "Function.prototype.bind called on non-function"
+            );
+        }
+        boundFunc._protoMagic = false;
+        return boundFunc;
     };
 
-}
+});
 
 if (!String.prototype.trim) {
     String.prototype.trim = new function () {
-        //http://perfectionkills.com/chr-deviations/
         //https://github.com/kriskowal/es5-shim/
-        var whitespace = "[\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF]",
-            //http://blog.stevenlevithan.com/archives/faster-trim-javascript/
-            left = new RegExp("^" + whitespace + whitespace + "*"),
-            right = new RegExp(whitespace + whitespace + "*$");
+         //http://perfectionkills.com/chr-deviations/
+        //http://blog.stevenlevithan.com/archives/faster-trim-javascript/
+        var whitespace, left, right;
+        whitespace = "\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000";
+        whitespace += "\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008";
+        whitespace += "\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF";
+        whitespace = "[" + whitespace + "]";
+        left = new RegExp("^" + whitespace + whitespace + "*");
+        right = new RegExp(whitespace + whitespace + "*$");
         return function () {
             return this.replace(left, "").replace(right, "");
         };
@@ -459,7 +493,9 @@ if (!Number.isFinite) {
 
 if (!Number.isInteger) {
     Number.isInteger = function (value) {
-        return "number" == typeof value && isFinite(value) && value > -9007199254740992 && value < 9007199254740992 && Math.floor(value) == value;
+        return "number" == typeof value && isFinite(value) &&
+               value > -9007199254740992 && value < 9007199254740992 &&
+               Math.floor(value) == value;
     };
 }
 
@@ -1080,9 +1116,9 @@ window.requestAnimationFrame || Object.assign(window, {
             var fps = 60, delay = 1000 / fps, navigationStart, prevCallTime;
             navigationStart = prevCallTime = Date.now();
             return function (callback) {
-                var currCallTime = Date.now(),
-                    timeout = Math.max(0, delay - (currCallTime - prevCallTime)),
-                    timeToCall = currCallTime + timeout;
+                var curCallTime = Date.now(),
+                    timeout = Math.max(0, delay - (curCallTime - prevCallTime)),
+                    timeToCall = curCallTime + timeout;
                 prevCallTime = timeToCall;
                 return window.setTimeout(function () {
                     callback(timeToCall - navigationStart);
@@ -1106,7 +1142,8 @@ window.requestAnimationFrame || Object.assign(window, {
 
 function StaticDOMStringMap() {}
 
-"dataset" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "dataset", {
+"dataset" in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, "dataset", {
 
     //simple implementation: the new property will not create an attribute
 
@@ -1135,7 +1172,11 @@ function StaticDOMStringMap() {}
             Array.forEach(attrs, function (attr) {
                 var attrName = attr.name.toLowerCase();
                 if (attrName.startsWith("data-")) {
-                    Object.defineProperty(dataset, attrToPropName(attrName), attrToPropDesc(attr));
+                    Object.defineProperty(
+                        dataset,
+                        attrToPropName(attrName),
+                        attrToPropDesc(attr)
+                    );
                 }
             });
             return dataset;
@@ -1201,8 +1242,9 @@ function StaticDOMStringMap() {}
             };
 
             return function () {
-                var i = 0, node, nodes = this.childNodes, length = nodes.length,
-                    j = 0, elements = new StaticHTMLCollection;
+                var i = 0, node, nodes = this.childNodes,
+                    j = 0, length = nodes.length,
+                    elements = new StaticHTMLCollection;
                 while (i < length) {
                     node = nodes[i];
                     if (ELEMENT_NODE == node.nodeType) {
@@ -1372,7 +1414,8 @@ function StaticDOMStringMap() {}
 
 };
 
-"classList" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "classList", {
+"classList" in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, "classList", {
 
     get: new function () {
 
@@ -1534,7 +1577,8 @@ var FormData = FormData || function () {
                 if ("select" == tag && field.multiple) {
                     return Array.some(field.options, isSelected);
                 }
-                if ("submit" == type || "reset" == type || "button" == type || "file" == type) {
+                if ("submit" == type || "reset" == type ||
+                    "button" == type || "file" == type) {
                     return false;
                 }
                 if (("radio" == type || "checkbox" == type) && field.checked) {
@@ -1543,13 +1587,17 @@ var FormData = FormData || function () {
                 return true;
             }
             function getValues(field) {
-                if ("select" == field.nodeName.toLowerCase() && field.multiple) {
-                    return Array.reduce(field.options, function (values, option) {
-                        if (isSelected(option)) {
-                            values.push(option.value);
-                        }
-                        return values;
-                    }, []);
+                if ("select" == field.tagName.toLowerCase() && field.multiple) {
+                    return Array.reduce(
+                        field.options,
+                        function (values, option) {
+                            if (isSelected(option)) {
+                                values.push(option.value);
+                            }
+                            return values;
+                        },
+                        []
+                    );
                 }
                 //todo replace CRLF
                 return [field.value];
@@ -1593,15 +1641,18 @@ var FormData = FormData || function () {
             //https://github.com/francois2metz/html5-formdata
             var boundary = this.boundary, body = "";
             Array.forEach(this, function (field) {
-                var name = field.name, value = field.value;
+                var name = field.name, value = field.value,
+                    filename = field.fileName || value.name;
                 body += "--" + boundary + "\r\n";
                 if (Object(value) === value) {
-                    body += 'Content-Disposition: form-data; name="' + name + '"; filename="' + (field.fileName || value.name) + '"\r\n';
+                    body += 'Content-Disposition: form-data; name="';
+                    body += name + '"; filename="' + filename + '"\r\n';
                     body += "Content-Type: " + value.type + "\r\n\r\n";
                     body += value.content + "\r\n";
                 }
                 else {
-                    body += 'Content-Disposition: form-data; name="'+ name + '"\r\n\r\n';
+                    body += 'Content-Disposition: form-data; name="';
+                    body += name + '"\r\n\r\n';
                     body += value + "\r\n";
                 }
             });
@@ -1615,7 +1666,10 @@ var FormData = FormData || function () {
         var send = XMLHttpRequest.prototype.send;
         return function (data) {
             if (data instanceof FormData) {
-                this.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + data.boundary);
+                this.setRequestHeader(
+                    "Content-Type",
+                    "multipart/form-data; boundary=" + data.boundary
+                );
                 data = data.toString();
             }
             send.call(this, data);
@@ -1646,9 +1700,14 @@ new function () {
     }
     catch (error) {
         Array.slice = function (iterable, start, end) {
-            var length = arguments.length;
+            var array, length = arguments.length;
             //NodeList instanceof Object → false in IE8
-            var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
+            if (Object(iterable) instanceof Object) {
+                array = iterable;
+            }
+            else {
+                array = toArray(iterable);
+            }
             //[1].slice(0, undefined) → [] in IE8
             if (1 == length || 2 == length && 0 == start) {
                 return array == iterable ? slice.call(array, 0) : array;
@@ -1869,7 +1928,9 @@ window.addEventListener || new function () {
         });
     }
 
-    function initMouseEvent(type, bubbles, cancelable, view, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
+    function initMouseEvent(type, bubbles, cancelable, view, detail, screenX,
+                            screenY, clientX, clientY, ctrlKey, altKey,
+                            shiftKey, metaKey, button, relatedTarget) {
         this.initUIEvent(type, bubbles, cancelable, view, detail);
         Object.assign(this, {
             screenX: screenX,
@@ -1935,16 +1996,21 @@ window.addEventListener || new function () {
 
     Object.defineProperty(Event.prototype, "relatedTarget", {
         get: function () {
-            return this.fromElement === this.target ? this.toElement : this.fromElement;
+            if (this.fromElement === this.srcElement) {
+                return this.toElement;
+            }
+            return this.fromElement;
         }
     });
 
-    [Window, HTMLDocument, HTMLElement, XMLHttpRequest].forEach(function (eventTarget) {
-        var proto = eventTarget.prototype;
-        proto.dispatchEvent = dispatchEvent;
-        proto.addEventListener = addEventListener;
-        proto.removeEventListener = removeEventListener;
-    });
+    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].forEach(
+        function (eventTarget) {
+            var proto = eventTarget.prototype;
+            proto.dispatchEvent = dispatchEvent;
+            proto.addEventListener = addEventListener;
+            proto.removeEventListener = removeEventListener;
+        }
+    );
 
     HTMLDocument.prototype.createEvent = function (group) {
         var event;
@@ -2035,7 +2101,8 @@ window.addEventListener || new function () {
 
 };
 
-"onload" in document.createElement("script") || Object.defineProperty(HTMLScriptElement.prototype, "onload", {
+"onload" in document.createElement("script") ||
+Object.defineProperty(HTMLScriptElement.prototype, "onload", {
 
     //Warning: don't use onreadystatechange with onload and onerror!
 
@@ -2085,7 +2152,10 @@ window instanceof Object || new function () {
     }
 
     function createAlphaFilter(value) {
-        return fixFontSmoothing(alpha.replace("{VALUE}", Math.trunc(value * 100)), value);
+        return fixFontSmoothing(
+            alpha.replace("{VALUE}", Math.trunc(value * 100)),
+            value
+        );
     }
 
     function changeAlphaFilter(filter, value) {
@@ -2221,7 +2291,8 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
     function createOpacityDesc(filters) {
         return {
             get: function () {
-                var alpha = filters["DXImageTransform.Microsoft.Alpha"] || filters.alpha;
+                var alpha = filters["DXImageTransform.Microsoft.Alpha"] ||
+                            filters.alpha;
                 if (alpha) {
                     return String(alpha.opacity / 100);
                 }
@@ -2232,17 +2303,31 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
     function getComputedStyle(element, pseudo) {
         if (pseudo) {
-            throw new Error("getComputedStyle implementation only accepts the first parameter");
+            throw new Error(
+                "getComputedStyle implementation only accepts the 1st parameter"
+            );
         }
         var compStyle = element._compStyle, currStyle;
         if (!compStyle) {
             compStyle = element._compStyle = createObject();
             currStyle = element.currentStyle;
             Object.keys(currStyle).forEach(function (property) {
-                Object.defineProperty(compStyle, property, createPropDesc(currStyle, property));
+                Object.defineProperty(
+                    compStyle,
+                    property,
+                    createPropDesc(currStyle, property)
+                );
             });
-            Object.defineProperty(compStyle, "cssFloat", createCSSFloatDesc(currStyle));
-            Object.defineProperty(compStyle, "opacity", createOpacityDesc(element.filters));
+            Object.defineProperty(
+                compStyle,
+                "cssFloat",
+                createCSSFloatDesc(currStyle)
+            );
+            Object.defineProperty(
+                compStyle,
+                "opacity",
+                createOpacityDesc(element.filters)
+            );
             compStyle.getPropertyValue = getPropertyValue;
         }
         return compStyle;
@@ -2456,17 +2541,22 @@ lib.html = {
 };
 
 
+//example: new lib.Template("Hi, {NAME}").match({name: "John"}) → "Hi, John"
 lib.Template = new function () {
 
     function Template(template) {
         this.template = Array.join(template, "");
     }
 
-    //example: new lib.Template("Hi, {NAME}").match({name: "John"}) → "Hi, John"
-    Template.prototype.match = function (stringMap) {
-        return Object.keys(stringMap).reduceRight(function (template, key) {
-            return template.split("{" + key.toUpperCase() + "}").join(stringMap[key]);
-        }, this.template);
+    Template.match = function (template, replacements) {
+        return Object.keys(replacements).reduceRight(function (template, key) {
+            var value = replacements[key];
+            return template.split("{" + key.toUpperCase() + "}").join(value);
+        }, template);
+    };
+
+    Template.prototype.match = function (replacements) {
+        return Template.match(this.template, replacements);
     };
 
     return Template;
@@ -2491,7 +2581,7 @@ lib.I18n = new function () {
                 message = i18n.messageBundle[message];
             }
             if (replacements) {
-                return new lib.Template(message).match(replacements);
+                return lib.Template.match(message, replacements);
             }
             return message;
         }
@@ -2552,6 +2642,20 @@ lib.css = {
             }, {});
         }
         return style[prefix(properties)];
+    },
+
+    getAnimationNames: new function () {
+        var separator = /,\s*/;
+        function excludeNone(value) {
+            return "none" != value;
+        }
+        return function (style) {
+            var names = style[this.animationName];
+            if (names) {
+                return names.split(separator).filter(excludeNone);
+            }
+            return [];
+        };
     }
 
 };
@@ -2565,7 +2669,10 @@ lib.css = {
 new function () {
 
     var ns = lib.css, properties = {
-            animation: ["Delay", "Direction", "Duration", "FillMode", "IterationCount", "Name", "PlayState", "TimingFunction"],
+            animation: [
+                "Delay", "Direction", "Duration", "FillMode", "IterationCount",
+                "Name", "PlayState", "TimingFunction"
+            ],
             transition: ["Delay", "Duration", "Property", "TimingFunction"],
             transform:  ["Origin", "Style"]
         };
@@ -2594,7 +2701,8 @@ Object.assign(lib.css, {
 
         if (lib.css.transition || lib.css.animation) {
             return function (element, properties) {
-                var animations = window.getComputedStyle(element)[this.animationName];
+                var style = window.getComputedStyle(element),
+                    animations = this.getAnimationNames(style);
                 changeStyle(element.style, properties);
                 return lib.event.awaitTransAnimEnd(element, animations);
             };
@@ -2643,7 +2751,7 @@ Object.assign(lib.css, {
 
 lib.event = {
 
-    //example: element.addEventListener("click", lib.event.preventDefault, false)
+    //example: element.addEventListener("click", lib.event.preventDefault)
     preventDefault: function (event) {
         event.preventDefault();
     },
@@ -2663,20 +2771,22 @@ lib.event = {
     },
 
     one: function (element, selector, eventTypes, callback) {
-        if (arguments.length == 3) {
-            callback = eventTypes;
-            eventTypes = selector;
-            selector = null;
-        }
-        var eventDetails = lib.event.on(element, selector, eventTypes, function (event) {
-            lib.event.off(eventDetails);
+        var details;
+        function listener(event) {
+            lib.event.off(details);
             if (callback.handleEvent) {
                 callback.handleEvent(event);
             }
             else {
                 callback.call(element, event);
             }
-        });
+        }
+        if (arguments.length == 3) {
+            callback = eventTypes;
+            eventTypes = selector;
+            selector = null;
+        }
+        details = lib.event.on(element, selector, eventTypes, listener);
     },
 
     on: function (element, selector, eventTypes, callback) {
@@ -2718,7 +2828,10 @@ lib.event = {
 
     off: function (eventDetails) {
         eventDetails.eventTypes.forEach(function (eventType) {
-            eventDetails.element.removeEventListener(eventType, eventDetails.callback);
+            eventDetails.element.removeEventListener(
+                eventType,
+                eventDetails.callback
+            );
         });
     }
 
@@ -2772,22 +2885,12 @@ Object.assign(lib.event, new function () {
 
     var transition = lib.css.transition,
         animationName = lib.css.animationName,
-        animationEnd = lib.event.animationEnd,
-        separator = /,\s*/;
-
-    function getAnimationNames(element, style) {
-        return (style || window.getComputedStyle(element))[animationName].split(separator);
-    }
+        animationEnd = lib.event.animationEnd;
 
     function getNewAnimationNames(oldNames, newNames) {
-        if (!newNames || oldNames == newNames) {
-            return [];
-        }
-        newNames = newNames.split(separator);
         if (!oldNames) {
             return newNames;
         }
-        oldNames = oldNames.split(separator);
         return newNames.reduce(function (names, name) {
             if (-1 == oldNames.indexOf(name)) {
                 names.push(name);
@@ -2806,13 +2909,16 @@ Object.assign(lib.event, new function () {
 
     function awaitAnimationEnd(element, animations) {
         if (!animations) {
-            animations = getAnimationNames(element);
+            animations = lib.css.getAnimationNames(element);
         }
         if (animations.length) {
             return new Promise(function (resolve) {
                 function onAnimationEnd(event) {
                     if (!dequeue(animations, event.animationName)) {
-                        element.removeEventListener(animationEnd, onAnimationEnd);
+                        element.removeEventListener(
+                            animationEnd,
+                            onAnimationEnd
+                        );
                         resolve(element);
                     }
                 }
@@ -2823,7 +2929,11 @@ Object.assign(lib.event, new function () {
     }
 
     function awaitTransitionEnd(element, style) {
-        var delay = lib.css.getTransitionTime(style || window.getComputedStyle(element));
+        var delay;
+        if (!style) {
+            style = window.getComputedStyle(element);
+        }
+        delay = lib.css.getTransitionTime(style);
         if (delay) {
             return new Promise(function (resolve) {
                 window.setTimeout(function () {
@@ -2835,9 +2945,11 @@ Object.assign(lib.event, new function () {
     }
 
     function awaitTransAnimEnd(element, prevAnimations) {
-        var style = window.getComputedStyle(element);
+        var style = window.getComputedStyle(element),
+            animations = lib.css.getAnimationNames(style);
+        animations = getNewAnimationNames(prevAnimations, animations);
         return Promise.all([
-            awaitAnimationEnd(element, getNewAnimationNames(prevAnimations, style[animationName])),
+            awaitAnimationEnd(element, animations),
             awaitTransitionEnd(element, style)
         ]).then(function () {
             return element;
@@ -2854,7 +2966,8 @@ Object.assign(lib.event, new function () {
 
         awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
 
-        awaitTransAnimEnd: animationName || transition ? awaitTransAnimEnd : fallback
+        awaitTransAnimEnd: animationName || transition ?
+                           awaitTransAnimEnd : fallback
 
     };
 
@@ -2875,8 +2988,10 @@ lib.dom = {
 //addClass, removeClass and toggleClass
 Object.assign(lib.dom, new function () {
 
-    var promise = lib.css.animation || lib.css.transition ? function (element, method, classes) {
-            var animations = window.getComputedStyle(element)[lib.css.animationName];
+    var promise = lib.css.animation || lib.css.transition ?
+        function (element, method, classes) {
+            var style = window.getComputedStyle(element),
+                animations = lib.css.getAnimationNames(style);
             if (changeClasses(element, method, classes)) {
                 return lib.event.awaitTransAnimEnd(element, animations);
             }
@@ -2987,7 +3102,8 @@ lib.request = new function () {
             }
         }
         if ("POST" == method) {
-            headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded; charset=UTF-8";
+            headers["Content-Type"] = headers["Content-Type"] ||
+            "application/x-www-form-urlencoded; charset=UTF-8";
         }
         else {
             if (!caching) {
@@ -3099,21 +3215,23 @@ lib.request = new function () {
                 url += (caching ? "?" : "&") + data;
             }
             return new Promise(function (resolve, reject) {
-                document.head.appendChild(Object.assign(document.createElement("script"), {
-                    onload: function () {
-                        unbind(this);
-                        this.remove();
-                        resolve();
-                    },
-                    onerror: function () {
-                        unbind(this);
-                        this.remove();
-                        reject(new Error("Could not load script"));
-                    },
-                    async: true,
-                    defer: true,
-                    src: url
-                }));
+                document.head.appendChild(
+                    Object.assign(document.createElement("script"), {
+                        onload: function () {
+                            unbind(this);
+                            this.remove();
+                            resolve();
+                        },
+                        onerror: function () {
+                            unbind(this);
+                            this.remove();
+                            reject(new Error("Could not load script"));
+                        },
+                        async: true,
+                        defer: true,
+                        src: url
+                    })
+                );
             });
         }
 

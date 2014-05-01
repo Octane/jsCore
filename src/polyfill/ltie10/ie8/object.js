@@ -3,7 +3,6 @@
 ({toString: null}).propertyIsEnumerable("toString") || new function () {
 
     //IE8 DontEnum bug fix
-    //https://developer.mozilla.org/en-US/docs/ECMAScript_DontEnum_attribute#JScript_DontEnum_Bug
     var hasBug = [
             "constructor", "toString", "toLocaleString", "valueOf",
             "hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"
@@ -28,10 +27,12 @@
 };
 
 if (!Object.create) {
-    //Warning: Object.create(null) instanceof Object → true, and it doesn't fix!
+    //Warning: Object.create(null) instanceof Object → true
     Object.create = function (prototype, properties) {
         if (properties) {
-            throw new Error("Object.create implementation only accepts the first parameter");
+            throw new Error(
+                "Object.create implementation only accepts the 1st parameter"
+            );
         }
         function NOP() {}
         NOP.prototype = prototype;

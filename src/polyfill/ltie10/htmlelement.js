@@ -1,5 +1,6 @@
 
-"classList" in document.documentElement || Object.defineProperty(HTMLElement.prototype, "classList", {
+"classList" in document.documentElement ||
+Object.defineProperty(HTMLElement.prototype, "classList", {
 
     get: new function () {
 

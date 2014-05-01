@@ -47,7 +47,8 @@ var FormData = FormData || function () {
                 if ("select" == tag && field.multiple) {
                     return Array.some(field.options, isSelected);
                 }
-                if ("submit" == type || "reset" == type || "button" == type || "file" == type) {
+                if ("submit" == type || "reset" == type ||
+                    "button" == type || "file" == type) {
                     return false;
                 }
                 if (("radio" == type || "checkbox" == type) && field.checked) {
@@ -56,13 +57,17 @@ var FormData = FormData || function () {
                 return true;
             }
             function getValues(field) {
-                if ("select" == field.nodeName.toLowerCase() && field.multiple) {
-                    return Array.reduce(field.options, function (values, option) {
-                        if (isSelected(option)) {
-                            values.push(option.value);
-                        }
-                        return values;
-                    }, []);
+                if ("select" == field.tagName.toLowerCase() && field.multiple) {
+                    return Array.reduce(
+                        field.options,
+                        function (values, option) {
+                            if (isSelected(option)) {
+                                values.push(option.value);
+                            }
+                            return values;
+                        },
+                        []
+                    );
                 }
                 //todo replace CRLF
                 return [field.value];
@@ -106,15 +111,18 @@ var FormData = FormData || function () {
             //https://github.com/francois2metz/html5-formdata
             var boundary = this.boundary, body = "";
             Array.forEach(this, function (field) {
-                var name = field.name, value = field.value;
+                var name = field.name, value = field.value,
+                    filename = field.fileName || value.name;
                 body += "--" + boundary + "\r\n";
                 if (Object(value) === value) {
-                    body += 'Content-Disposition: form-data; name="' + name + '"; filename="' + (field.fileName || value.name) + '"\r\n';
+                    body += 'Content-Disposition: form-data; name="';
+                    body += name + '"; filename="' + filename + '"\r\n';
                     body += "Content-Type: " + value.type + "\r\n\r\n";
                     body += value.content + "\r\n";
                 }
                 else {
-                    body += 'Content-Disposition: form-data; name="'+ name + '"\r\n\r\n';
+                    body += 'Content-Disposition: form-data; name="';
+                    body += name + '"\r\n\r\n';
                     body += value + "\r\n";
                 }
             });
@@ -128,7 +136,10 @@ var FormData = FormData || function () {
         var send = XMLHttpRequest.prototype.send;
         return function (data) {
             if (data instanceof FormData) {
-                this.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + data.boundary);
+                this.setRequestHeader(
+                    "Content-Type",
+                    "multipart/form-data; boundary=" + data.boundary
+                );
                 data = data.toString();
             }
             send.call(this, data);

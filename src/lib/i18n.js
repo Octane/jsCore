@@ -17,7 +17,7 @@ lib.I18n = new function () {
                 message = i18n.messageBundle[message];
             }
             if (replacements) {
-                return new lib.Template(message).match(replacements);
+                return lib.Template.match(message, replacements);
             }
             return message;
         }

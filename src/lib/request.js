@@ -69,7 +69,8 @@ lib.request = new function () {
             }
         }
         if ("POST" == method) {
-            headers["Content-Type"] = headers["Content-Type"] || "application/x-www-form-urlencoded; charset=UTF-8";
+            headers["Content-Type"] = headers["Content-Type"] ||
+            "application/x-www-form-urlencoded; charset=UTF-8";
         }
         else {
             if (!caching) {
@@ -181,21 +182,23 @@ lib.request = new function () {
                 url += (caching ? "?" : "&") + data;
             }
             return new Promise(function (resolve, reject) {
-                document.head.appendChild(Object.assign(document.createElement("script"), {
-                    onload: function () {
-                        unbind(this);
-                        this.remove();
-                        resolve();
-                    },
-                    onerror: function () {
-                        unbind(this);
-                        this.remove();
-                        reject(new Error("Could not load script"));
-                    },
-                    async: true,
-                    defer: true,
-                    src: url
-                }));
+                document.head.appendChild(
+                    Object.assign(document.createElement("script"), {
+                        onload: function () {
+                            unbind(this);
+                            this.remove();
+                            resolve();
+                        },
+                        onerror: function () {
+                            unbind(this);
+                            this.remove();
+                            reject(new Error("Could not load script"));
+                        },
+                        async: true,
+                        defer: true,
+                        src: url
+                    })
+                );
             });
         }
 

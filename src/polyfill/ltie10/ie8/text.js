@@ -1,5 +1,6 @@
 
-"textContent" in document.createTextNode("test") || Object.defineProperty(Text.prototype, "textContent", {
+"textContent" in document.createTextNode("test") ||
+Object.defineProperty(Text.prototype, "textContent", {
     get: function () {
         return this.nodeValue;
     },

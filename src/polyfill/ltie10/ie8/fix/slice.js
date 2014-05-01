@@ -19,9 +19,14 @@ new function () {
     }
     catch (error) {
         Array.slice = function (iterable, start, end) {
-            var length = arguments.length;
+            var array, length = arguments.length;
             //NodeList instanceof Object → false in IE8
-            var array = Object(iterable) instanceof Object ? iterable : toArray(iterable);
+            if (Object(iterable) instanceof Object) {
+                array = iterable;
+            }
+            else {
+                array = toArray(iterable);
+            }
             //[1].slice(0, undefined) → [] in IE8
             if (1 == length || 2 == length && 0 == start) {
                 return array == iterable ? slice.call(array, 0) : array;

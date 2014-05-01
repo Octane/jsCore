@@ -20,7 +20,10 @@ window instanceof Object || new function () {
     }
 
     function createAlphaFilter(value) {
-        return fixFontSmoothing(alpha.replace("{VALUE}", Math.trunc(value * 100)), value);
+        return fixFontSmoothing(
+            alpha.replace("{VALUE}", Math.trunc(value * 100)),
+            value
+        );
     }
 
     function changeAlphaFilter(filter, value) {

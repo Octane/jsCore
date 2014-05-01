@@ -44,7 +44,8 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
     function createOpacityDesc(filters) {
         return {
             get: function () {
-                var alpha = filters["DXImageTransform.Microsoft.Alpha"] || filters.alpha;
+                var alpha = filters["DXImageTransform.Microsoft.Alpha"] ||
+                            filters.alpha;
                 if (alpha) {
                     return String(alpha.opacity / 100);
                 }
@@ -55,17 +56,31 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
 
     function getComputedStyle(element, pseudo) {
         if (pseudo) {
-            throw new Error("getComputedStyle implementation only accepts the first parameter");
+            throw new Error(
+                "getComputedStyle implementation only accepts the 1st parameter"
+            );
         }
         var compStyle = element._compStyle, currStyle;
         if (!compStyle) {
             compStyle = element._compStyle = createObject();
             currStyle = element.currentStyle;
             Object.keys(currStyle).forEach(function (property) {
-                Object.defineProperty(compStyle, property, createPropDesc(currStyle, property));
+                Object.defineProperty(
+                    compStyle,
+                    property,
+                    createPropDesc(currStyle, property)
+                );
             });
-            Object.defineProperty(compStyle, "cssFloat", createCSSFloatDesc(currStyle));
-            Object.defineProperty(compStyle, "opacity", createOpacityDesc(element.filters));
+            Object.defineProperty(
+                compStyle,
+                "cssFloat",
+                createCSSFloatDesc(currStyle)
+            );
+            Object.defineProperty(
+                compStyle,
+                "opacity",
+                createOpacityDesc(element.filters)
+            );
             compStyle.getPropertyValue = getPropertyValue;
         }
         return compStyle;
