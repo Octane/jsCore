@@ -2,6 +2,7 @@
 
 ##v0.4.2
 
+ - fix: `.dispatchEvent()` must return a value
  - fix: bug in `.stopPropagation()`
 
 ##v0.4.1

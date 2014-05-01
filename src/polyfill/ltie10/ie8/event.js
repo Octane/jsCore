@@ -91,11 +91,7 @@ window.addEventListener || new function () {
 		else {
 			this.fireEvent("on" + event.type, event);
 		}
-		//todo
-		//return boolean;
-		//The return value of dispatchEvent indicates whether any of the listeners
-		//which handled the event called preventDefault.
-		//If preventDefault was called the value is false, else the value is true.
+		return !event.defaultPrevented;
 	}
 
 	function initEvent(type, bubbles, cancelable) {
