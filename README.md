@@ -338,7 +338,7 @@ example:
 ```javascript
 lib.css.set(element, {
     //properties will be prefixed automatically
-    animationName: 'someName',
+    animationName: 'some-name',
     animationDuration: '5s'
 }).then(doSomething);
 ```
@@ -436,7 +436,7 @@ lib.event.one(window, 'load', onLoad);
 
 ####lib.event.when()
 
-`.when()` like `.one()`, but returns a promise, the callback is passed to `then`
+`.when()` like `.one()`, but returns a promise, the callback is passed to `.then()`
 ```javascript
 lib.event.when(element[, selector], eventTypes) //→ promise
 ```
@@ -497,7 +497,7 @@ if (lib.event.animationEnd) {
 ```javascript
 lib.date.isLeapYear([date]) //→ boolean
 ```
-where `date` is instance of `Date` or the four-digit number
+where `date` is instance of `Date()` or the four-digit number
 
 ####lib.date.monthLength()
 
@@ -505,11 +505,11 @@ where `date` is instance of `Date` or the four-digit number
 ```javascript
 lib.date.monthLength(monthIndex, fullYear) //→ number
 ```
-if instead `monthIndex` pass the instance of `Date`, then the second argument not needed
+if instead `monthIndex` pass the instance of `Date()`, then the second argument not needed
 
 ###lib.request()
 
-`.request()` performs a request to a server using `XMLHttpRequest`, returns a promise
+`.request()` performs a request to a server using `XMLHttpRequest()`, returns a promise
 ```javascript
 lib.request({
     method:   String,
