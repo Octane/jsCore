@@ -59,7 +59,7 @@ node build.js --no_ie8
         - [Prefixed event types](#prefixed-event-types)
     - [Namespace `.date`](#libdate)
         - [Method `.isLeapYear()`](#libdataisleapyear)
-        - [Method `.monthLength()`](#libdatemonthlength)
+        - [Method `.getMonthLength()`](#libdategetmonthlength)
     - [Namespace and method `.request()`](#librequest)
         - [Method `.get()`](#librequestget)
         - [Method `.post()`](#librequestpost)
@@ -497,11 +497,11 @@ lib.date.isLeapYear([date]) //→ boolean
 ```
 where `date` is instance of `Date()` or the four-digit number
 
-####lib.date.monthLength()
+####lib.date.getMonthLength()
 
-`.monthLength()` returns the number of days in a month
+`.getMonthLength()` returns the number of days in a month
 ```javascript
-lib.date.monthLength(monthIndex, fullYear) //→ number
+lib.date.getMonthLength(monthIndex, fullYear) //→ number
 ```
 if instead `monthIndex` pass the instance of `Date()`, then the second argument not needed
 
