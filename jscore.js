@@ -2384,7 +2384,6 @@ var lib = {};
 
 Object.assign(lib, {
 
-    //example: if (tests.every(lib.isTrue))
     isTrue: function (bool) {
         return true === bool;
     },
@@ -2968,7 +2967,7 @@ lib.event = Object.assign({
 });
 
 
-lib.dom = {
+lib.dom = Object.assign({
 
     ready: function () {
         if ('complete' == document.readyState) {
@@ -2977,10 +2976,7 @@ lib.dom = {
         return lib.event.when(document, 'DOMContentLoaded');
     }
 
-};
-
-//addClass, removeClass and toggleClass
-Object.assign(lib.dom, new function () {
+}, new function () {
 
     var css = lib.css,
         promise = css.animation || css.transition ?
