@@ -5,7 +5,7 @@ lib.date = new function () {
     var date = this,
         lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-    function isLeapYear(year) {
+    date.isLeapYear = function (year) {
         if (!arguments.length) {
             year = new Date;
         }
@@ -13,9 +13,7 @@ lib.date = new function () {
             year = year.getFullYear();
         }
         return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
-    }
-
-    date.isLeapYear = isLeapYear;
+    };
 
     date.getMonthLength = function (monthIndex, year) {
         if (!arguments.length) {
@@ -25,7 +23,7 @@ lib.date = new function () {
             year = monthIndex.getFullYear();
             monthIndex = monthIndex.getMonth();
         }
-        if (1 == monthIndex && isLeapYear(year)) {
+        if (1 == monthIndex && date.isLeapYear(year)) {
             return 29;
         }
         return lengths[monthIndex];
