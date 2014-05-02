@@ -1,40 +1,48 @@
 body {
-    background-color: #ecf0f1;
-    font-family: sans-serif;
+    margin: 0;
+    background-color: #f1f1f1;
+    font: 16px/24px Helvetica, Arial, sans-serif;
+    color: #333;
 }
-.animated {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    background: #3cf;
-    transition: all 3s;
+a:link, a:visited {
+    color: #4772e0;
+    text-decoration: none;
 }
-.move {
-    width: 300px;
-    -webkit-animation: move-top 5s, move-left 1s;
-    -webkit-animation-fill-mode: both;
-    animation: move-top 5s, move-left 1s;
-    animation-fill-mode: both;
+a:hover {
+    background-color: #4772e0;
+    color: #f1f1f1;
 }
-@keyframes move-top {
-    100% {
-        top: 0;
-    }
+h1, p {
+    margin: 0;
+    padding: 0;
 }
-@keyframes move-left {
-    100% {
-        left: 0;
-    }
+h1 {
+    display: inline;
+    font-size: 56px;
+    line-height: 66px;
 }
-@-webkit-keyframes move-top {
-    100% {
-        top: 0;
-    }
+p {
+    display: inline-block;
+    width: 160px;
+    line-height: 16px;
 }
-@-webkit-keyframes move-left {
-    100% {
-        left: 0;
-    }
+img {
+    width: 66px;
+    height: 66px;
+    vertical-align: bottom;
+}
+.page {
+    position: relative;
+    padding: 20px;
+}
+.github {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+pre {
+    margin: 0;
+    padding: 0 4px;
+    font-family: Consolas, monospace;
 }
