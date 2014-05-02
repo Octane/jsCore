@@ -30,6 +30,11 @@ try {
         'polyfill/map.js',
         'polyfill/weakset.js',
         'polyfill/weakmap.js',
+
+
+        'polyfill/ltie10/ie8/setimmediate.js',
+
+
         'polyfill/setimmediate.js',
         'polyfill/promise.js',
         'polyfill/requestanimationframe.js',
@@ -44,7 +49,6 @@ try {
         'polyfill/ltie10/ie8/fix/splice.js',
         'polyfill/ltie10/ie8/fix/dataset.js',
         'polyfill/ltie10/ie8/fix/children.js',
-        'polyfill/ltie10/ie8/setimmediate.js',
         'polyfill/ltie10/ie8/event.js',
         'polyfill/ltie10/ie8/cssstyledeclaration.js',
         'polyfill/ltie10/ie8/getcomputedstyle.js',
