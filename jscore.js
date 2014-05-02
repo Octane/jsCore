@@ -2867,7 +2867,8 @@ lib.event = Object.assign({
             animation: 'animationend',
             MozAnimation: 'mozAnimationEnd',
             WebkitAnimation: 'webkitAnimationEnd'
-        }[animation];
+        }[animation],
+        fallback = Promise.resolve;
 
     function getNewAnimationNames(oldNames, newNames) {
         if (!oldNames) {
@@ -2936,10 +2937,6 @@ lib.event = Object.assign({
         ]).then(function () {
             return element;
         });
-    }
-
-    function fallback(element) {
-        return Promise.resolve(element);
     }
 
     return {
