@@ -2511,8 +2511,6 @@ lib.array = {
 
 lib.date = {
 
-    _monthLengths: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-
     isLeapYear: function (year) {
         if (!arguments.length) {
             year = new Date;
@@ -2523,18 +2521,21 @@ lib.date = {
         return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
     },
 
-    monthLength: function (monthIndex, year) {
-        if (!arguments.length) {
-            monthIndex = new Date;
-        }
-        if (monthIndex instanceof Date) {
-            year = monthIndex.getFullYear();
-            monthIndex = monthIndex.getMonth();
-        }
-        if (1 == monthIndex && this.isLeapYear(year)) {
-            return 29;
-        }
-        return this._monthLengths[monthIndex];
+    getMonthLength: new function () {
+        var lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        return function (monthIndex, year) {
+            if (!arguments.length) {
+                monthIndex = new Date;
+            }
+            if (monthIndex instanceof Date) {
+                year = monthIndex.getFullYear();
+                monthIndex = monthIndex.getMonth();
+            }
+            if (1 == monthIndex && this.isLeapYear(year)) {
+                return 29;
+            }
+            return lengths[monthIndex];
+        };
     }
 
 };
@@ -2629,7 +2630,6 @@ lib.I18n = new function () {
 lib.css = {
 
     prefix: new function () {
-
         var cache = {},
             prefixes = ['ms', 'O', 'Webkit', 'Moz'],
             properties = new function () {
@@ -2637,7 +2637,6 @@ lib.css = {
                     proto = style.constructor.prototype;
                 return 'top' in proto ? proto : style;
             };
-
         return function (property) {
             var prefixed,
                 name,
@@ -2661,7 +2660,6 @@ lib.css = {
             cache[property] = undefined;
             return undefined;
         };
-
     },
 
     get: function (element, properties) {
@@ -2692,47 +2690,37 @@ lib.css = {
 
 };
 
-/* useful prefixed CSS properties
- * example:
- * if (lib.css.animation) {
- *     element.style[lib.css.animationDuration] = '3s';
- * }
- */
 new function () {
 
-    var ns = lib.css,
-        properties = {
-            animation: [
-                'Delay', 'Direction', 'Duration', 'FillMode', 'IterationCount',
-                'Name', 'PlayState', 'TimingFunction'
-            ],
-            transition: ['Delay', 'Duration', 'Property', 'TimingFunction'],
-            transform:  ['Origin', 'Style']
-        };
+    var css = lib.css;
 
-    Object.keys(properties).forEach(function (composite) {
-        var prefixed = ns.prefix(composite);
-        if (prefixed) {
-            ns[composite] = prefixed;
-            properties[composite].forEach(function (single) {
-                ns[composite + single] = prefixed + single;
-            });
-        }
-    });
+    new function () {
+        var properties = {
+                animation: [
+                    'Delay', 'Direction', 'Duration', 'FillMode',
+                    'IterationCount', 'Name', 'PlayState', 'TimingFunction'
+                ],
+                transition: ['Delay', 'Duration', 'Property', 'TimingFunction'],
+                transform:  ['Origin', 'Style']
+            };
+        Object.keys(properties).forEach(function (composite) {
+            var prefixed = css.prefix(composite);
+            if (prefixed) {
+                css[composite] = prefixed;
+                properties[composite].forEach(function (single) {
+                    css[composite + single] = prefixed + single;
+                });
+            }
+        });
+    };
 
-};
-
-Object.assign(lib.css, {
-
-    set: new function () {
-
+    css.set = new function () {
         function changeStyle(style, properties) {
             Object.keys(properties).forEach(function (property) {
-                style[lib.css.prefix(property)] = properties[property];
+                style[css.prefix(property)] = properties[property];
             });
         }
-
-        if (lib.css.transition || lib.css.animation) {
+        if (css.transition || css.animation) {
             return function (element, properties) {
                 var style = window.getComputedStyle(element),
                     animations = this.getAnimationNames(style);
@@ -2744,17 +2732,14 @@ Object.assign(lib.css, {
             changeStyle(element.style, properties);
             return Promise.resolve(element);
         };
+    };
 
-    },
-
-    getTransitionTime: lib.css.transition ? new function () {
-
+    css.getTransitionTime = css.transition ? new function () {
         function parseFloats(string) {
             return string.split(',').map(function (string) {
                 return Number.parseFloat(string) || 0;
             });
         }
-
         function calcTransitionTime(delay, duration) {
             var maxTime = 0,
                 time,
@@ -2769,66 +2754,46 @@ Object.assign(lib.css, {
             }
             return Math.ceil(maxTime * 1000);
         }
-
         return function (style) {
             return calcTransitionTime(
-                parseFloats(style[lib.css.transitionDelay]),
-                parseFloats(style[lib.css.transitionDuration])
+                parseFloats(style[css.transitionDelay]),
+                parseFloats(style[css.transitionDuration])
             );
         };
-
     } : function () {
         return 0;
-    }
+    };
 
-});
+};
 
 
-lib.event = {
+lib.event = Object.assign({
 
-    //example: element.addEventListener('click', lib.event.preventDefault)
     preventDefault: function (event) {
         event.preventDefault();
     },
 
-    stopPropagation: function (event) {
+    stopPropagation: function(event) {
         event.stopPropagation();
-    },
+    }
 
-    when: function (element, selector, eventTypes) {
-        if (arguments.length == 2) {
-            eventTypes = selector;
-            selector = null;
-        }
-        return new Promise(function (resolve) {
-            lib.event.one(element, selector, eventTypes, resolve);
+}, new function () {
+
+    function off(eventDetails) {
+        eventDetails.eventTypes.forEach(function (eventType) {
+            eventDetails.element.removeEventListener(
+                eventType,
+                eventDetails.callback
+            );
         });
-    },
+    }
 
-    one: function (element, selector, eventTypes, callback) {
-        var details;
-        function listener(event) {
-            lib.event.off(details);
-            if (callback.handleEvent) {
-                callback.handleEvent(event);
-            } else {
-                callback.call(element, event);
-            }
-        }
-        if (arguments.length == 3) {
-            callback = eventTypes;
-            eventTypes = selector;
-            selector = null;
-        }
-        details = lib.event.on(element, selector, eventTypes, listener);
-    },
-
-    on: function (element, selector, eventTypes, callback) {
+    function on(element, selector, eventTypes, callback) {
         var listener;
         if (arguments.length == 3) {
             callback = eventTypes;
             eventTypes = selector;
-            selector = null;
+            selector = undefined;
         }
         if (selector) {
             selector += ',' + selector + ' *';
@@ -2856,68 +2821,53 @@ lib.event = {
             eventTypes: eventTypes,
             callback: listener
         };
-    },
+    }
 
-    off: function (eventDetails) {
-        eventDetails.eventTypes.forEach(function (eventType) {
-            eventDetails.element.removeEventListener(
-                eventType,
-                eventDetails.callback
-            );
+    function one(element, selector, eventTypes, callback) {
+        var details;
+        function listener(event) {
+            off(details);
+            if (callback.handleEvent) {
+                callback.handleEvent(event);
+            } else {
+                callback.call(element, event);
+            }
+        }
+        if (arguments.length == 3) {
+            callback = eventTypes;
+            eventTypes = selector;
+            selector = undefined;
+        }
+        details = on(element, selector, eventTypes, listener);
+    }
+
+    function when(element, selector, eventTypes) {
+        if (arguments.length == 2) {
+            eventTypes = selector;
+            selector = undefined;
+        }
+        return new Promise(function (resolve) {
+            one(element, selector, eventTypes, resolve);
         });
     }
 
-};
-
-//CSS animation and transition event types
-//example: element.addEventListener(lib.event.animationEnd, callback)
-Object.assign(lib.event, new function () {
-
-    var animation = lib.css.animation;
-
     return {
-
-        animationEnd: {
-            animation: 'animationend',
-            OAnimation: 'oanimationend',
-            msAnimation: 'MSAnimationEnd',
-            MozAnimation: 'mozAnimationEnd',
-            WebkitAnimation: 'webkitAnimationEnd'
-        }[animation],
-
-        animationStart: {
-            animation: 'animationstart',
-            OAnimation: 'oanimationstart',
-            msAnimation: 'MSAnimationStart',
-            MozAnimation: 'mozAnimationStart',
-            WebkitAnimation: 'webkitAnimationStart'
-        }[animation],
-
-        animationIteration: {
-            animation: 'animationiteration',
-            OAnimation: 'oanimationiteration',
-            msAnimation: 'MSAnimationIteration',
-            MozAnimation: 'mozAnimationIteration',
-            WebkitAnimation: 'webkitAnimationIteration'
-        }[animation],
-
-        transitionEnd: {
-            transition: 'transitionend',
-            OTransition: 'otransitionend',
-            MozTransition: 'mozTransitionEnd',
-            WebkitTransition: 'webkitTransitionEnd'
-        }[lib.css.transition]
-
+        off: off,
+        on: on,
+        one: one,
+        when: when
     };
 
-});
+}, new function () {
 
-//awaitAnimationEnd, awaitTransitionEnd and awaitTransAnimEnd
-Object.assign(lib.event, new function () {
-
-    var transition = lib.css.transition,
-        animationName = lib.css.animationName,
-        animationEnd = lib.event.animationEnd;
+    var css = lib.css,
+        animation = css.animation,
+        transition = css.transition,
+        animationEnd = {
+            animation: 'animationend',
+            MozAnimation: 'mozAnimationEnd',
+            WebkitAnimation: 'webkitAnimationEnd'
+        }[animation];
 
     function getNewAnimationNames(oldNames, newNames) {
         if (!oldNames) {
@@ -2941,7 +2891,7 @@ Object.assign(lib.event, new function () {
 
     function awaitAnimationEnd(element, animations) {
         if (!animations) {
-            animations = lib.css.getAnimationNames(element);
+            animations = css.getAnimationNames(element);
         }
         if (animations.length) {
             return new Promise(function (resolve) {
@@ -2965,7 +2915,7 @@ Object.assign(lib.event, new function () {
         if (!style) {
             style = window.getComputedStyle(element);
         }
-        delay = lib.css.getTransitionTime(style);
+        delay = css.getTransitionTime(style);
         if (delay) {
             return new Promise(function (resolve) {
                 window.setTimeout(function () {
@@ -2978,7 +2928,7 @@ Object.assign(lib.event, new function () {
 
     function awaitTransAnimEnd(element, prevAnimations) {
         var style = window.getComputedStyle(element),
-            animations = lib.css.getAnimationNames(style);
+            animations = css.getAnimationNames(style);
         animations = getNewAnimationNames(prevAnimations, animations);
         return Promise.all([
             awaitAnimationEnd(element, animations),
@@ -2994,12 +2944,27 @@ Object.assign(lib.event, new function () {
 
     return {
 
-        awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
+        animationEnd: animationEnd,
+        animationStart: {
+            animation: 'animationstart',
+            MozAnimation: 'mozAnimationStart',
+            WebkitAnimation: 'webkitAnimationStart'
+        }[animation],
+        animationIteration: {
+            animation: 'animationiteration',
+            MozAnimation: 'mozAnimationIteration',
+            WebkitAnimation: 'webkitAnimationIteration'
+        }[animation],
+        transitionEnd: {
+            transition: 'transitionend',
+            MozTransition: 'mozTransitionEnd',
+            WebkitTransition: 'webkitTransitionEnd'
+        }[transition],
 
+        awaitAnimationEnd: animation ? awaitAnimationEnd : fallback,
         awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
-
-        awaitTransAnimEnd: animationName || transition ?
-                           awaitTransAnimEnd : fallback
+        awaitTransAnimEnd: animation || transition ? awaitTransAnimEnd :
+                                                     fallback
 
     };
 
@@ -3020,10 +2985,11 @@ lib.dom = {
 //addClass, removeClass and toggleClass
 Object.assign(lib.dom, new function () {
 
-    var promise = lib.css.animation || lib.css.transition ?
+    var css = lib.css,
+        promise = css.animation || css.transition ?
         function (element, method, classes) {
             var style = window.getComputedStyle(element),
-                animations = lib.css.getAnimationNames(style);
+                animations = css.getAnimationNames(style);
             if (changeClasses(element, method, classes)) {
                 return lib.event.awaitTransAnimEnd(element, animations);
             }

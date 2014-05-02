@@ -1,50 +1,32 @@
 'use strict';
 
-lib.event = {
+lib.event = Object.assign({
 
-    //example: element.addEventListener('click', lib.event.preventDefault)
     preventDefault: function (event) {
         event.preventDefault();
     },
 
-    stopPropagation: function (event) {
+    stopPropagation: function(event) {
         event.stopPropagation();
-    },
+    }
 
-    when: function (element, selector, eventTypes) {
-        if (arguments.length == 2) {
-            eventTypes = selector;
-            selector = null;
-        }
-        return new Promise(function (resolve) {
-            lib.event.one(element, selector, eventTypes, resolve);
+}, new function () {
+
+    function off(eventDetails) {
+        eventDetails.eventTypes.forEach(function (eventType) {
+            eventDetails.element.removeEventListener(
+                eventType,
+                eventDetails.callback
+            );
         });
-    },
+    }
 
-    one: function (element, selector, eventTypes, callback) {
-        var details;
-        function listener(event) {
-            lib.event.off(details);
-            if (callback.handleEvent) {
-                callback.handleEvent(event);
-            } else {
-                callback.call(element, event);
-            }
-        }
-        if (arguments.length == 3) {
-            callback = eventTypes;
-            eventTypes = selector;
-            selector = null;
-        }
-        details = lib.event.on(element, selector, eventTypes, listener);
-    },
-
-    on: function (element, selector, eventTypes, callback) {
+    function on(element, selector, eventTypes, callback) {
         var listener;
         if (arguments.length == 3) {
             callback = eventTypes;
             eventTypes = selector;
-            selector = null;
+            selector = undefined;
         }
         if (selector) {
             selector += ',' + selector + ' *';
@@ -72,68 +54,53 @@ lib.event = {
             eventTypes: eventTypes,
             callback: listener
         };
-    },
+    }
 
-    off: function (eventDetails) {
-        eventDetails.eventTypes.forEach(function (eventType) {
-            eventDetails.element.removeEventListener(
-                eventType,
-                eventDetails.callback
-            );
+    function one(element, selector, eventTypes, callback) {
+        var details;
+        function listener(event) {
+            off(details);
+            if (callback.handleEvent) {
+                callback.handleEvent(event);
+            } else {
+                callback.call(element, event);
+            }
+        }
+        if (arguments.length == 3) {
+            callback = eventTypes;
+            eventTypes = selector;
+            selector = undefined;
+        }
+        details = on(element, selector, eventTypes, listener);
+    }
+
+    function when(element, selector, eventTypes) {
+        if (arguments.length == 2) {
+            eventTypes = selector;
+            selector = undefined;
+        }
+        return new Promise(function (resolve) {
+            one(element, selector, eventTypes, resolve);
         });
     }
 
-};
-
-//CSS animation and transition event types
-//example: element.addEventListener(lib.event.animationEnd, callback)
-Object.assign(lib.event, new function () {
-
-    var animation = lib.css.animation;
-
     return {
-
-        animationEnd: {
-            animation: 'animationend',
-            OAnimation: 'oanimationend',
-            msAnimation: 'MSAnimationEnd',
-            MozAnimation: 'mozAnimationEnd',
-            WebkitAnimation: 'webkitAnimationEnd'
-        }[animation],
-
-        animationStart: {
-            animation: 'animationstart',
-            OAnimation: 'oanimationstart',
-            msAnimation: 'MSAnimationStart',
-            MozAnimation: 'mozAnimationStart',
-            WebkitAnimation: 'webkitAnimationStart'
-        }[animation],
-
-        animationIteration: {
-            animation: 'animationiteration',
-            OAnimation: 'oanimationiteration',
-            msAnimation: 'MSAnimationIteration',
-            MozAnimation: 'mozAnimationIteration',
-            WebkitAnimation: 'webkitAnimationIteration'
-        }[animation],
-
-        transitionEnd: {
-            transition: 'transitionend',
-            OTransition: 'otransitionend',
-            MozTransition: 'mozTransitionEnd',
-            WebkitTransition: 'webkitTransitionEnd'
-        }[lib.css.transition]
-
+        off: off,
+        on: on,
+        one: one,
+        when: when
     };
 
-});
+}, new function () {
 
-//awaitAnimationEnd, awaitTransitionEnd and awaitTransAnimEnd
-Object.assign(lib.event, new function () {
-
-    var transition = lib.css.transition,
-        animationName = lib.css.animationName,
-        animationEnd = lib.event.animationEnd;
+    var css = lib.css,
+        animation = css.animation,
+        transition = css.transition,
+        animationEnd = {
+            animation: 'animationend',
+            MozAnimation: 'mozAnimationEnd',
+            WebkitAnimation: 'webkitAnimationEnd'
+        }[animation];
 
     function getNewAnimationNames(oldNames, newNames) {
         if (!oldNames) {
@@ -157,7 +124,7 @@ Object.assign(lib.event, new function () {
 
     function awaitAnimationEnd(element, animations) {
         if (!animations) {
-            animations = lib.css.getAnimationNames(element);
+            animations = css.getAnimationNames(element);
         }
         if (animations.length) {
             return new Promise(function (resolve) {
@@ -181,7 +148,7 @@ Object.assign(lib.event, new function () {
         if (!style) {
             style = window.getComputedStyle(element);
         }
-        delay = lib.css.getTransitionTime(style);
+        delay = css.getTransitionTime(style);
         if (delay) {
             return new Promise(function (resolve) {
                 window.setTimeout(function () {
@@ -194,7 +161,7 @@ Object.assign(lib.event, new function () {
 
     function awaitTransAnimEnd(element, prevAnimations) {
         var style = window.getComputedStyle(element),
-            animations = lib.css.getAnimationNames(style);
+            animations = css.getAnimationNames(style);
         animations = getNewAnimationNames(prevAnimations, animations);
         return Promise.all([
             awaitAnimationEnd(element, animations),
@@ -210,12 +177,27 @@ Object.assign(lib.event, new function () {
 
     return {
 
-        awaitAnimationEnd: animationName ? awaitAnimationEnd : fallback,
+        animationEnd: animationEnd,
+        animationStart: {
+            animation: 'animationstart',
+            MozAnimation: 'mozAnimationStart',
+            WebkitAnimation: 'webkitAnimationStart'
+        }[animation],
+        animationIteration: {
+            animation: 'animationiteration',
+            MozAnimation: 'mozAnimationIteration',
+            WebkitAnimation: 'webkitAnimationIteration'
+        }[animation],
+        transitionEnd: {
+            transition: 'transitionend',
+            MozTransition: 'mozTransitionEnd',
+            WebkitTransition: 'webkitTransitionEnd'
+        }[transition],
 
+        awaitAnimationEnd: animation ? awaitAnimationEnd : fallback,
         awaitTransitionEnd: transition ? awaitTransitionEnd : fallback,
-
-        awaitTransAnimEnd: animationName || transition ?
-                           awaitTransAnimEnd : fallback
+        awaitTransAnimEnd: animation || transition ? awaitTransAnimEnd :
+                                                     fallback
 
     };
 

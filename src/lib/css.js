@@ -3,7 +3,6 @@
 lib.css = {
 
     prefix: new function () {
-
         var cache = {},
             prefixes = ['ms', 'O', 'Webkit', 'Moz'],
             properties = new function () {
@@ -11,7 +10,6 @@ lib.css = {
                     proto = style.constructor.prototype;
                 return 'top' in proto ? proto : style;
             };
-
         return function (property) {
             var prefixed,
                 name,
@@ -35,7 +33,6 @@ lib.css = {
             cache[property] = undefined;
             return undefined;
         };
-
     },
 
     get: function (element, properties) {
@@ -66,47 +63,37 @@ lib.css = {
 
 };
 
-/* useful prefixed CSS properties
- * example:
- * if (lib.css.animation) {
- *     element.style[lib.css.animationDuration] = '3s';
- * }
- */
 new function () {
 
-    var ns = lib.css,
-        properties = {
-            animation: [
-                'Delay', 'Direction', 'Duration', 'FillMode', 'IterationCount',
-                'Name', 'PlayState', 'TimingFunction'
-            ],
-            transition: ['Delay', 'Duration', 'Property', 'TimingFunction'],
-            transform:  ['Origin', 'Style']
-        };
+    var css = lib.css;
 
-    Object.keys(properties).forEach(function (composite) {
-        var prefixed = ns.prefix(composite);
-        if (prefixed) {
-            ns[composite] = prefixed;
-            properties[composite].forEach(function (single) {
-                ns[composite + single] = prefixed + single;
-            });
-        }
-    });
+    new function () {
+        var properties = {
+                animation: [
+                    'Delay', 'Direction', 'Duration', 'FillMode',
+                    'IterationCount', 'Name', 'PlayState', 'TimingFunction'
+                ],
+                transition: ['Delay', 'Duration', 'Property', 'TimingFunction'],
+                transform:  ['Origin', 'Style']
+            };
+        Object.keys(properties).forEach(function (composite) {
+            var prefixed = css.prefix(composite);
+            if (prefixed) {
+                css[composite] = prefixed;
+                properties[composite].forEach(function (single) {
+                    css[composite + single] = prefixed + single;
+                });
+            }
+        });
+    };
 
-};
-
-Object.assign(lib.css, {
-
-    set: new function () {
-
+    css.set = new function () {
         function changeStyle(style, properties) {
             Object.keys(properties).forEach(function (property) {
-                style[lib.css.prefix(property)] = properties[property];
+                style[css.prefix(property)] = properties[property];
             });
         }
-
-        if (lib.css.transition || lib.css.animation) {
+        if (css.transition || css.animation) {
             return function (element, properties) {
                 var style = window.getComputedStyle(element),
                     animations = this.getAnimationNames(style);
@@ -118,17 +105,14 @@ Object.assign(lib.css, {
             changeStyle(element.style, properties);
             return Promise.resolve(element);
         };
+    };
 
-    },
-
-    getTransitionTime: lib.css.transition ? new function () {
-
+    css.getTransitionTime = css.transition ? new function () {
         function parseFloats(string) {
             return string.split(',').map(function (string) {
                 return Number.parseFloat(string) || 0;
             });
         }
-
         function calcTransitionTime(delay, duration) {
             var maxTime = 0,
                 time,
@@ -143,16 +127,14 @@ Object.assign(lib.css, {
             }
             return Math.ceil(maxTime * 1000);
         }
-
         return function (style) {
             return calcTransitionTime(
-                parseFloats(style[lib.css.transitionDelay]),
-                parseFloats(style[lib.css.transitionDuration])
+                parseFloats(style[css.transitionDelay]),
+                parseFloats(style[css.transitionDuration])
             );
         };
-
     } : function () {
         return 0;
-    }
+    };
 
-});
+};
