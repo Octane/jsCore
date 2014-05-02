@@ -1,8 +1,11 @@
 'use strict';
 
-lib.css = {
+lib.css = new function () {
 
-    prefix: new function () {
+    var css = this,
+        prefix;
+
+    css.prefix = prefix = new function () {
         var cache = {},
             prefixes = ['ms', 'O', 'Webkit', 'Moz'],
             properties = new function () {
@@ -33,39 +36,7 @@ lib.css = {
             cache[property] = undefined;
             return undefined;
         };
-    },
-
-    get: function (element, properties) {
-        var style = window.getComputedStyle(element),
-            prefix = this.prefix;
-        if (Array.isArray(properties)) {
-            return properties.reduce(function (result, property) {
-                result[property] = style[prefix(property)];
-                return result;
-            }, {});
-        }
-        return style[prefix(properties)];
-    },
-
-    getAnimationNames: new function () {
-        var separator = /,\s*/;
-        function excludeNone(value) {
-            return 'none' != value;
-        }
-        return function (style) {
-            var names = style[this.animationName];
-            if (names) {
-                return names.split(separator).filter(excludeNone);
-            }
-            return [];
-        };
-    }
-
-};
-
-new function () {
-
-    var css = lib.css;
+    };
 
     new function () {
         var properties = {
@@ -77,7 +48,7 @@ new function () {
                 transform:  ['Origin', 'Style']
             };
         Object.keys(properties).forEach(function (composite) {
-            var prefixed = css.prefix(composite);
+            var prefixed = prefix(composite);
             if (prefixed) {
                 css[composite] = prefixed;
                 properties[composite].forEach(function (single) {
@@ -87,16 +58,30 @@ new function () {
         });
     };
 
+    css.getAnimationNames = new function () {
+        var separator = /,\s*/;
+        function excludeNone(value) {
+            return 'none' != value;
+        }
+        return function (style) {
+            var names = style[css.animationName];
+            if (names) {
+                return names.split(separator).filter(excludeNone);
+            }
+            return [];
+        };
+    };
+
     css.set = new function () {
         function changeStyle(style, properties) {
             Object.keys(properties).forEach(function (property) {
-                style[css.prefix(property)] = properties[property];
+                style[prefix(property)] = properties[property];
             });
         }
         if (css.transition || css.animation) {
             return function (element, properties) {
                 var style = window.getComputedStyle(element),
-                    animations = this.getAnimationNames(style);
+                    animations = css.getAnimationNames(style);
                 changeStyle(element.style, properties);
                 return lib.event.awaitTransAnimEnd(element, animations);
             };
@@ -105,6 +90,17 @@ new function () {
             changeStyle(element.style, properties);
             return Promise.resolve(element);
         };
+    };
+
+    css.get = function (element, properties) {
+        var style = window.getComputedStyle(element);
+        if (Array.isArray(properties)) {
+            return properties.reduce(function (result, property) {
+                result[property] = style[prefix(property)];
+                return result;
+            }, {});
+        }
+        return style[prefix(properties)];
     };
 
     css.getTransitionTime = css.transition ? new function () {
