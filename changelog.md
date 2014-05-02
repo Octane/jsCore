@@ -2,7 +2,7 @@
 
 ##v0.4.3
 
- -
+ - remove `.catch_()` and `.delete_()` aliases, use brackets notation in IE8
 
 ##v0.4.2
 

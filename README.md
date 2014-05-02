@@ -94,11 +94,11 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`, `.addEventListener()`, `.removeEventListener()`, `.dispatchEvent()`
 `Date` generics | `.now()`
 `Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`
-`Promise.prototype` | `.then`, `.catch`<sup>[17](#Promise.prototype.catch)</sup>
-`Set.prototype` | `.add()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`, `.size`
-`Map.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`, `.size`
-`WeakSet.prototype` | `.add()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`
-`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[18](#Set.prototype.delete)</sup>, `.clear()`
+`Promise.prototype` | `.then`, `.catch`<sup>[17](#catch-delete)</sup>
+`Set.prototype` | `.add()`, `.has()`, `.delete()`<sup>[17](#catch-delete)</sup>, `.clear()`, `.size`
+`Map.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[17](#catch-delete)</sup>, `.clear()`, `.size`
+`WeakSet.prototype` | `.add()`, `.has()`, `.delete()`<sup>[17](#catch-delete)</sup>, `.clear()`
+`WeakMap.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[17](#catch-delete)</sup>, `.clear()`
 
 ###Notes/Known Issues
 
@@ -138,15 +138,13 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="Event.prototype">13</sup> –  global event constructors (`Event()`, `CustomEvent()`, etc.) not available, use `document.createEvent()`
 
-<sup name="Event.prototype.initEvent">14</sup> – event methods (`.initEvent()`, `.initMouseEvent()`, ect.) just copy all function parameters to the instance of `Event()`, the main purpose is to set the type of the event without `IE8` check
+<sup name="Event.prototype.initEvent">14</sup> – event methods (`.initEvent()`, `.initMouseEvent()`, etc.) just copy all function parameters to the instance of `Event()`, the main purpose is to set the type of the event without `IE8` check
 
 <sup name="XMLHttpRequest">15</sup> – `xhr.send()` supports `FormData()`
 
 <sup name="Promise">16</sup> – `Promise()` doesn't support [thenable](https://github.com/promises-aplus/promises-spec#terminology)-objects
 
-<sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called “catch”, use `.catch_()`
-
-<sup name="Set.prototype.delete">18</sup> – IE8 doesn't allow to use a method called “delete”, use `.delete_()`
+<sup name="catch-delete">17</sup> – IE8 doesn't allow to use the dot notation as accessor for methods called “catch” and “delete”
 
 ##lib
 
