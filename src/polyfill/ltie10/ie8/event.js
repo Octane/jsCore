@@ -1,6 +1,19 @@
 
 window.addEventListener || new function () {
 
+    var eventReplacements = {
+            DOMContentLoaded: {
+                eventType: 'readystatechange',
+                decorateListener: function (listener) {
+                    return function (event) {
+                        if ('complete' == document.readyState) {
+                            listener(event);
+                        }
+                    };
+                }
+            }
+        };
+
     function fixEvent(event) {
         var root = document.documentElement;
         event.pageX = event.clientX + root.scrollLeft;
@@ -34,8 +47,10 @@ window.addEventListener || new function () {
 
     function addEventListener(eventType, callback, useCapture) {
         var element = this,
+            listener,
             events,
-            event;
+            event,
+            fix;
         if (useCapture) {
             throw new Error('Capturing phase is not supported');
         }
@@ -43,14 +58,22 @@ window.addEventListener || new function () {
             element._events = {};
         }
         events = element._events;
+        fix = eventReplacements[eventType];
+        if (fix) {
+            eventType = fix.eventType;
+        }
         event = events[eventType];
         if (!event) {
             event = {
                 callbacks: []
             };
-            event.listener = createEventListener(event.callbacks, element);
+            listener = createEventListener(event.callbacks, element);
+            if (fix) {
+                listener = fix.decorateListener(listener);
+            }
+            event.listener = listener;
             events[eventType] = event;
-            this.attachEvent('on' + eventType, event.listener);
+            this.attachEvent('on' + eventType, listener);
         }
         if (-1 == event.callbacks.indexOf(callback)) {
             event.callbacks.push(callback);
@@ -62,7 +85,8 @@ window.addEventListener || new function () {
             callbacks,
             events,
             event,
-            index;
+            index,
+            fix;
         if (useCapture) {
             throw new Error('Capturing phase is not supported');
         }
@@ -70,6 +94,10 @@ window.addEventListener || new function () {
             return;
         }
         events = element._events;
+        fix = eventReplacements[eventType];
+        if (fix) {
+            eventType = fix.eventType;
+        }
         if (!events[eventType]) {
             return;
         }
@@ -87,15 +115,21 @@ window.addEventListener || new function () {
     }
 
     function dispatchEvent(event) {
-        var events;
+        var eventType = event.type,
+            events,
+            fix;
         if (event instanceof CustomEvent) {
             event.target = this;
             events = this._events;
-            if (events && events[event.type]) {
-                events[event.type].listener(event);
+            if (events && events[eventType]) {
+                events[eventType].listener(event);
             }
         } else {
-            this.fireEvent('on' + event.type, event);
+            fix = eventReplacements[eventType];
+            if (fix) {
+                eventType = fix.eventType;
+            }
+            this.fireEvent('on' + eventType, event);
         }
         return !event.defaultPrevented;
     }

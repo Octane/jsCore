@@ -13,15 +13,17 @@ catch (error) {
     };
 }
 
-document.addEventListener('mousemove', {
-    coords: new lib.Template('x: {X}, y: {Y}'),
-    node: document.body.
-                appendChild(document.createElement('pre')).
-                    appendChild(document.createTextNode('')),
-    handleEvent: function (event) {
-        this.node.nodeValue = this.coords.match({
-            x: event.pageX,
-            y: event.pageY
-        });
-    }
+lib.dom.ready().then(function () {
+    lib.event.on(document, 'mousemove', {
+        coords: new lib.Template('x: {X}, y: {Y}'),
+        node: document.body.
+                    appendChild(document.createElement('pre')).
+                        appendChild(document.createTextNode('')),
+        handleEvent: function (event) {
+            this.node.nodeValue = this.coords.match({
+                x: event.pageX,
+                y: event.pageY
+            });
+        }
+    });
 });

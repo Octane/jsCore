@@ -2,6 +2,7 @@
 
 ##v0.4.3
 
+ - fix: support `DOMContentLoaded` in IE8
  - remove `.catch_()` and `.delete_()` aliases, use brackets notation in IE8
 
 ##v0.4.2
