@@ -3201,13 +3201,13 @@ lib.request = new function () {
         },
 
         json: function (params) {
-            return this.get(params).then(function (xhr) {
+            return request.get(params).then(function (xhr) {
                 return JSON.parse(xhr.responseText);
             });
         },
 
         jsonp: function (params) {
-            return this.script(params);
+            return request.script(params);
         },
 
         script: function (params) {
