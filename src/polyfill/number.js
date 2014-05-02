@@ -1,9 +1,5 @@
 'use strict';
 
-if (!Number.MAX_SAFE_INTEGER) {
-    Number.MAX_SAFE_INTEGER = 9007199254740991;
-}
-
 if (!Number.isFinite) {
     Number.isFinite = function (value) {
         return 'number' == typeof value && isFinite(value);

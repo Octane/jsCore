@@ -9,7 +9,7 @@
  - remove `.initKeyEvent()` and `.initMutationEvent()`
  - fix: `.dispatchEvent()` must return a value
  - fix: bug in `.stopPropagation()`
- - fix: `.getComputedStyle(el).animationName` may be equal to `none, none, …` in IE11
+ - fix: `.getComputedStyle(el).animationName` may be equal to `"none, none, …"` in IE11
 
 ##v0.4.1
 

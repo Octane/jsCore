@@ -1,6 +1,6 @@
 'use strict';
 
-/* jsCore JavaScript library v0.4.2
+/* jsCore JavaScript library v0.4.3
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * https://github.com/Octane/jsCore/
@@ -496,10 +496,6 @@ if (!String.prototype.repeat) {
     };
 }
 
-
-if (!Number.MAX_SAFE_INTEGER) {
-    Number.MAX_SAFE_INTEGER = 9007199254740991;
-}
 
 if (!Number.isFinite) {
     Number.isFinite = function (value) {

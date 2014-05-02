@@ -144,9 +144,9 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="Promise">16</sup> – `Promise()` doesn't support [thenable](https://github.com/promises-aplus/promises-spec#terminology)-objects
 
-<sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called "catch", use `.catch_()`
+<sup name="Promise.prototype.catch">17</sup> – IE8 doesn't allow to use a method called “catch”, use `.catch_()`
 
-<sup name="Set.prototype.delete">18</sup> – IE8 doesn't allow to use a method called "delete", use `.delete_()`
+<sup name="Set.prototype.delete">18</sup> – IE8 doesn't allow to use a method called “delete”, use `.delete_()`
 
 ##lib
 
