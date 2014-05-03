@@ -36,7 +36,7 @@ window instanceof Object || Object.assign(window, new function () {
                 var script = document.createElement('script');
                 script.onreadystatechange = onReadyStateChange;
                 document.appendChild(script);
-            }
+            };
             return id;
         },
 
