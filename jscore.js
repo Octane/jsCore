@@ -445,18 +445,16 @@ if (!Array.prototype.fill) {
     Array.prototype.fill = function (value, start, end) {
         var length = this.length,
             i;
-        if (!(1 in arguments)) {
-            start = 0;
+        start = Number(start) || 0;
+        if (2 in arguments) {
+            end = Number(end) || 0;
         }
-        if (!(2 in arguments)) {
+        else {
             end = length;
         }
-        if (start < 0) {
-            i = Math.max(length + start, 0);
-        } else {
-            i = Math.min(start, length);
-        }
-        while (i < length && i < end) {
+        i = start < 0 ? Math.max(length + start, 0) : Math.min(start, length);
+        end = end < 0 ? Math.max(length + end, 0) : Math.min(end, length);
+        while (i < end) {
             this[i] = value;
             i++;
         }

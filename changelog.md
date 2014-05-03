@@ -2,6 +2,7 @@
 
 ##v0.4.3
 
+ - fix: bug with negative `endIndex` in `Array.prototype.fill` polyfill
  - fix: define `.setImmediate()` once
  - fix: `lib` methods don't depend on the activation object (`this`)
  - fix: support `DOMContentLoaded` in IE8
