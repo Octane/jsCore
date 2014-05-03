@@ -1,6 +1,8 @@
-/.idea/
-/index.js
-/index.bat
-/build.bat
-/jsCore.sublime-workspace
-/jsCore.sublime-project
+.idea
+export.js
+index.js
+index.bat
+build.bat
+minify.bat
+jsCore.sublime-workspace
+jsCore.sublime-project

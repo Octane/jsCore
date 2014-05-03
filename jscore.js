@@ -3,7 +3,7 @@
 /* jsCore JavaScript library v0.4.3
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
- * https://github.com/Octane/jsCore/
+ * github.com/Octane/jsCore
  */
 var HTMLElement = HTMLElement || Element;
 
@@ -1823,25 +1823,27 @@ new function () {
 };
 
 //IE8 dataset polyfill fix
-try {
-    Object.defineProperty({}, 'test', {});
-}
-catch (error) {
-    window.StaticDOMStringMap = new function () {
-        //https://github.com/es-shims/es5-shim/issues/152
-        var uid = 0,
-            fakeDoc = new ActiveXObject('htmlfile'),
-            proto = createObject().constructor.prototype;
-        function createObject() {
-            return fakeDoc.getElementsByName(uid++);
-        }
-        Object.keys(proto).forEach(function (key) {
-            proto[key] = undefined;
-        });
-        proto = null;
-        return createObject;
-    };
-}
+new function () {
+    try {
+        Object.defineProperty({}, 'test', {});
+    }
+    catch (error) {
+        window.StaticDOMStringMap = new function () {
+            //https://github.com/es-shims/es5-shim/issues/152
+            var uid = 0,
+                fakeDoc = new ActiveXObject('htmlfile'),
+                proto = createObject().constructor.prototype;
+            function createObject() {
+                return fakeDoc.getElementsByName(uid++);
+            }
+            Object.keys(proto).forEach(function (key) {
+                proto[key] = undefined;
+            });
+            proto = null;
+            return createObject;
+        };
+    }
+};
 
 //IE8 children.length fix (exclude COMMENT_NODE)
 (function () {
@@ -2417,12 +2419,12 @@ var lib = {};
 Object.assign(lib, {
 
     //example: if (tests.every(lib.isTrue))
-    isTrue: function (bool) {
-        return true === bool;
+    isTrue: function (anything) {
+        return true === anything;
     },
 
-    isFalse: function (bool) {
-        return false === bool;
+    isFalse: function (anything) {
+        return false === anything;
     },
 
     isHTML: function (string) {
