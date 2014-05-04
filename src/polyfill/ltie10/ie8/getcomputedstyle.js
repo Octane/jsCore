@@ -1,8 +1,8 @@
 
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
-    //https://github.com/es-shims/es5-shim/issues/152
     var uid = 0,
+        //github.com/es-shims/es5-shim/issues/152
         fakeDoc = new ActiveXObject('htmlfile'),
         proto = createObject().constructor.prototype;
 

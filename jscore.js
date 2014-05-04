@@ -1,6 +1,6 @@
 'use strict';
 
-/* jsCore JavaScript library v0.4.3
+/* jsCore JavaScript library v0.4.4
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -309,11 +309,11 @@ Function.bind || (Function.prototype.bind = new function () {
 
 });
 
+//github.com/kriskowal/es5-shim
+//perfectionkills.com/whitespace-deviations
+//blog.stevenlevithan.com/archives/faster-trim-javascript
 if (!String.prototype.trim) {
     String.prototype.trim = new function () {
-        //https://github.com/kriskowal/es5-shim/
-         //http://perfectionkills.com/chr-deviations/
-        //http://blog.stevenlevithan.com/archives/faster-trim-javascript/
         var whitespace,
             right,
             left;
@@ -337,7 +337,7 @@ if (!Date.now) {
 
 
 //IE9-11 Object.create bug fix
-//http://webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
+//webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
 (function () {
     var object = Object.create({});
     object[0] = null;
@@ -359,10 +359,10 @@ if (!Date.now) {
     };
 };
 
+//using Object.keys: goo.gl/0QNMDz
+//several sources: twitter.com/rwaldron/status/454114058640183296
+//people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
 if (!Object.assign) {
-    //http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
-    //https://twitter.com/rwaldron/status/454114058640183296
-    //getify http://goo.gl/0QNMDz
     Object.assign = function (target) {
         Array.prototype.slice.call(arguments, 1).forEach(function (source) {
             Object.keys(source).forEach(function (key) {
@@ -389,7 +389,7 @@ if (!Object.is) {
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {
         if (!Object(iterable).length) {
-            //https://bugs.ecmascript.org/show_bug.cgi?id=2435
+            //bugs.ecmascript.org/show_bug.cgi?id=2435
             return [];
         }
         if (func) {
@@ -1352,7 +1352,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 
 };
 
-//DOM4 http://www.w3.org/TR/dom/#element
+//DOM4 mutation methods
 'append' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1,
@@ -1422,7 +1422,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
                     var contains,
                         root;
                     if (this === document) {
-                        //if documentFragment.constructor ≡ document.constructor
+                        //if docFragment.constructor ≡ document.constructor
                         return false;
                     }
                     root = this.parentNode;
@@ -1712,7 +1712,7 @@ var FormData = FormData || function () {
 
         toString: function () {
             //source by François de Metz
-            //https://github.com/francois2metz/html5-formdata
+            //github.com/francois2metz/html5-formdata
             var boundary = this.boundary,
                 body = '';
             Array.forEach(this, function (field) {
@@ -1799,7 +1799,7 @@ new function () {
 };
 
 //IE8 Array.splice fix
-//http://javascript.ru/forum/307534-post71.html
+//javascript.ru/forum/307534-post71.html
 (function () {
     var iterable = {
         0: true,
@@ -1829,7 +1829,7 @@ new function () {
     }
     catch (error) {
         window.StaticDOMStringMap = new function () {
-            //https://github.com/es-shims/es5-shim/issues/152
+            //github.com/es-shims/es5-shim/issues/152
             var uid = 0,
                 fakeDoc = new ActiveXObject('htmlfile'),
                 proto = createObject().constructor.prototype;
@@ -2317,8 +2317,8 @@ window instanceof Object || new function () {
 
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
-    //https://github.com/es-shims/es5-shim/issues/152
     var uid = 0,
+        //github.com/es-shims/es5-shim/issues/152
         fakeDoc = new ActiveXObject('htmlfile'),
         proto = createObject().constructor.prototype;
 
@@ -2452,7 +2452,7 @@ lib.classExtends = function (Class, SuperClass) {
 lib.array = {
 
     //counts the actual number of elements
-    //http://javascript.ru/forum/155335-post38.html
+    //javascript.ru/forum/155335-post38.html
     //example: count([1,,2]) → 2, but [1,,2].length → 3
     count: function (iterable) {
         return Array.reduce(iterable, function (length) {

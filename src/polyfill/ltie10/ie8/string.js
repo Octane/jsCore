@@ -1,9 +1,9 @@
 
+//github.com/kriskowal/es5-shim
+//perfectionkills.com/whitespace-deviations
+//blog.stevenlevithan.com/archives/faster-trim-javascript
 if (!String.prototype.trim) {
     String.prototype.trim = new function () {
-        //https://github.com/kriskowal/es5-shim/
-         //http://perfectionkills.com/chr-deviations/
-        //http://blog.stevenlevithan.com/archives/faster-trim-javascript/
         var whitespace,
             right,
             left;

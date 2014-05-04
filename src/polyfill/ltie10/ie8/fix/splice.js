@@ -1,6 +1,6 @@
 
 //IE8 Array.splice fix
-//http://javascript.ru/forum/307534-post71.html
+//javascript.ru/forum/307534-post71.html
 (function () {
     var iterable = {
         0: true,

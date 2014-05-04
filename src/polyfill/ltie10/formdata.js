@@ -109,7 +109,7 @@ var FormData = FormData || function () {
 
         toString: function () {
             //source by François de Metz
-            //https://github.com/francois2metz/html5-formdata
+            //github.com/francois2metz/html5-formdata
             var boundary = this.boundary,
                 body = '';
             Array.forEach(this, function (field) {

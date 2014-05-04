@@ -6,7 +6,7 @@ new function () {
     }
     catch (error) {
         window.StaticDOMStringMap = new function () {
-            //https://github.com/es-shims/es5-shim/issues/152
+            //github.com/es-shims/es5-shim/issues/152
             var uid = 0,
                 fakeDoc = new ActiveXObject('htmlfile'),
                 proto = createObject().constructor.prototype;

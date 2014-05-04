@@ -3,7 +3,7 @@
 lib.array = {
 
     //counts the actual number of elements
-    //http://javascript.ru/forum/155335-post38.html
+    //javascript.ru/forum/155335-post38.html
     //example: count([1,,2]) → 2, but [1,,2].length → 3
     count: function (iterable) {
         return Array.reduce(iterable, function (length) {

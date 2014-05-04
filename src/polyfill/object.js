@@ -1,7 +1,7 @@
 'use strict';
 
 //IE9-11 Object.create bug fix
-//http://webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
+//webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
 (function () {
     var object = Object.create({});
     object[0] = null;
@@ -23,10 +23,10 @@
     };
 };
 
+//using Object.keys: goo.gl/0QNMDz
+//several sources: twitter.com/rwaldron/status/454114058640183296
+//people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
 if (!Object.assign) {
-    //http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign
-    //https://twitter.com/rwaldron/status/454114058640183296
-    //getify http://goo.gl/0QNMDz
     Object.assign = function (target) {
         Array.prototype.slice.call(arguments, 1).forEach(function (source) {
             Object.keys(source).forEach(function (key) {

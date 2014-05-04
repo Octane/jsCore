@@ -147,7 +147,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 
 };
 
-//DOM4 http://www.w3.org/TR/dom/#element
+//DOM4 mutation methods
 'append' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1,
@@ -217,7 +217,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
                     var contains,
                         root;
                     if (this === document) {
-                        //if documentFragment.constructor ≡ document.constructor
+                        //if docFragment.constructor ≡ document.constructor
                         return false;
                     }
                     root = this.parentNode;

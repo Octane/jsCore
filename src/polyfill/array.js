@@ -3,7 +3,7 @@
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {
         if (!Object(iterable).length) {
-            //https://bugs.ecmascript.org/show_bug.cgi?id=2435
+            //bugs.ecmascript.org/show_bug.cgi?id=2435
             return [];
         }
         if (func) {
