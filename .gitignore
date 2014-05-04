@@ -1,8 +1,5 @@
 .idea
-export.js
+node_modules
 index.js
-index.bat
-build.bat
-minify.bat
 jsCore.sublime-workspace
 jsCore.sublime-project

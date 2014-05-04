@@ -46,3 +46,7 @@ pre {
     padding: 0 4px;
     font-family: Consolas, monospace;
 }
+
+fieldset {
+    margin: 20px;
+}
