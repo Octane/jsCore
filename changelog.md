@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.4.4
+
+ -
+
 ##v0.4.3
 
  - fix: bug with negative `endIndex` in `Array.prototype.fill` polyfill
