@@ -1,6 +1,6 @@
 'use strict';
 
-var Set = Set || new function () {
+window.Set || (window.Set = new function () {
 
     function Set() {
         if (arguments.length) {
@@ -49,4 +49,4 @@ var Set = Set || new function () {
 
     return Set;
 
-};
+});

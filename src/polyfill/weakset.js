@@ -1,6 +1,6 @@
 'use strict';
 
-var WeakSet = WeakSet || new function () {
+window.WeakSet || (window.WeakSet = new function () {
 
     function WeakSet() {
         if (arguments.length) {
@@ -51,4 +51,4 @@ var WeakSet = WeakSet || new function () {
 
     return WeakSet;
 
-};
+});

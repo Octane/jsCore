@@ -1,5 +1,5 @@
 
-var FormData = FormData || function () {
+window.FormData || (window.FormData = new function () {
 
     /* <input type="file"> not supported,
      * but if you know file contents,
@@ -150,4 +150,4 @@ var FormData = FormData || function () {
 
     return FormData;
 
-};
+});

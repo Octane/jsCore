@@ -1,6 +1,6 @@
 'use strict';
 
-var Map = Map || new function () {
+window.Map || (window.Map = new function () {
 
     var KEY = 0,
         VALUE = 1;
@@ -63,4 +63,4 @@ var Map = Map || new function () {
 
     return Map;
 
-};
+});
