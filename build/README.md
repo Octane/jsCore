@@ -9,4 +9,4 @@ node build/build.js
 
  - A build version is inserted from `bower.json`.
  - A order of the source files specified in `file-order.json`.
- - A settings of the versions are stored in `versions.json`.
+ - Settings of the versions are stored in `versions.json`.
