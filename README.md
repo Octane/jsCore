@@ -6,7 +6,10 @@ To use jsCore, just drop a single JavaScript file into your page:
 ```html
 <script src="jscore.js"></script>
 ```
-Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octane/jsCore/master/dev/jscore.js).
+Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octane/jsCore/master/dev/jscore.js) or install via Bower:
+```shell
+bower install jscore
+```
 
 ##Contents
  - [`Polyfill`](#polyfill)
