@@ -2,7 +2,8 @@
 
 ##v0.4.4
 
- - fix: remove a global variable `error` (`try-catch(error)` in global scope)
+ - fix: remove a global variable `error` (`catch(error)` in the global scope)
+ - fix: define a variable `fileName` in `FormData()` polyfill when necessary
  - new: a builder
 
 ##v0.4.3

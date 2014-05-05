@@ -115,9 +115,10 @@ window.FormData || (window.FormData = new function () {
             Array.forEach(this, function (field) {
                 var name = field.name,
                     value = field.value,
-                    filename = field.fileName || value.name;
+                    filename;
                 body += '--' + boundary + '\r\n';
                 if (Object(value) === value) {
+                    filename = field.fileName || value.name;
                     body += 'Content-Disposition: form-data; name="';
                     body += name + '"; filename="' + filename + '"\r\n';
                     body += 'Content-Type: ' + value.type + '\r\n\r\n';
