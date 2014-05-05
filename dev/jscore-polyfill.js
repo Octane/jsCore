@@ -335,7 +335,6 @@ if (!Date.now) {
     };
 }
 
-
 //IE9-11 Object.create bug fix
 //webreflection.blogspot.com/2014/04/all-ie-objects-are-broken.html
 (function () {
@@ -384,7 +383,6 @@ if (!Object.is) {
         return value1 === value2;
     };
 }
-
 
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {
@@ -462,7 +460,6 @@ if (!Array.prototype.fill) {
     };
 }
 
-
 if (!String.prototype.startsWith) {
     String.prototype.startsWith = function (string, position) {
         if (!position) {
@@ -494,7 +491,6 @@ if (!String.prototype.repeat) {
     };
 }
 
-
 if (!Number.isFinite) {
     Number.isFinite = function (value) {
         return 'number' == typeof value && isFinite(value);
@@ -523,7 +519,6 @@ if (!Number.parseFloat) {
     Number.parseFloat = parseFloat;
 }
 
-
 if (!Math.trunc) {
     Math.trunc = function (value) {
         value = Number(value);
@@ -542,7 +537,6 @@ if (!Math.sign) {
         return (value > 0) - (value < 0);
     };
 }
-
 
 //Array and String generic methods polyfill
 new function () {
@@ -598,7 +592,6 @@ new function () {
 
 };
 
-
 window.Set || (window.Set = new function () {
 
     function Set() {
@@ -649,7 +642,6 @@ window.Set || (window.Set = new function () {
     return Set;
 
 });
-
 
 window.Map || (window.Map = new function () {
 
@@ -716,7 +708,6 @@ window.Map || (window.Map = new function () {
 
 });
 
-
 window.WeakSet || (window.WeakSet = new function () {
 
     function WeakSet() {
@@ -769,7 +760,6 @@ window.WeakSet || (window.WeakSet = new function () {
     return WeakSet;
 
 });
-
 
 window.WeakMap || (window.WeakMap = new function () {
 
@@ -892,7 +882,6 @@ window instanceof Object || Object.assign(window, new function () {
 
 });
 
-
 window.setImmediate || Object.assign(window, window.msSetImmediate ? {
 
     //IE10
@@ -951,7 +940,6 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     };
 
 });
-
 
 window.Promise || (window.Promise = new function () {
 
@@ -1168,7 +1156,6 @@ window.Promise || (window.Promise = new function () {
 
 });
 
-
 window.requestAnimationFrame || Object.assign(window, {
 
     requestAnimationFrame: [
@@ -1203,7 +1190,6 @@ window.requestAnimationFrame || Object.assign(window, {
     ].find(Boolean)
 
 });
-
 
 function StaticDOMStringMap() {}
 

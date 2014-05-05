@@ -194,8 +194,7 @@ Object.defineProperties(FileList.prototype, {
      */
     clean: {
         value: function (code) {
-            //todo normalize empty lines
-            return code.replace("'use strict';", '');
+            return code.replace(/^['"]use strict['"];\r?\n/, '');
         }
     },
 
