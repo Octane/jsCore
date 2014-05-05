@@ -137,7 +137,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="XMLHttpRequest">15</sup> – `xhr.send()` supports `FormData()`
 
-<sup name="Promise">16</sup> – `Promise()` doesn't support [thenable](https://github.com/promises-aplus/promises-spec#terminology)-objects
+<sup name="Promise">16</sup> – `Promise()` doesn't support [thenable-objects](https://github.com/promises-aplus/promises-spec#terminology)
 
 <sup name="catch-delete">17</sup> – IE8 doesn't allow to use the dot notation as accessor for methods called “catch” and “delete”
 
