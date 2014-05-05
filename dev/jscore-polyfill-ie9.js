@@ -16,9 +16,9 @@ new function () {'use strict';
     Object.create = function (prototype, properties) {
         var object = create(prototype, properties);
         if (!Object.hasOwnProperty.call(object, 0)) {
-            //numeric key fixes a bug,
+            //a numeric key fixes the bug,
             //it can be removed after,
-            //unlike alphabetic key
+            //unlike the alphabetic key
             Object.defineProperty(object, 0, {
                 configurable: true
             });
