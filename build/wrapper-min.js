@@ -3,7 +3,7 @@
            Date, RegExp, Math,
            Error, TypeError,
            isFinite, isNaN, parseFloat, parseInt) {'use strict';
-//code
+{/*CODE*/}
 }(window, document,
   Object, Array, Function, String, Number, Boolean,
   Date, RegExp, Math,

@@ -1,176 +1,194 @@
 var fs = require('fs'),
     UglifyJS = require('uglify-js'),
-    src = 'src/',
-    files,
-    versions,
-    buildVer = JSON.parse(read('bower.json')).version;
 
-console.log('\n Start building jsCore v' + buildVer);
+    cache = {},
 
-files = [
+    SOURCE_PATH = 'src/',
+    BUILD_PATH = 'build/',
+    DEV_PATH = 'dev/',
+    MIN_PATH = 'min/',
 
-    'polyfill/ltie10/ie8/htmlelement.js',
-    'polyfill/ltie10/ie8/text.js',
-    'polyfill/ltie10/ie8/head.js',
-    'polyfill/ltie10/ie8/object.js',
-    'polyfill/ltie10/ie8/array.js',
-    'polyfill/ltie10/ie8/function.js',
-    'polyfill/ltie10/ie8/string.js',
-    'polyfill/ltie10/ie8/date.js',
-
-
-    'polyfill/object.js',
-    'polyfill/array.js',
-    'polyfill/string.js',
-    'polyfill/number.js',
-    'polyfill/math.js',
-    'polyfill/generic.js',
-    'polyfill/set.js',
-    'polyfill/map.js',
-    'polyfill/weakset.js',
-    'polyfill/weakmap.js',
-
-
-    'polyfill/ltie10/ie8/setimmediate.js',
-
-
-    'polyfill/setimmediate.js',
-    'polyfill/promise.js',
-    'polyfill/requestanimationframe.js',
-    'polyfill/htmlelement.js',
-
-
-    'polyfill/ltie10/htmlelement.js',
-    'polyfill/ltie10/formdata.js',
-
-
-    'polyfill/ltie10/ie8/fix/slice.js',
-    'polyfill/ltie10/ie8/fix/splice.js',
-    'polyfill/ltie10/ie8/fix/dataset.js',
-    'polyfill/ltie10/ie8/fix/children.js',
-    'polyfill/ltie10/ie8/event.js',
-    'polyfill/ltie10/ie8/cssstyledeclaration.js',
-    'polyfill/ltie10/ie8/getcomputedstyle.js',
-
-
-    'lib/namespace.js',
-    'lib/is.js',
-    'lib/class.js',
-    'lib/array.js',
-    'lib/date.js',
-    'lib/html.js',
-    'lib/template.js',
-    'lib/i18n.js',
-    'lib/css.js',
-    'lib/event.js',
-    'lib/dom.js',
-    'lib/request.js'
-
-];
-
-versions = [
-    {
-        support: 'IE8+',
-        output: {
-            normal: 'jscore.js',
-            minified: 'jscore.min.js'
-        }
+    files = {
+        header: {
+            dev: BUILD_PATH + 'header.js',
+            min: BUILD_PATH + 'header-min.js'
+        },
+        wrapper: {
+            dev: BUILD_PATH + 'wrapper.js',
+            min: BUILD_PATH + 'wrapper-min.js'
+        },
+        sources: readJSON(BUILD_PATH + 'file-order.json')
     },
-    {
-        support: 'IE9+',
-        exclude: '/ie8/',
-        output: {
-            normal: 'jscore.ie9.js',
-            minified: 'jscore.ie9.min.js'
-        }
+
+    versions = readJSON(BUILD_PATH + 'versions.json'),
+    semVer = readJSON('bower.json').version;
+
+function readJSON(fileName) {
+    return JSON.parse(readFile(fileName));
+}
+
+function readFile(fileName) {
+    if (fileName in cache) {
+        return cache[fileName];
+    }
+    return fs.readFileSync(fileName, {encoding: 'utf8'});
+}
+
+function writeFile(fileName, code) {
+    console.log(' > ' + fileName);
+    fs.writeFileSync(fileName, code, {encoding: 'utf8'});
+    return code.length;
+}
+
+function replace(code, pattern, replacement) {
+    return code.split(pattern).join(replacement);
+}
+
+function Header(file) {
+    this.code = readFile(file);
+}
+
+Object.defineProperties(Header.prototype, {
+    code: {
+        value: 'JavaScript code',
+        writable: true
     },
-    {
-        support: 'IE10+',
-        exclude: '/ltie10/',
-        output: {
-            normal: 'jscore.ie10.js',
-            minified: 'jscore.ie10.min.js'
+    compile: {
+        value: function (type, buildVer) {
+            var code = this.code;
+            code = replace(code, '{TYPE}', type);
+            code = replace(code, '{VERSION}', buildVer);
+            return code;
         }
     }
-];
+});
 
-function read(file) {
-    return fs.readFileSync(file, {encoding: 'utf8'});
+function Wrapper(file) {
+    this.code = readFile(file);
 }
 
-function write(file, code) {
-    fs.writeFileSync(file, code, {encoding: 'utf8'});
+Object.defineProperties(Wrapper.prototype, {
+    code: {
+        value: 'JavaScript code',
+        writable: true
+    },
+    wrap: {
+        value: function (code) {
+           return replace(this.code, '{/*CODE*/}', code);
+        }
+    },
+    minify: {
+        value: function (code) {
+            //todo source map
+            return UglifyJS.minify(this.wrap(code), {
+                fromString: true
+            }).code;
+        }
+    }
+});
+
+function FileList(orderedList) {
+    this.files = orderedList;
 }
 
-function exclude(path) {
-    return files.filter(function (file) {
-        var include = -1 == file.indexOf(path);
-        console.log((include ? ' + ' : ' - ') + file);
-        return include;
-    });
+Object.defineProperties(FileList.prototype, {
+    files: {
+        value: [],
+        writable: true
+    },
+    clean: {
+        value: function (code) {
+            //todo normalize empty lines
+            return code.replace("'use strict';", '');
+        }
+    },
+    exclude: {
+        value: function (directories) {
+            var files = this.files;
+            if (!directories) {
+                directories = [];
+            }
+            if ('string' == typeof directories) {
+                directories = [directories];
+            }
+            files = files.filter(function (filePath) {
+                var include = directories.every(function (directory) {
+                    return -1 == filePath.indexOf(directory);
+                });
+                console.log((include ? ' + ' : ' - ') + filePath);
+                return include;
+            });
+            console.log('\n Selected ' + files.length + ' files of ' + this.files.length);
+            return files;
+
+        }
+    },
+    merge: {
+        value: function (exclude) {
+            var clean = this.clean;
+            return this.exclude(exclude).reduce(function (code, filePath) {
+                return code + clean(readFile(SOURCE_PATH + filePath));
+            }, '');
+        }
+    }
+});
+
+function Build(params) {
+    this.type = params.type;
+    this.version = semVer + ' ' + params.support;
+    console.log('\n Build jsCore JavaScript ' + this.type + ' v' + this.version + '\n');
+    this.code = new FileList(files.sources).merge(params.exclude);
+    console.log('\n Output files:');
 }
 
-function merge(files) {
-    return files.reduce(function (code, file) {
-        //todo normalize empty lines
-        return code + read(src + file).replace("'use strict';", '');
-    }, '');
-}
+Object.defineProperties(Build.prototype, {
+    type: {
+        value: 'library',
+        writable: true
+    },
+    version: {
+        value: '0.0.0 IE8+',
+        writable: true
+    },
+    code: {
+        value: 'JavaScript code',
+        writable: true
+    },
+    devOut: {
+        value: 'dev/jscore.js',
+        writable: true
+    },
+    minOut: {
+        value: 'min/jscore.js',
+        writable: true
+    },
+    devBuild: {
+        value: function () {
+            var header = new Header(files.header.dev).compile(this.type, this.version),
+                body = new Wrapper(files.wrapper.dev).wrap(this.code);
+            return header + body;
+        }
+    },
+    minBuild: {
+        value: function () {
+            var type = 'library' == this.type ? '' : ' ' + this.type,
+                header = new Header(files.header.min).compile(type, this.version),
+                body = new Wrapper(files.wrapper.min).minify(this.code);
+            return header + body;
+        }
+    }
+});
 
-function wrap(wrapper, code) {
-    return wrapper.split('//code').join(code);
-}
+console.log('\n Start building jsCore v' + semVer);
+versions.forEach(function (params) {
+    var build = new Build(params),
+        dev = build.devBuild(),
+        min = build.minBuild();
 
-function setVer(header, ver) {
-    return header.split('{VERSION}').join(ver);
-}
+    writeFile(DEV_PATH + params.name + '.js', dev);
+    writeFile(MIN_PATH + params.name + '.js', min);
 
-function minify(code) {
-    //todo source map
-    return UglifyJS.minify(code, {fromString: true, warnings: true}).code;
-}
-
-try {
-    versions.forEach(function (version) {
-
-        var output = version.output,
-            fileList,
-            fileName = output.normal,
-            minFileName = output.minified,
-            semVer = buildVer + ' ' + version.support,
-            code,
-            minCode,
-            mergedCode,
-            headerCode,
-            minHeaderCode,
-            wrappedCode,
-            minWrappedCode;
-
-        console.log('\n Build jsCore v' + semVer + '\n');
-
-        fileList = exclude(version.exclude),
-        mergedCode = merge(fileList);
-        console.log('\n Merged ' + fileList.length + ' files of ' + files.length);
-
-        //normal
-        headerCode = setVer(read(src + 'header.js'), semVer);
-        wrappedCode = wrap(read(src + 'wrapper.js'), mergedCode);
-        code = headerCode + wrappedCode;
-        write(fileName, code);
-        console.log(' Output file: ' + fileName);
-
-        //minified
-        minHeaderCode = setVer(read(src + 'header.min.js'), semVer);
-        minWrappedCode = minify(wrap(read(src + 'wrapper.min.js'), mergedCode));
-        minCode = minHeaderCode + minWrappedCode;
-        write(minFileName, minCode);
-        console.log(' Minified file: ' + minFileName + ', compression ' + Math.round(100 - minCode.length * 100 / code.length) + '%');
-
-        console.log('\n Done');
-    });
-
-    console.log('\n All done\n');
-}
-catch (error) {
-    console.log(error);
-}
+    console.log(' Compression: ' + Math.round(100 - min.length * 100 / dev.length) + '%');
+    console.log('\n Done');
+});
+console.log('\n All done\n');

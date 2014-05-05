@@ -6,12 +6,7 @@ To use jsCore, just drop a single JavaScript file into your page:
 ```html
 <script src="jscore.js"></script>
 ```
-Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octane/jsCore/master/jscore.js).
-
-If you don't want to support IE8, rebuild `jscore.js` using `build.js`:
-```
-node build.js --no_ie8
-```
+Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octane/jsCore/master/dev/jscore.js).
 
 ##Contents
  - [`Polyfill`](#polyfill)

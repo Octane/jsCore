@@ -17,12 +17,18 @@ lib.dom.ready().then(function () {
 
     var windows = [],
         files = [
-            'jscore.js',
-            'jscore.min.js',
-            'jscore.ie9.js',
-            'jscore.ie9.min.js',
-            'jscore.ie10.js',
-            'jscore.ie10.min.js'
+            'dev/jscore.js',
+            'dev/jscore-ie9.js',
+            'dev/jscore-ie10.js',
+            'dev/jscore-polyfill.js',
+            'dev/jscore-polyfill-ie9.js',
+            'dev/jscore-polyfill-ie10.js',
+            'min/jscore.js',
+            'min/jscore-ie9.js',
+            'min/jscore-ie10.js',
+            'min/jscore-polyfill.js',
+            'min/jscore-polyfill-ie9.js',
+            'min/jscore-polyfill-ie10.js'
         ],
         width = Math.round(screen.availWidth / files.length),
         height = 200,
@@ -83,7 +89,8 @@ lib.dom.ready().then(function () {
             doc.open();
             doc.write(html.match({
                 jsCore: jsCore,
-                test: 'test/test.js'
+                test: 'test/test' + (jsCore.contains('polyfill') ?
+                                    '-polyfill' : '') + '.js'
             }));
             doc.close();
             //avoid closure

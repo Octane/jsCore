@@ -1,0 +1,37 @@
+[
+    {
+        "name": "jscore",
+        "type": "library",
+        "support": "IE8+"
+    },
+    {
+        "name": "jscore-polyfill",
+        "type": "polyfill",
+        "support": "IE8+",
+        "exclude": "lib/"
+    },
+    {
+        "name": "jscore-ie9",
+        "type": "library",
+        "support": "IE9+",
+        "exclude": "/ie8/"
+    },
+    {
+        "name": "jscore-polyfill-ie9",
+        "type": "polyfill",
+        "support": "IE9+",
+        "exclude": ["lib/", "/ie8/"]
+    },
+    {
+        "name": "jscore-ie10",
+        "type": "library",
+        "support": "IE10+",
+        "exclude": "/ltie10/"
+    },
+    {
+        "name": "jscore-polyfill-ie10",
+        "type": "polyfill",
+        "support": "IE10+",
+        "exclude": ["lib/", "/ltie10/"]
+    }
+]

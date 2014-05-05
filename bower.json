@@ -25,6 +25,7 @@
         "index.html",
         "jscore_logo.png",
         "MIT-LICENSE.txt",
+        "build",
         "src",
         "test"
     ]

@@ -1,3 +1,3 @@
 new function () {'use strict';
-//code
+{/*CODE*/}
 };//the end of jsCore
