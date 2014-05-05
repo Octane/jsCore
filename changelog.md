@@ -2,21 +2,22 @@
 
 ##v0.4.4
 
- -
+ - fix: remove a global variable `error` (`try-catch(error)` in global scope)
+ - new: a builder
 
 ##v0.4.3
 
- - fix: bug with negative `endIndex` in `Array.prototype.fill` polyfill
+ - fix: a bug with negative `endIndex` in `Array.prototype.fill` polyfill
  - fix: define `.setImmediate()` once
  - fix: `lib` methods don't depend on the activation object (`this`)
  - fix: support `DOMContentLoaded` in IE8
- - remove `.catch_()` and `.delete_()` aliases, use brackets notation in IE8
+ - remove `.catch_()` and `.delete_()` aliases, use the brackets notation in IE8
 
 ##v0.4.2
 
  - remove `.initKeyEvent()` and `.initMutationEvent()`
  - fix: `.dispatchEvent()` must return a value
- - fix: bug in `.stopPropagation()`
+ - fix: a bug in `.stopPropagation()`
  - fix: `.getComputedStyle(el).animationName` may be equal to `"none, none, …"` in IE11
 
 ##v0.4.1
@@ -38,8 +39,8 @@
 
  - new: prefixed transition and animation event types
  - new: prefixed transition and animation property names
- - new: method `.prefix()` for CSS properties
- - new: method `.getTransitionTime()` for calculate the maximum CSS transition time
+ - new: a method `.prefix()` for the CSS properties
+ - new: a method `.getTransitionTime()` for calculate the maximum CSS transition time
  - new: methods `.awaitAnimationEnd()`, `.awaitTransitionEnd()` and `.awaitTransAnimEnd()`
  - new: methods `.addClass()`, `.removeClass()` and `.toggleClass()` for perform actions at the end of all CSS transitions and animations
  - fix: `lib.event` API support `handleEvent`
