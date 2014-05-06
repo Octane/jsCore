@@ -126,7 +126,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="HTMLElement.prototype.classList">8</sup> – `element.classList` doesn't update automatically when you change `element.className`
 
-<sup name="HTMLElement.prototype.dataset">9</sup> – `element.dataset` doesn't add attribute when you add a new property
+<sup name="HTMLElement.prototype.dataset">9</sup> – `element.dataset` doesn't add an attribute when you add a new property
 
 <sup name="HTMLScriptElement.prototype.onload">10</sup> – don't use `script.onload()` and `script.onerror()` with `script.onreadystatechange()`
 
@@ -368,7 +368,7 @@ lib.dom.ready().then(function () {
 
 ####lib.dom.add|remove|toggleClass()
 
-`.addClass()`, `.removeClass()` and `.toggleClass()` return the promise to perform actions at the end of all CSS transitions and animations
+`.addClass()`, `.removeClass()` and `.toggleClass()` returns the promise to perform actions at the end of all CSS transitions and animations
 ```javascript
 lib.dom.addClass(element, class1[, class2[, ...]]], element) //→ promise
 lib.dom.removeClass(element, class1[, class2[, ...]]], element) //→ promise
