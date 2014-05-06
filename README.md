@@ -1,4 +1,4 @@
-#<img src="https://raw.githubusercontent.com/Octane/jsCore/master/jscore_logo.png" width="66" height="66" align="left" valign="middle" hspace="10" alt="jsCore logotype">jsCore JavaScript library
+#<img src="https://raw.githubusercontent.com/Octane/jsCore/master/jscore-logo.png" width="66" height="66" align="left" valign="middle" hspace="10" alt="jsCore logotype">jsCore JavaScript library
 
 The library consists of a complex polyfill and a set of methods in the `lib` namespace.
 
