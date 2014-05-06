@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.4.5
+
+ - fix: an animation event propagation bug in `.awaitAnimationEnd()` (listen only the `AT_TARGET` phase)
+
 ##v0.4.4
 
  - fix: remove a global variable `error` (`catch(error)` in the global scope)

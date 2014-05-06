@@ -130,7 +130,8 @@ lib.event = Object.assign({
         if (animations.length) {
             return new Promise(function (resolve) {
                 function onAnimationEnd(event) {
-                    if (!dequeue(animations, event.animationName)) {
+                    if (event.target == element &&
+                        !dequeue(animations, event.animationName)) {
                         element.removeEventListener(
                             animationEnd,
                             onAnimationEnd

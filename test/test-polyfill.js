@@ -2,10 +2,10 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    setImmediate(function () {
+    window.setImmediate(function () {
 
 
-        requestAnimationFrame(function (t) {
+        window.requestAnimationFrame(function (t) {
 
             document.addEventListener('mousemove', {
                 coords: 'x: {X}, y: {Y}',
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
-    getComputedStyle(document.body);
+    window.getComputedStyle(document.body);
     document.body.classList;
     document.body.dataset;
     Promise.resolve();

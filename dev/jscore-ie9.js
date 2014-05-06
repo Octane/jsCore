@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.4.4 IE9+
+/* jsCore JavaScript library v0.4.5 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -1868,7 +1868,8 @@ lib.event = Object.assign({
         if (animations.length) {
             return new Promise(function (resolve) {
                 function onAnimationEnd(event) {
-                    if (!dequeue(animations, event.animationName)) {
+                    if (event.target == element &&
+                        !dequeue(animations, event.animationName)) {
                         element.removeEventListener(
                             animationEnd,
                             onAnimationEnd
