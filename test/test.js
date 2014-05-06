@@ -121,4 +121,11 @@ lib.dom.ready().then(function () {
         }
     });
 
+    requestAnimationFrame(function (t) {
+        var event = document.createEvent('MouseEvent');
+        event.initMouseEvent('mousemove', true, true, window, 'test',
+                             t, t, t, t, false, false, false, false, 0, null);
+        document.dispatchEvent(event);
+    });
+
 });

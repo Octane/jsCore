@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setImmediate(function () {
 
 
-        requestAnimationFrame(function () {
+        requestAnimationFrame(function (t) {
 
             document.addEventListener('mousemove', {
                 coords: 'x: {X}, y: {Y}',
@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                                 replace('{Y}', event.pageY);
                 }
             });
+
+            var event = document.createEvent('MouseEvent');
+            event.initMouseEvent('mousemove', true, true, window, 'test',
+                                 t, t, t, t, false, false, false, false, 0, null);
+            document.dispatchEvent(event);
 
         });
 
