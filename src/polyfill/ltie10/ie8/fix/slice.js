@@ -18,8 +18,7 @@ new function () {
     try {
         //array methods don't work with array-like DOM-objects in IE8
         Array.slice(document.documentElement.childNodes, 0);
-    }
-    catch (error) {
+    } catch (error) {
         Array.slice = function (iterable, start, end) {
             var result,
                 length = arguments.length;

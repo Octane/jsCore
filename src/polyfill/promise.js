@@ -27,8 +27,7 @@ window.Promise || (window.Promise = new function () {
     function tryCall(callback, data) {
         try {
             callback(data);
-        }
-        catch (error) {
+        } catch (error) {
         }
     }
 
@@ -135,8 +134,7 @@ window.Promise || (window.Promise = new function () {
                         try {
                             promise._value = onFulfilled(promise._value);
                             promise._fulfilled = true;
-                        }
-                        catch (error) {
+                        } catch (error) {
                             promise._reason = error;
                             promise._rejected = true;
                             rejectQueue(promise._reason);
@@ -161,8 +159,7 @@ window.Promise || (window.Promise = new function () {
                         try {
                             promise._reason = onRejected(promise._reason);
                             promise._rejected = true;
-                        }
-                        catch (error) {
+                        } catch (error) {
                             promise._reason = error;
                             promise._rejected = true;
                             rejectQueue(promise._reason);
@@ -192,8 +189,7 @@ window.Promise || (window.Promise = new function () {
                 } else {
                     promise._enqueue(onFulfilled, onRejected);
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 if (!promise._fulfilled || !promise._rejected) {
                     onRejectedCaller(error);
                 }

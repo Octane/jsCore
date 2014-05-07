@@ -1,4 +1,4 @@
-/* jsCore JavaScript polyfill v0.4.5 IE8+
+/* jsCore JavaScript polyfill v0.4.6 IE8+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -968,8 +968,7 @@ window.Promise || (window.Promise = new function () {
     function tryCall(callback, data) {
         try {
             callback(data);
-        }
-        catch (error) {
+        } catch (error) {
         }
     }
 
@@ -1076,8 +1075,7 @@ window.Promise || (window.Promise = new function () {
                         try {
                             promise._value = onFulfilled(promise._value);
                             promise._fulfilled = true;
-                        }
-                        catch (error) {
+                        } catch (error) {
                             promise._reason = error;
                             promise._rejected = true;
                             rejectQueue(promise._reason);
@@ -1102,8 +1100,7 @@ window.Promise || (window.Promise = new function () {
                         try {
                             promise._reason = onRejected(promise._reason);
                             promise._rejected = true;
-                        }
-                        catch (error) {
+                        } catch (error) {
                             promise._reason = error;
                             promise._rejected = true;
                             rejectQueue(promise._reason);
@@ -1133,8 +1130,7 @@ window.Promise || (window.Promise = new function () {
                 } else {
                     promise._enqueue(onFulfilled, onRejected);
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 if (!promise._fulfilled || !promise._rejected) {
                     onRejectedCaller(error);
                 }
@@ -1761,8 +1757,7 @@ new function () {
     try {
         //array methods don't work with array-like DOM-objects in IE8
         Array.slice(document.documentElement.childNodes, 0);
-    }
-    catch (error) {
+    } catch (error) {
         Array.slice = function (iterable, start, end) {
             var result,
                 length = arguments.length;
@@ -1813,8 +1808,7 @@ new function () {
 new function () {
     try {
         Object.defineProperty({}, 'test', {});
-    }
-    catch (error) {
+    } catch (error) {
         window.StaticDOMStringMap = new function () {
             //github.com/es-shims/es5-shim/issues/152
             var uid = 0,
@@ -2135,8 +2129,7 @@ window.addEventListener || new function () {
         open: function () {
             try {
                 open.apply(this, arguments);
-            }
-            catch (error) {
+            } catch (error) {
                 this._unbind();
                 this._fireEvent('error');
             }
@@ -2146,8 +2139,7 @@ window.addEventListener || new function () {
             this.onreadystatechange = this._onReadyStateChange;
             try {
                 send.call(this, data);
-            }
-            catch (error) {
+            } catch (error) {
                 this._unbind();
                 this._fireEvent('error');
             }

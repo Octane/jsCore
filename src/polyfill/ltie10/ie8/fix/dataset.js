@@ -3,8 +3,7 @@
 new function () {
     try {
         Object.defineProperty({}, 'test', {});
-    }
-    catch (error) {
+    } catch (error) {
         window.StaticDOMStringMap = new function () {
             //github.com/es-shims/es5-shim/issues/152
             var uid = 0,

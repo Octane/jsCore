@@ -293,8 +293,7 @@ window.addEventListener || new function () {
         open: function () {
             try {
                 open.apply(this, arguments);
-            }
-            catch (error) {
+            } catch (error) {
                 this._unbind();
                 this._fireEvent('error');
             }
@@ -304,8 +303,7 @@ window.addEventListener || new function () {
             this.onreadystatechange = this._onReadyStateChange;
             try {
                 send.call(this, data);
-            }
-            catch (error) {
+            } catch (error) {
                 this._unbind();
                 this._fireEvent('error');
             }
