@@ -1,15 +1,6 @@
 
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
-    var uid = 0,
-        //github.com/es-shims/es5-shim/issues/152
-        fakeDoc = new ActiveXObject('htmlfile'),
-        proto = createObject().constructor.prototype;
-
-    function createObject() {
-        return fakeDoc.getElementsByName(uid++);
-    }
-
     function toUpperCase(str) {
         return str.charAt(1).toUpperCase();
     }
@@ -63,7 +54,7 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
         var compStyle = element._compStyle,
             currStyle;
         if (!compStyle) {
-            compStyle = element._compStyle = createObject();
+            compStyle = element._compStyle = new ES5Object;
             currStyle = element.currentStyle;
             Object.keys(currStyle).forEach(function (property) {
                 Object.defineProperty(
@@ -86,11 +77,6 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
         }
         return compStyle;
     }
-
-    Object.keys(proto).forEach(function (key) {
-        proto[key] = undefined;
-    });
-    proto = null;
 
     return getComputedStyle;
 

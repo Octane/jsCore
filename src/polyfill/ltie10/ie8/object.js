@@ -38,3 +38,44 @@ if (!Object.create) {
         return new NOP;
     };
 }
+
+//Creates an object that supports getters and setters
+var ES5Object = window instanceof Object || new function () {
+
+    function createLengthDesc() {
+        var length;
+        return {
+            get: function () {
+                return length;
+            },
+            set: function (value) {
+                length = value;
+            }
+        };
+    }
+
+    function fixLength(obj) {
+        return Object.defineProperty(obj, 'length', createLengthDesc());
+    }
+
+    return new function () {//avoid closure
+
+        //github.com/es-shims/es5-shim/issues/152
+        var fakeDoc = new ActiveXObject('htmlfile'),
+            proto = ES5Object().constructor.prototype,
+            uid = 0;
+
+        function ES5Object() {
+            return fixLength(fakeDoc.getElementsByName(uid++));
+        }
+
+        proto.urns = undefined;
+        proto.tags = undefined;
+        proto.item = undefined;
+        proto.namedItem = undefined;
+        proto = null;
+
+        return ES5Object;
+    };
+
+};
