@@ -61,12 +61,12 @@ var ES5Object = window instanceof Object || new function () {
     return new function () {//avoid closure
 
         //github.com/es-shims/es5-shim/issues/152
-        var fakeDoc = new ActiveXObject('htmlfile'),
+        var fake = new ActiveXObject('htmlfile'),
             proto = ES5Object().constructor.prototype,
             uid = 0;
 
         function ES5Object() {
-            return fixLength(fakeDoc.getElementsByName(uid++));
+            return fixLength(fake.getElementsByName(uid++));
         }
 
         proto.urns = undefined;
