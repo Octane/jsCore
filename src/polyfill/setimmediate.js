@@ -2,7 +2,7 @@
 
 window.setImmediate || Object.assign(window, new function () {
 
-    var id = 0,
+    var uid = 0,
         storage = {},
         firstCall = true,
         message = 'setImmediatePolyfillMessage';
@@ -35,7 +35,8 @@ window.setImmediate || Object.assign(window, new function () {
     return {
 
         setImmediate: function () {
-            var key = message + ++id;
+            var id = uid++,
+                key = message + id;
             storage[key] = arguments;
             if (firstCall) {
                 firstCall = false;
