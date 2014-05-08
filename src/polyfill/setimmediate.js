@@ -1,12 +1,6 @@
 'use strict';
 
-window.setImmediate || Object.assign(window, window.msSetImmediate ? {
-
-    //IE10
-    setImmediate: window.msSetImmediate,
-    clearImmediate: window.msClearImmediate
-
-} : new function () {
+window.setImmediate || Object.assign(window, new function () {
 
     var id = 0,
         storage = {},
@@ -32,8 +26,8 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
         if ('string' == typeof key && key.startsWith(message)) {
             data = storage[key];
             if (data) {
-                fastApply(data);
                 delete storage[key];
+                fastApply(data);
             }
         }
     }
