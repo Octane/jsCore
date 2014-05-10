@@ -123,9 +123,36 @@ lib.dom.ready().then(function () {
 
     window.requestAnimationFrame(function (t) {
         var event = document.createEvent('MouseEvent');
+        /*todo fix github.com/cubiq/iscroll/issues/501
         event.initMouseEvent('mousemove', true, true, window, 'test',
                              t, t, t, t, false, false, false, false, 0, null);
+        */
+        event.initEvent('mousemove', true, true);
         document.dispatchEvent(event);
     });
 
 });
+
+/*
+window.addEventListener('popstate', function (event) {
+    console.log(JSON.stringify(event.state));
+});
+setTimeout(function () {
+    history.pushState({test: 1}, '', '#test-1');
+    setTimeout(function () {
+        history.pushState({test: 2}, '', '#test-2');
+        setTimeout(function () {
+            history.pushState({test: 3}, '', '#test-2');
+            setTimeout(function () {
+                history.back();
+                setTimeout(function () {
+                    history.back();
+                    setTimeout(function () {
+                        history.back();
+                    }, 100);
+                }, 100);
+            }, 100);
+        }, 100);
+    }, 100);
+}, 100);
+*/

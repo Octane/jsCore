@@ -20,8 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             var event = document.createEvent('MouseEvent');
+            /*todo fix github.com/cubiq/iscroll/issues/501
             event.initMouseEvent('mousemove', true, true, window, 'test',
                                  t, t, t, t, false, false, false, false, 0, null);
+            */
+            event.initEvent('mousemove', true, true);
             document.dispatchEvent(event);
 
         });

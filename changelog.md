@@ -4,6 +4,7 @@
 
  - fix: the settled promise bug
  - fix: a bug with settled promise value changes
+ - new: history API polyfill
 
 ##v0.4.5
 

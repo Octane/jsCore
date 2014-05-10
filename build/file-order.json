@@ -43,6 +43,9 @@
     "polyfill/ltie10/ie8/getcomputedstyle.js",
 
 
+    "polyfill/ltie10/history.js",
+
+
     "lib/namespace.js",
     "lib/is.js",
     "lib/class.js",
