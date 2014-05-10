@@ -559,10 +559,30 @@ window.setImmediate || Object.assign(window, new function () {
 
 window.Promise || (window.Promise = new function () {
 
-    //todo thenable value support
+    function toPromise(thenable) {
+        if (isPromise(thenable)) {
+            return thenable;
+        }
+        return new Promise(function (resolve, reject) {
+            //execute thenable.then asynchronously
+            //github.com/getify/native-promise-only/issues/5
+            //github.com/domenic/promises-unwrapping/issues/105
+            window.setImmediate(function () {
+                try {
+                    thenable.then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
 
     function isPromise(anything) {
         return anything instanceof Promise;
+    }
+
+    function isThenable(anything) {
+        return 'then' in Object(anything);
     }
 
     function isSettled(promise) {
@@ -597,45 +617,50 @@ window.Promise || (window.Promise = new function () {
         this._resolve(resolver);
     }
 
-    Promise.resolve = function (value) {
-        if (isPromise(value)) {
-            return value.then(defaultOnFulfilled, defaultOnRejected);
+    Object.assign(Promise, {
+
+        resolve: function (value) {
+            if (isThenable(value)) {
+                return toPromise(value);
+            }
+            return new Promise(function (resolve) {
+                resolve(value);
+            });
+        },
+
+        reject: function (reason) {
+            return new Promise(function (resolve, reject) {
+                reject(reason);
+            });
+        },
+
+        race: function (promises) {
+            return new Promise(function (resolve, reject) {
+                Array.forEach(promises, function (promise) {
+                    toPromise(promise).then(resolve, reject);
+                });
+            });
+        },
+
+        all: function (promises) {
+            return new Promise(function (resolve, reject) {
+                var values = [];
+                promises = Array.map(promises, toPromise);
+                promises.forEach(function (promise, index) {
+                    promise.then(
+                        function (value) {
+                            values[index] = value;
+                            if (allSettled(promises)) {
+                                resolve(values);
+                            }
+                        },
+                        reject
+                    );
+                });
+            });
         }
-        return new Promise(function (resolve) {
-            resolve(value);
-        });
-    };
 
-    Promise.reject = function (reason) {
-        return new Promise(function (resolve, reject) {
-            reject(reason);
-        });
-    };
-
-    Promise.race = function (promises) {
-        return new Promise(function (resolve, reject) {
-            Array.forEach(promises, function (promise) {
-                promise.then(resolve, reject);
-            });
-        });
-    };
-
-    Promise.all = function (promises) {
-        return new Promise(function (resolve, reject) {
-            var values = [];
-            Array.forEach(promises, function (promise, index) {
-                promise.then(
-                    function (value) {
-                        values[index] = value;
-                        if (allSettled(promises)) {
-                            resolve(values);
-                        }
-                    },
-                    reject
-                );
-            });
-        });
-    };
+    });
 
     Object.assign(Promise.prototype, {
 
@@ -704,13 +729,13 @@ window.Promise || (window.Promise = new function () {
                         try {
                             value = onFulfilled(promise._value);
                         } catch (error) {
-                            window.setImmediate(reject, error);
+                            reject(error);
                             return;
                         }
-                        if (isPromise(value)) {
-                            value.then(resolve, reject);
+                        if (isThenable(value)) {
+                            toPromise(value).then(resolve, reject);
                         } else {
-                            window.setImmediate(resolve, value);
+                            resolve(value);
                         }
                     });
                 }
@@ -721,13 +746,13 @@ window.Promise || (window.Promise = new function () {
                         try {
                             reason = onRejected(promise._reason);
                         } catch (error) {
-                            window.setImmediate(reject, error);
+                            reject(error);
                             return;
                         }
-                        if (isPromise(reason)) {
-                            reason.then(resolve, reject);
+                        if (isThenable(reason)) {
+                            toPromise(reason).then(resolve, reject);
                         } else {
-                            window.setImmediate(resolve, reason);
+                            resolve(reason);
                         }
                     });
                 }
