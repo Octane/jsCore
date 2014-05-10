@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.4.6 IE8+
+/* jsCore JavaScript library v0.4.6-alpha IE8+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -72,6 +72,47 @@ if (!Object.create) {
         return new NOP;
     };
 }
+
+//Creates an object that supports getters and setters
+var ES5Object = window instanceof Object || new function () {
+
+    function createLengthDesc() {
+        var length;
+        return {
+            get: function () {
+                return length;
+            },
+            set: function (value) {
+                length = value;
+            }
+        };
+    }
+
+    function fixLength(obj) {
+        return Object.defineProperty(obj, 'length', createLengthDesc());
+    }
+
+    return new function () {//avoid closure
+
+        //github.com/es-shims/es5-shim/issues/152
+        var fake = new ActiveXObject('htmlfile'),
+            proto = ES5Object().constructor.prototype,
+            uid = 0;
+
+        function ES5Object() {
+            return fixLength(fake.getElementsByName(uid++));
+        }
+
+        proto.urns = undefined;
+        proto.tags = undefined;
+        proto.item = undefined;
+        proto.namedItem = undefined;
+        proto = null;
+
+        return ES5Object;
+    };
+
+};
 
 if (!Array.isArray) {
     Array.isArray = function (anything) {
@@ -882,15 +923,9 @@ window instanceof Object || Object.assign(window, new function () {
 
 });
 
-window.setImmediate || Object.assign(window, window.msSetImmediate ? {
+window.setImmediate || Object.assign(window, new function () {
 
-    //IE10
-    setImmediate: window.msSetImmediate,
-    clearImmediate: window.msClearImmediate
-
-} : new function () {
-
-    var id = 0,
+    var uid = 0,
         storage = {},
         firstCall = true,
         message = 'setImmediatePolyfillMessage';
@@ -914,8 +949,8 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
         if ('string' == typeof key && key.startsWith(message)) {
             data = storage[key];
             if (data) {
-                fastApply(data);
                 delete storage[key];
+                fastApply(data);
             }
         }
     }
@@ -923,7 +958,8 @@ window.setImmediate || Object.assign(window, window.msSetImmediate ? {
     return {
 
         setImmediate: function () {
-            var key = message + ++id;
+            var id = uid++,
+                key = message + id;
             storage[key] = arguments;
             if (firstCall) {
                 firstCall = false;
@@ -950,7 +986,7 @@ window.Promise || (window.Promise = new function () {
     }
 
     function isSettled(promise) {
-        return promise._settled;
+        return promise._fulfilled || promise._rejected;
     }
 
     function allSettled(promises) {
@@ -965,24 +1001,12 @@ window.Promise || (window.Promise = new function () {
         throw reason;
     }
 
-    function tryCall(callback, data) {
-        try {
-            callback(data);
-        } catch (error) {
-        }
+    function call(callback) {
+        callback();
     }
 
-    function callEach(callbacks, data) {
-        callbacks.forEach(function (callback) {
-            window.setImmediate(tryCall, callback, data);
-        });
-    }
-
-    function Promise(resolver, _defer) {
+    function Promise(resolver) {
         Object.assign(this, {
-            _resolver: resolver,
-            _pending: true,
-            _settled: false,
             _fulfilled: false,
             _rejected: false,
             _value: undefined,
@@ -990,58 +1014,94 @@ window.Promise || (window.Promise = new function () {
             _onFulfilled: [],
             _onRejected: []
         });
-        return _defer ? this : this.then();
+        this._resolve(resolver);
     }
 
-    Object.assign(Promise, {
-
-        resolve: function (value) {
-            if (isPromise(value)) {
-                return value.then(defaultOnFulfilled, defaultOnRejected);
-            }
-            return new Promise(function (resolve) {
-                resolve(value);
-            });
-        },
-
-        reject: function (reason) {
-            return new Promise(function (resolve, reject) {
-                reject(reason);
-            });
-        },
-
-        race: function (promises) {
-            return new Promise(function (resolve, reject) {
-                Array.forEach(promises, function (promise) {
-                    promise.then(resolve, reject);
-                });
-            });
-        },
-
-        all: function (promises) {
-            return new Promise(function (resolve, reject) {
-                var values = [];
-                Array.forEach(promises, function (promise, index) {
-                    promise.then(
-                        function (value) {
-                            values[index] = value;
-                            if (allSettled(promises)) {
-                                resolve(values);
-                            }
-                        },
-                        reject
-                    );
-                });
-            });
+    Promise.resolve = function (value) {
+        if (isPromise(value)) {
+            return value.then(defaultOnFulfilled, defaultOnRejected);
         }
+        return new Promise(function (resolve) {
+            resolve(value);
+        });
+    };
 
-    });
+    Promise.reject = function (reason) {
+        return new Promise(function (resolve, reject) {
+            reject(reason);
+        });
+    };
+
+    Promise.race = function (promises) {
+        return new Promise(function (resolve, reject) {
+            Array.forEach(promises, function (promise) {
+                promise.then(resolve, reject);
+            });
+        });
+    };
+
+    Promise.all = function (promises) {
+        return new Promise(function (resolve, reject) {
+            var values = [];
+            Array.forEach(promises, function (promise, index) {
+                promise.then(
+                    function (value) {
+                        values[index] = value;
+                        if (allSettled(promises)) {
+                            resolve(values);
+                        }
+                    },
+                    reject
+                );
+            });
+        });
+    };
 
     Object.assign(Promise.prototype, {
 
+        _resolve: function (resolver) {
+
+            var promise = this;
+
+            function resolve(value) {
+                promise._fulfill(value);
+            }
+
+            function reject(reason) {
+                promise._reject(reason);
+            }
+
+            try {
+                resolver(resolve, reject);
+            } catch(error) {
+                if (!isSettled(promise)) {
+                    reject(error);
+                }
+            }
+
+        },
+
+        _fulfill: function (value) {
+            if (!isSettled(this)) {
+                this._fulfilled = true;
+                this._value = value;
+                this._onFulfilled.forEach(call);
+                this._clearQueue();
+            }
+        },
+
+        _reject: function (reason) {
+            if (!isSettled(this)) {
+                this._rejected = true;
+                this._reason = reason;
+                this._onRejected.forEach(call);
+                this._clearQueue();
+            }
+        },
+
         _enqueue: function (onFulfilled, onRejected) {
-            this._onFulfilled.push(onFulfilled || defaultOnFulfilled);
-            this._onRejected.push(onRejected || defaultOnRejected);
+            this._onFulfilled.push(onFulfilled);
+            this._onRejected.push(onRejected);
         },
 
         _clearQueue: function () {
@@ -1051,94 +1111,56 @@ window.Promise || (window.Promise = new function () {
 
         then: function (onFulfilled, onRejected) {
 
-            var promise = this,
-                settled;
-
-            function fulfillQueue(value) {
-                promise._value = value;
-                callEach(promise._onFulfilled, value);
-                promise._clearQueue();
-            }
-
-            function rejectQueue(reason) {
-                promise._reason = reason;
-                callEach(promise._onRejected, reason);
-                promise._clearQueue();
-            }
-
-            function onFulfilledCaller(value) {
-                if (!settled) {
-                    settled = true;
-                    promise._value = value;
-                    window.setImmediate(function () {
-                        promise._settled = true;
-                        try {
-                            promise._value = onFulfilled(promise._value);
-                            promise._fulfilled = true;
-                        } catch (error) {
-                            promise._reason = error;
-                            promise._rejected = true;
-                            rejectQueue(promise._reason);
-                        }
-                        if (promise._fulfilled) {
-                            if (isPromise(promise._value)) {
-                                promise._value.then(fulfillQueue, rejectQueue);
-                            } else {
-                                fulfillQueue(promise._value);
-                            }
-                        }
-                    });
-                }
-            }
-
-            function onRejectedCaller(reason) {
-                if (!settled) {
-                    settled = true;
-                    promise._reason = reason;
-                    window.setImmediate(function () {
-                        promise._settled = true;
-                        try {
-                            promise._reason = onRejected(promise._reason);
-                            promise._rejected = true;
-                        } catch (error) {
-                            promise._reason = error;
-                            promise._rejected = true;
-                            rejectQueue(promise._reason);
-                        }
-                        if (promise._rejected) {
-                            if (isPromise(promise._reason)) {
-                                promise._reason.then(fulfillQueue, rejectQueue);
-                            } else {
-                                fulfillQueue(promise._value);
-                            }
-                        }
-                    });
-                }
-            }
-
-            onFulfilled = onFulfilled || defaultOnFulfilled;
-            onRejected = onRejected || defaultOnRejected;
-
-            try {
-                if (promise._pending) {
-                    promise._pending = false;
-                    promise._resolver(onFulfilledCaller, onRejectedCaller);
-                } else if (promise._fulfilled) {
-                    onFulfilledCaller(promise._value);
-                } else if (promise._rejected) {
-                    onRejectedCaller(promise._reason);
-                } else {
-                    promise._enqueue(onFulfilled, onRejected);
-                }
-            } catch (error) {
-                if (!promise._fulfilled || !promise._rejected) {
-                    onRejectedCaller(error);
-                }
-            }
+            var promise = this;
 
             return new Promise(function (resolve, reject) {
-                promise._enqueue(resolve, reject);
-            }, true);
+
+                onFulfilled = onFulfilled || defaultOnFulfilled;
+                onRejected = onRejected || defaultOnRejected;
+
+                function asyncOnFulfilled() {
+                    window.setImmediate(function () {
+                        var value;
+                        try {
+                            value = onFulfilled(promise._value);
+                        } catch (error) {
+                            window.setImmediate(reject, error);
+                            return;
+                        }
+                        if (isPromise(value)) {
+                            value.then(resolve, reject);
+                        } else {
+                            window.setImmediate(resolve, value);
+                        }
+                    });
+                }
+
+                function asyncOnRejected() {
+                    window.setImmediate(function () {
+                        var reason;
+                        try {
+                            reason = onRejected(promise._reason);
+                        } catch (error) {
+                            window.setImmediate(reject, error);
+                            return;
+                        }
+                        if (isPromise(reason)) {
+                            reason.then(resolve, reject);
+                        } else {
+                            window.setImmediate(resolve, reason);
+                        }
+                    });
+                }
+
+                if (promise._fulfilled) {
+                    asyncOnFulfilled();
+                } else if (promise._rejected) {
+                    asyncOnRejected();
+                } else {
+                    promise._enqueue(asyncOnFulfilled, asyncOnRejected);
+                }
+
+            });
 
         },
 
@@ -1805,26 +1827,9 @@ new function () {
 };
 
 //IE8 dataset polyfill fix
-new function () {
-    try {
-        Object.defineProperty({}, 'test', {});
-    } catch (error) {
-        window.StaticDOMStringMap = new function () {
-            //github.com/es-shims/es5-shim/issues/152
-            var uid = 0,
-                fakeDoc = new ActiveXObject('htmlfile'),
-                proto = createObject().constructor.prototype;
-            function createObject() {
-                return fakeDoc.getElementsByName(uid++);
-            }
-            Object.keys(proto).forEach(function (key) {
-                proto[key] = undefined;
-            });
-            proto = null;
-            return createObject;
-        };
-    }
-};
+if ('function' == typeof ES5Object) {
+    StaticDOMStringMap = ES5Object;
+}
 
 //IE8 children.length fix (exclude COMMENT_NODE)
 (function () {
@@ -2296,15 +2301,6 @@ window instanceof Object || new function () {
 
 window.getComputedStyle || (window.getComputedStyle = new function () {
 
-    var uid = 0,
-        //github.com/es-shims/es5-shim/issues/152
-        fakeDoc = new ActiveXObject('htmlfile'),
-        proto = createObject().constructor.prototype;
-
-    function createObject() {
-        return fakeDoc.getElementsByName(uid++);
-    }
-
     function toUpperCase(str) {
         return str.charAt(1).toUpperCase();
     }
@@ -2358,7 +2354,7 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
         var compStyle = element._compStyle,
             currStyle;
         if (!compStyle) {
-            compStyle = element._compStyle = createObject();
+            compStyle = element._compStyle = new ES5Object;
             currStyle = element.currentStyle;
             Object.keys(currStyle).forEach(function (property) {
                 Object.defineProperty(
@@ -2382,14 +2378,57 @@ window.getComputedStyle || (window.getComputedStyle = new function () {
         return compStyle;
     }
 
-    Object.keys(proto).forEach(function (key) {
-        proto[key] = undefined;
-    });
-    proto = null;
-
     return getComputedStyle;
 
 });
+
+history.pushState || new function () {
+
+    console.log('history polyfill');
+
+    var proto = history.constructor.prototype,
+        loc = window.location,
+        states = {},
+        state = null,
+        skip = {};
+
+    function onPopState() {
+        var event = document.createEvent('CustomEvent');
+        event.initEvent('popstate', false, false);
+        event.state = state;
+        window.dispatchEvent(event);
+    }
+
+    proto.pushState = function (state, title, hash) {
+        if (!hash.startsWith('#')) {
+            hash = '#' + hash;
+        }
+        states[hash] = state;
+        skip[hash] = true;
+        loc.hash = hash;
+    };
+
+    proto.replaceState = function (state, title, hash) {
+        throw Error('history.replaceState not implemented');
+    };
+
+    Object.defineProperty(proto, 'state', {
+        get: function () {
+            return state;
+        }
+    });
+
+    window.addEventListener('hashchange', function (event) {
+        var hash = loc.hash;
+        if (skip[hash]) {
+            delete skip[hash];
+        } else {
+            state = states[hash] || null;
+            onPopState();
+        }
+    });
+
+};
 
 window.lib = {};
 

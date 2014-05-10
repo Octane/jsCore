@@ -1,5 +1,10 @@
 #jsCore changelog
 
+##v0.4.6
+
+ - fix: the settled promise bug
+ - fix: a bug with settled promise value changes
+
 ##v0.4.5
 
  - fix: an animation event propagation bug in `.awaitAnimationEnd()` (listen only the `AT_TARGET` phase)
