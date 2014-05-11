@@ -1002,7 +1002,8 @@ window.Promise || (window.Promise = new function () {
     }
 
     function isThenable(anything) {
-        return 'then' in Object(anything);
+        return Object(anything) === anything &&
+               'function' == typeof anything.then;
     }
 
     function isSettled(promise) {
@@ -1010,7 +1011,7 @@ window.Promise || (window.Promise = new function () {
     }
 
     function allSettled(promises) {
-        return Array.every(promises, isSettled);
+        return promises.every(isSettled);
     }
 
     function defaultOnFulfilled(value) {
@@ -1056,7 +1057,7 @@ window.Promise || (window.Promise = new function () {
 
         race: function (promises) {
             return new Promise(function (resolve, reject) {
-                Array.forEach(promises, function (promise) {
+                promises.forEach(function (promise) {
                     toPromise(promise).then(resolve, reject);
                 });
             });
@@ -1065,7 +1066,7 @@ window.Promise || (window.Promise = new function () {
         all: function (promises) {
             return new Promise(function (resolve, reject) {
                 var values = [];
-                promises = Array.map(promises, toPromise);
+                promises = promises.map(toPromise);
                 promises.forEach(function (promise, index) {
                     promise.then(
                         function (value) {

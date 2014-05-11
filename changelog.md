@@ -2,8 +2,7 @@
 
 ##v0.4.6
 
- - fix: the settled promise bug
- - fix: a bug with settled promise value changes
+ - many `Promise` [fixes](https://github.com/Octane/Promise/releases)
  - new: history API polyfill
 
 ##v0.4.5
