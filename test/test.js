@@ -132,27 +132,3 @@ lib.dom.ready().then(function () {
     });
 
 });
-
-/*
-window.addEventListener('popstate', function (event) {
-    console.log(JSON.stringify(event.state));
-});
-setTimeout(function () {
-    history.pushState({test: 1}, '', '#test-1');
-    setTimeout(function () {
-        history.pushState({test: 2}, '', '#test-2');
-        setTimeout(function () {
-            history.pushState({test: 3}, '', '#test-2');
-            setTimeout(function () {
-                history.back();
-                setTimeout(function () {
-                    history.back();
-                    setTimeout(function () {
-                        history.back();
-                    }, 100);
-                }, 100);
-            }, 100);
-        }, 100);
-    }, 100);
-}, 100);
-*/
