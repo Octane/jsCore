@@ -1,7 +1,7 @@
 {
     "name": "jsCore",
     "main": "jscore.js",
-    "version": "0.4.6-alpha",
+    "version": "0.4.6",
     "description": "Complex JavaScript polyfill and set of methods",
     "keywords": [
         "browser",

@@ -1,4 +1,4 @@
-/* jsCore JavaScript polyfill v0.4.6-alpha IE9+
+/* jsCore JavaScript polyfill v0.4.6 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
