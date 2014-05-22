@@ -78,7 +78,7 @@ Object/Scope | Methods/Properties
 :------------|:-----------------------------
 global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, `WeakMap()`
 `window` | `.setImmediate()`, `.clearImmediate()`, `.requestAnimationFrame()`, `.cancelAnimationFrame()`, `.getComputedStyle()`
-`Object` generics | `.create()`<sup>[1](#Object.create)</sup>, `.assign()`<sup>[2](#Object.assign)</sup>, `.is()`, `.keys()`<sup>[3](#Object.keys)</sup>
+`Object` generics | `.create()`<sup>[1](#Object.create)</sup>, `.assign()`<sup>[2](#Object.assign)</sup>, `.is()`, `.keys()`<sup>[3](#Object.keys)</sup>, `.setPrototypeOf()`<sup>[16](#Object.setPrototypeOf)</sup>
 `Array` generics<sup>[4](#Array_generics)</sup> | `.isArray()`, `.from()`, `.of()`, `.concat()`, `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.join()`, `.lastIndexOf()`, `.map()`, `.pop()`, `.push()`, `.reduce()`, `.reduceRight()`, `.reverse()`, `.shift()`, `.slice()`<sup>[5](#Array.slice)</sup>, `.some()`, `.sort()`, `.splice()`<sup>[6](#Array.splice)</sup>, `.unshift()`
 `Array.prototype` | `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.lastIndexOf()`, `.map()`, `.reduce()`, `.reduceRight()`, `.some()`
 `String` generics | `.charAt()`, `.charCodeAt()`, `.concat()`, `.contains()`, `.endsWith()`, `.indexOf()`, `.lastIndexOf()`, `.match()`, `.repeat()`, `.replace()`, `.search()`, `.slice()`, `.split()`, `.startsWith()`, `.substr()`, `.substring()`, `.toLowerCase()`, `.toUpperCase()`, `.trim()`
@@ -96,7 +96,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`
 `XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`, `.addEventListener()`, `.removeEventListener()`, `.dispatchEvent()`
 `Date` generics | `.now()`
-`Promise` generics<sup>[16](#Promise)</sup> | `.resolve()`, `.reject()`, `.all()`, `.race()`
+`Promise` generics | `.resolve()`, `.reject()`, `.all()`, `.race()`
 `Promise.prototype` | `.then`, `.catch`<sup>[17](#catch-delete)</sup>
 `Set.prototype` | `.add()`, `.has()`, `.delete()`<sup>[17](#catch-delete)</sup>, `.clear()`, `.size`
 `Map.prototype` | `.set()`, `.get()`, `.has()`, `.delete()`<sup>[17](#catch-delete)</sup>, `.clear()`, `.size`
@@ -145,7 +145,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 
 <sup name="XMLHttpRequest">15</sup> – `xhr.send()` supports `FormData()`
 
-<sup name="Promise">16</sup> – `Promise()` doesn't support [thenable-objects](https://github.com/promises-aplus/promises-spec#terminology)
+<sup name="Object.setPrototypeOf">16</sup> – `Object.setPrototypeOf` implementation requires `__proto__` support (IE10+)
 
 <sup name="catch-delete">17</sup> – IE8 doesn't allow to use the dot notation as accessor for methods called “catch” and “delete”
 

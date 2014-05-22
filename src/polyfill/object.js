@@ -48,3 +48,11 @@ if (!Object.is) {
         return value1 === value2;
     };
 }
+
+//IE10+
+if (!Object.setPrototypeOf) {
+    Object.setPrototypeOf = function (object, prototype) {
+        object.__proto__ = prototype;
+        return object;
+    };
+}
