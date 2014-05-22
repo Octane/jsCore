@@ -47,7 +47,6 @@
 
 
     "lib/namespace.js",
-    "lib/is.js",
     "lib/class.js",
     "lib/array.js",
     "lib/date.js",
@@ -57,5 +56,6 @@
     "lib/css.js",
     "lib/event.js",
     "lib/dom.js",
-    "lib/request.js"
+    "lib/request.js",
+    "lib/cookie.js"
 ]

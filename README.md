@@ -33,8 +33,6 @@ bower install jscore
         - [Method `.shuffle()`](#libarrayshuffle)
         - [Method `.range()`](#libarrayrange)
         - [Method `.remove()`](#libarrayremove)
-    - [Namespace `.is`](#libis)
-        - [Methods `.isTrue()`, `.isFalse()`, `.isHTML()`, `.isObject()` and `.isHTMLElement()`](#libis)
     - [Namespace `.css`](#libcss)
         - [Method `.prefix()`](#libcssprefix)
         - [Method `.get()`](#libcssget)
@@ -87,6 +85,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `HTMLScriptElement.prototype` | `.onload()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>, `.onerror()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>
 `CSSStyleDeclaration.prototype` | `.getPropertyValue()`, `.removeProperty()`, `.setProperty()`, `.cssFloat`, `.opacity`
 `document` | `.head`, `.createEvent()`<sup>[11](#document.createEvent)</sup>
+`history` | `.pushState()`, `.replaceState()`, `.state`
 `FormData.prototype` | `.append()`
 `Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`
 `XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`, `.addEventListener()`, `.removeEventListener()`, `.dispatchEvent()`
@@ -231,8 +230,8 @@ lib.array.count(iterable) //→ 2
 
 `.all()` like `Array.every()`, but it is sensitive to the length of the array and missing indexes
 ```javascript
-[].every(lib.isTrue) //→ true
-lib.array.all([], lib.isTrue) //→ false
+[].every(isTrue) //→ true
+lib.array.all([], isTrue) //→ false
 ```
 
 ####lib.array.unique()
@@ -278,15 +277,6 @@ lib.array.range(5) //→ [0, 1, 2, 3, 4]
 var list = ['a', 'b', 'c'];
 lib.array.remove(list, 'b');
 console.log(list) //→ ['a', 'c']
-```
-
-###lib.is
-
-`.isTrue()`, `.isFalse()`, `.isHTML()`, `.isObject()`, `.isHTMLElement()` are helper functions for use, e.g., in `Array` iteration methods
-```javascript
-if (testResults.every(lib.isTrue)) {
-    //do something
-}
 ```
 
 ###lib.css
