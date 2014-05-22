@@ -1,5 +1,10 @@
 #jsCore changelog
 
+##v0.4.7
+
+ - new: `lib.cookie`
+ - new: history API polyfill
+
 ##v0.4.6
 
  - many `Promise` [fixes](https://github.com/Octane/Promise/releases)
