@@ -54,6 +54,14 @@ if (!Object.is) {
     };
 }
 
+//IE10+
+if (!Object.setPrototypeOf) {
+    Object.setPrototypeOf = function (object, prototype) {
+        object.__proto__ = prototype;
+        return object;
+    };
+}
+
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {
         if (!Object(iterable).length) {
