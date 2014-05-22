@@ -25,6 +25,25 @@
         </fieldset>
     </div>
 
+    <script>
+        new function () {
+            try {
+                console.log;
+            }
+            catch (error) {
+                window.console = {
+                    log: function () {
+                        var pre = document.createElement('pre');
+                        pre.appendChild(document.createTextNode(
+                            Array.prototype.join.call(arguments, ', ')
+                        ));
+                        document.body.appendChild(pre);
+                    }
+                };
+            }
+        };
+    </script>
+
 
     <script src="src/polyfill/ltie10/ie8/htmlelement.js"></script>
     <script src="src/polyfill/ltie10/ie8/text.js"></script>
