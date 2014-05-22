@@ -56,6 +56,12 @@ bower install jscore
     - [Namespace `.date`](#libdate)
         - [Method `.isLeapYear()`](#libdataisleapyear)
         - [Method `.getMonthLength()`](#libdategetmonthlength)
+    - [Namespace `.cookie`](#libcookie)
+        - [Method `.get()`](#libcookieget)
+        - [Method `.set()`](#libcookieset)
+        - [Method `.has()`](#libcookiehas)
+        - [Method `.remove()`](#libcookieremove)
+        - [Method `.keys()`](#libcookiekeys)
     - [Namespace and method `.request()`](#librequest)
         - [Method `.get()`](#librequestget)
         - [Method `.post()`](#librequestpost)
@@ -492,6 +498,57 @@ where `date` is instance of `Date()` or the four-digit number
 lib.date.getMonthLength(monthIndex, fullYear) //→ number
 ```
 if instead `monthIndex` pass the instance of `Date()`, then the second argument not needed
+
+###lib.cookie
+
+####lib.cookie.get()
+
+`.get()` reads a cookie
+```javascript
+lib.cookie.get(key) //→ 'value' or null
+```
+
+####lib.cookie.set()
+
+`.set()` creates or overwrites a cookie
+```javascript
+lib.cookie.set(key, value[, params]) //→ boolean
+
+    //all parameters are optional
+    params = {
+        end: number|string|Date, //seconds or GMTString or instance of Date
+        path: string,
+        domain: string,
+        secure: boolean
+    }
+```
+
+####lib.cookie.has()
+
+`.has()` checks if a cookie exists
+```javascript
+lib.cookie.has(key) //→ boolean
+```
+
+####lib.cookie.remove()
+
+`.remove()` deletes a cookie
+```javascript
+lib.cookie.remove(key[, params]) //→ boolean
+
+    //all parameters are optional
+    params = {
+        path: string,
+        domain: string
+    }
+```
+
+####lib.cookie.keys()
+
+`.keys()` returns an array of all readable cookies from this location
+```javascript
+lib.cookie.keys() //→ ['key1', 'key2', …]
+```
 
 ###lib.request()
 
