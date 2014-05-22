@@ -91,7 +91,6 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `HTMLScriptElement.prototype` | `.onload()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>, `.onerror()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>
 `CSSStyleDeclaration.prototype` | `.getPropertyValue()`, `.removeProperty()`, `.setProperty()`, `.cssFloat`, `.opacity`
 `document` | `.head`, `.createEvent()`<sup>[11](#document.createEvent)</sup>
-`history` | `.pushState()`, `.replaceState()`, `.state`
 `FormData.prototype` | `.append()`
 `Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`
 `XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`, `.addEventListener()`, `.removeEventListener()`, `.dispatchEvent()`

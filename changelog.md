@@ -3,7 +3,7 @@
 ##v0.4.7
 
  - new: `lib.cookie` utils
- - new: history API polyfill
+ - new: `Object.setPrototypeOf` polyfill
 
 ##v0.4.6
 
