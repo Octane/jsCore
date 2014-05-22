@@ -555,15 +555,15 @@ lib.cookie.keys() //→ ['key1', 'key2', …]
 `.request()` performs a request to a server using `XMLHttpRequest()`, returns a promise
 ```javascript
 lib.request({
-    method:   String,
-    url:      String,
-    data:     String|Object|FormData,
-    userName: String,
-    password: String,
-    timeout:  Number,
-    async:    Boolean,
-    caching:  Boolean,
-    mimeType: String,
+    method:   string,
+    url:      string,
+    data:     string|Object|FormData,
+    userName: string,
+    password: string,
+    timeout:  number,
+    async:    boolean,
+    caching:  boolean,
+    mimeType: string,
     headers:  Object
 }) //→ promise
 ```
@@ -596,9 +596,9 @@ lib.request.get(params).then(function (xhr) {
 `.script()` loads a JavaScript file from the server request, then execute it, returns the promise
 ```javascript
 lib.request.script({
-    url:     String,
-    data:    String|Object,
-    caching: Boolean
+    url:     string,
+    data:    string|Object,
+    caching: boolean
 }) //→ promise
 ```
 `data` can be the string or the object, which automatically converted into the query string

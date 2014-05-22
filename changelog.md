@@ -2,7 +2,7 @@
 
 ##v0.4.7
 
- - new: `lib.cookie`
+ - new: `lib.cookie` utils
  - new: history API polyfill
 
 ##v0.4.6
