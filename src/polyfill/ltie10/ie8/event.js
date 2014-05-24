@@ -155,6 +155,7 @@ window.addEventListener || new function () {
                             shiftKey, metaKey, button, relatedTarget) {
         this.initUIEvent(type, bubbles, cancelable, view, detail);
         Object.assign(this, {
+            _relatedTarget: relatedTarget,
             screenX: screenX,
             screenY: screenY,
             clientX: clientX,
@@ -163,8 +164,7 @@ window.addEventListener || new function () {
             altKey: altKey,
             shiftKey: shiftKey,
             metaKey: metaKey,
-            button: button,
-            fromElement: relatedTarget
+            button: button
         });
     }
 
@@ -218,10 +218,17 @@ window.addEventListener || new function () {
 
     Object.defineProperty(Event.prototype, 'relatedTarget', {
         get: function () {
-            if (this.fromElement === this.srcElement) {
+            var type = this.type;
+            if (this._relatedTarget) {
+                return this._relatedTarget;
+            }
+            if ('mouseover' == type) {
+                return this.fromElement;
+            }
+            if ('mouseout' == type) {
                 return this.toElement;
             }
-            return this.fromElement;
+            return null;
         }
     });
 

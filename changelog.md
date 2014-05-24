@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.4.8
+
+ - fix: set `relatedTarget` only for `mouseover` and `mouseout`
+
 ##v0.4.7
 
  - new: `lib.cookie` utils
