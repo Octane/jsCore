@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.4.7 IE10+
+/* jsCore JavaScript library v0.4.8 IE10+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
