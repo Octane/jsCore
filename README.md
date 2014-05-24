@@ -515,8 +515,8 @@ lib.cookie.set(key, value[, params]) //→ boolean
 
     //all parameters are optional
     params = {
-        end: number|string|Date, //seconds or GMTString or instance of Date
-        path: string,
+        end:    number|string|Date, //seconds or GMTString or instance of Date
+        path:   string,
         domain: string,
         secure: boolean
     }
@@ -537,7 +537,7 @@ lib.cookie.remove(key[, params]) //→ boolean
 
     //all parameters are optional
     params = {
-        path: string,
+        path:   string,
         domain: string
     }
 ```
