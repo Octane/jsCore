@@ -1,8 +1,12 @@
 #jsCore changelog
 
+##v0.4.9
+
+ - update `Promise()` polyfill (fix [#6](https://github.com/Octane/Promise/pull/6), [#7](https://github.com/Octane/Promise/issues/7), [#8](https://github.com/Octane/Promise/issues/8))
+
 ##v0.4.8
 
- - fix: set `relatedTarget` only for `mouseover` and `mouseout`
+ - fix: set `.relatedTarget` only for `mouseover` and `mouseout`
 
 ##v0.4.7
 
