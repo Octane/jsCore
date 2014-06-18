@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.4.8 IE9+
+/* jsCore JavaScript library v0.4.9 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -598,10 +598,6 @@ window.Promise || (window.Promise = new function () {
         return promise._fulfilled || promise._rejected;
     }
 
-    function allSettled(promises) {
-        return promises.every(isSettled);
-    }
-
     function defaultOnFulfilled(value) {
         return value;
     }
@@ -612,6 +608,24 @@ window.Promise || (window.Promise = new function () {
 
     function call(callback) {
         callback();
+    }
+
+    function dive(thenable, onFulfilled, onRejected) {
+        function interimOnFulfilled(value) {
+            if (isThenable(value)) {
+                toPromise(value).then(interimOnFulfilled, interimOnRejected);
+            } else {
+                onFulfilled(value);
+            }
+        }
+        function interimOnRejected(reason) {
+            if (isThenable(reason)) {
+                toPromise(reason).then(interimOnFulfilled, interimOnRejected);
+            } else {
+                onRejected(reason);
+            }
+        }
+        toPromise(thenable).then(interimOnFulfilled, interimOnRejected);
     }
 
     function Promise(resolver) {
@@ -643,29 +657,57 @@ window.Promise || (window.Promise = new function () {
             });
         },
 
-        race: function (promises) {
+        race: function (values) {
             return new Promise(function (resolve, reject) {
-                promises.forEach(function (promise) {
-                    toPromise(promise).then(resolve, reject);
-                });
+                var value,
+                    length = values.length,
+                    i = 0;
+                while (i < length) {
+                    value = values[i];
+                    if (isThenable(value)) {
+                        dive(value, resolve, reject);
+                    } else {
+                        resolve(value);
+                    }
+                    i++;
+                }
             });
         },
 
-        all: function (promises) {
+        all: function (values) {
             return new Promise(function (resolve, reject) {
-                var values = [];
-                promises = promises.map(toPromise);
-                promises.forEach(function (promise, index) {
-                    promise.then(
-                        function (value) {
-                            values[index] = value;
-                            if (allSettled(promises)) {
-                                resolve(values);
-                            }
-                        },
-                        reject
-                    );
-                });
+                var thenables = 0,
+                    fulfilled = 0,
+                    value,
+                    length = values.length,
+                    i = 0;
+                values = values.slice(0);
+                while (i < length) {
+                    value = values[i];
+                    if (isThenable(value)) {
+                        thenables++;
+                        dive(
+                            value,
+                            function (index) {
+                                return function (value) {
+                                    values[index] = value;
+                                    fulfilled++;
+                                    if (fulfilled == thenables) {
+                                        resolve(values);
+                                    }
+                                };
+                            }(i),
+                            reject
+                        );
+                    } else {
+                        //[1, , 3] → [1, undefined, 3]
+                        values[i] = value;
+                    }
+                    i++;
+                }
+                if (!thenables) {
+                    resolve(values);
+                }
             });
         }
 
