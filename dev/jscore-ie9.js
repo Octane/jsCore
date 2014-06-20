@@ -585,24 +585,27 @@ window.Promise || (window.Promise = new function () {
         });
     }
 
+    function isCallable(anything) {
+        return 'function' == typeof anything;
+    }
+
     function isPromise(anything) {
         return anything instanceof Promise;
     }
 
     function isThenable(anything) {
-        return Object(anything) === anything &&
-               'function' == typeof anything.then;
+        return Object(anything) === anything && isCallable(anything.then);
     }
 
     function isSettled(promise) {
         return promise._fulfilled || promise._rejected;
     }
 
-    function defaultOnFulfilled(value) {
+    function identity(value) {
         return value;
     }
 
-    function defaultOnRejected(reason) {
+    function thrower(reason) {
         throw reason;
     }
 
@@ -768,6 +771,9 @@ window.Promise || (window.Promise = new function () {
         then: function (onFulfilled, onRejected) {
 
             var promise = this;
+
+            onFulfilled = isCallable(onFulfilled) ? onFulfilled : identity;
+            onRejected = isCallable(onRejected) ? onRejected : thrower;
 
             return new Promise(function (resolve, reject) {
 
