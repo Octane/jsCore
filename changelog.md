@@ -1,8 +1,12 @@
 #jsCore changelog
 
+##v0.5.0
+
+ - removed `.query()` and `.queryAll()` methods ([excluded from the W3C DOM 4 editor's draft](https://github.com/w3c/dom/commit/26355318c1013ea13c9d209665d14d2c13e28827))
+
 ##v0.4.9
 
- - update `Promise()` polyfill (fix [#2](https://github.com/Octane/Promise/issues/2), [#6](https://github.com/Octane/Promise/pull/6), [#7](https://github.com/Octane/Promise/issues/7), [#8](https://github.com/Octane/Promise/issues/8))
+ - updated `Promise()` polyfill (fix [#2](https://github.com/Octane/Promise/issues/2), [#6](https://github.com/Octane/Promise/pull/6), [#7](https://github.com/Octane/Promise/issues/7), [#8](https://github.com/Octane/Promise/issues/8))
 
 ##v0.4.8
 

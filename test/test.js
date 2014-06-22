@@ -91,8 +91,8 @@ lib.dom.ready().then(function () {
 
     if (-1 == window.name.indexOf('test')) {
         window.onunload = closeAll;
-        document.query('#test-open').onclick = testAll;
-        document.query('#test-close').onclick = closeAll;
+        document.querySelector('#test-open').onclick = testAll;
+        document.querySelector('#test-close').onclick = closeAll;
     }
 
     lib.event.on(document, 'mousemove', {
