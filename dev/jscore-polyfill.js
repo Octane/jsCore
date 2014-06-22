@@ -1,4 +1,4 @@
-/* jsCore JavaScript polyfill v0.4.9 IE8+
+/* jsCore JavaScript polyfill v0.5.0 IE8+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -29,7 +29,7 @@ Object.defineProperty(Text.prototype, "textContent", {
 
 'head' in document || Object.defineProperty(document, 'head', {
     get: function () {
-        return this.query('head');
+        return document.querySelector('head');
     }
 });
 
@@ -1438,7 +1438,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 
 };
 
-//DOM4 mutation methods
+//DOM4 w3c.github.io/dom
 'append' in document.createDocumentFragment() || new function () {
 
     var ELEMENT_NODE = 1,
@@ -1490,13 +1490,9 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
                 this.insertBefore(mutationMacro(arguments), this.firstChild);
             },
 
-            query: function (selector) {
-                return this.querySelector(selector);
-            },
+            querySelector: proto.querySelector,
 
-            queryAll: function (selector) {
-                return this.querySelectorAll(selector);
-            },
+            querySelectorAll: proto.querySelectorAll,
 
             matches: [
                 proto.matchesSelector,
@@ -1566,10 +1562,14 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
     Object.keys(api).forEach(implement);
 
     proto = document.constructor.prototype;
-    ['query', 'queryAll'].forEach(implement);
+    ['querySelector', 'querySelectorAll'].forEach(implement);
 
     proto = document.createDocumentFragment().constructor.prototype;
-    ['append', 'prepend', 'query', 'queryAll', 'matches'].forEach(implement);
+    [
+        'append', 'prepend',
+        'querySelector', 'querySelectorAll',
+        'matches'
+    ].forEach(implement);
 
 };
 
