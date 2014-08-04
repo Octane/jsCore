@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.5.1
+
+ - wontfix [bug 2435](https://bugs.ecmascript.org/show_bug.cgi?id=2435)
+
 ##v0.5.0
 
  - removed `.query()` and `.queryAll()` methods ([excluded from the W3C DOM 4 editor's draft](https://github.com/w3c/dom/commit/26355318c1013ea13c9d209665d14d2c13e28827))

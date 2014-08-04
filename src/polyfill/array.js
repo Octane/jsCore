@@ -1,11 +1,8 @@
 'use strict';
 
+//bugs.ecmascript.org/show_bug.cgi?id=2435
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {
-        if (!Object(iterable).length) {
-            //bugs.ecmascript.org/show_bug.cgi?id=2435
-            return [];
-        }
         if (func) {
             return Array.map(iterable, func, boundThis);
         }
