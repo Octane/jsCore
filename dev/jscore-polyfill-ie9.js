@@ -1,4 +1,4 @@
-/* jsCore JavaScript polyfill v0.5.0 IE9+
+/* jsCore JavaScript polyfill v0.5.1 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -62,12 +62,9 @@ if (!Object.setPrototypeOf) {
     };
 }
 
+//bugs.ecmascript.org/show_bug.cgi?id=2435
 if (!Array.from) {
     Array.from = function (iterable, func, boundThis) {
-        if (!Object(iterable).length) {
-            //bugs.ecmascript.org/show_bug.cgi?id=2435
-            return [];
-        }
         if (func) {
             return Array.map(iterable, func, boundThis);
         }
