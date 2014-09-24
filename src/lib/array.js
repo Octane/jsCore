@@ -11,10 +11,6 @@ lib.array = {
         }, 0);
     },
 
-    contains: function (iterable, anything, position) {
-        return -1 != Array.indexOf(iterable, anything, position);
-    },
-
     unique: function (iterable) {
         var result = [],
             anything,

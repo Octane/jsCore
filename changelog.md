@@ -1,16 +1,21 @@
 #jsCore changelog
 
+##v0.6.0
+
+ - new: `Array.prototype.contains()` polyfill
+ - del: `lib.contains()`
+
 ##v0.5.1
 
  - wontfix [bug 2435](https://bugs.ecmascript.org/show_bug.cgi?id=2435)
 
 ##v0.5.0
 
- - removed `.query()` and `.queryAll()` methods ([excluded from the W3C DOM 4 editor's draft](https://github.com/w3c/dom/commit/26355318c1013ea13c9d209665d14d2c13e28827))
+ - del: `.query()` and `.queryAll()` methods ([excluded from the W3C DOM 4 editor's draft](https://github.com/w3c/dom/commit/26355318c1013ea13c9d209665d14d2c13e28827))
 
 ##v0.4.9
 
- - updated `Promise()` polyfill (fix [#2](https://github.com/Octane/Promise/issues/2), [#6](https://github.com/Octane/Promise/pull/6), [#7](https://github.com/Octane/Promise/issues/7), [#8](https://github.com/Octane/Promise/issues/8))
+ - upd: `Promise()` polyfill (fix [#2](https://github.com/Octane/Promise/issues/2), [#6](https://github.com/Octane/Promise/pull/6), [#7](https://github.com/Octane/Promise/issues/7), [#8](https://github.com/Octane/Promise/issues/8))
 
 ##v0.4.8
 
@@ -41,11 +46,11 @@
  - fix: define `.setImmediate()` once
  - fix: `lib` methods don't depend on the activation object (`this`)
  - fix: support `DOMContentLoaded` in IE8
- - remove `.catch_()` and `.delete_()` aliases, use the brackets notation in IE8
+ - del: `.catch_()` and `.delete_()` aliases, use the brackets notation in IE8
 
 ##v0.4.2
 
- - remove `.initKeyEvent()` and `.initMutationEvent()`
+ - del: `.initKeyEvent()` and `.initMutationEvent()`
  - fix: `.dispatchEvent()` must return a value
  - fix: a bug in `.stopPropagation()`
  - fix: `.getComputedStyle(el).animationName` may be equal to `"none, none, …"` in IE11
@@ -61,8 +66,8 @@
  - new: `.get()` and `.set()` for CSS properties
  - new: `CSSStyleDeclaration()` polyfill
  - new: `opacity` in computed style
+ - del: `lib.dom.query()` and `lib.dom.queryAll()`
  - rename `lib.class._extend()` to `lib.classExtends()`
- - delete `lib.dom.query()` and `lib.dom.queryAll()`
  - simplify `lib.request()` code
 
 ##v0.3.0
