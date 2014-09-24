@@ -33,22 +33,34 @@ if (!Array.prototype.map) {
     };
 }
 
-if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (anything) {
+if (!Array.prototype.indexOf1) {
+    Array.prototype.indexOf = function (anything, position) {
         var length = this.length,
-            i = 0;
-        while (i < length) {
-            if (i in this && this[i] === anything) {
-                return i;
+            i;
+        if (length) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
             }
-            i++;
+            while (i < length) {
+                if (i in this && this[i] === anything) {
+                    return i;
+                }
+                i++;
+            }
         }
         return -1;
     };
 }
 
 if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (anything) {
+    Array.prototype.lastIndexOf = function (anything) {//todo position
         var i = this.length;
         while (i--) {
             if (i in this && this[i] === anything) {

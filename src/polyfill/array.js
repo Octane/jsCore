@@ -75,23 +75,27 @@ if (!Array.prototype.fill) {
 
 if (!Array.prototype.contains) {
     Array.prototype.contains = function (anything, position) {
-        var i,
-            length;
+        var length = this.length,
+            i;
+        if (!length) {
+            return false;
+        }
         if (Number.isNaN(anything)) {
-            length = this.length;
-            if (length) {
-                position = Number.parseInt(position, 10) || 0;
+            if (1 in arguments) {
+                position = Number(position) || 0;
                 if (position < 0) {
                     i = Math.max(length + position, 0);
                 } else {
                     i = position;
                 }
-                while (i < length) {
-                    if (Number.isNaN(this[i])) {
-                        return true;
-                    }
-                    i++;
+            } else {
+                i = 0;
+            }
+            while (i < length) {
+                if (Number.isNaN(this[i])) {
+                    return true;
                 }
+                i++;
             }
             return false;
         }
