@@ -33,7 +33,7 @@ if (!Array.prototype.map) {
     };
 }
 
-if (!Array.prototype.indexOf1) {
+if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (anything, position) {
         var length = this.length,
             i;
