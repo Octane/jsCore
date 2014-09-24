@@ -92,7 +92,7 @@ if (!Array.prototype.contains) {
                 i = 0;
             }
             while (i < length) {
-                if (Number.isNaN(this[i])) {
+                if (i in this && Number.isNaN(this[i])) {
                     return true;
                 }
                 i++;

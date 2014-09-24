@@ -42,6 +42,7 @@ if (!Array.prototype.indexOf) {
                 position = Number(position) || 0;
                 if (position < 0) {
                     i = Math.max(length + position, 0);
+                    //todo test -x
                 } else {
                     i = position;
                 }
@@ -60,11 +61,24 @@ if (!Array.prototype.indexOf) {
 }
 
 if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (anything) {//todo position
+    Array.prototype.lastIndexOf = function (anything, position) {
         var i = this.length;
-        while (i--) {
-            if (i in this && this[i] === anything) {
-                return i;
+        if (i) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i += position + 1;
+                    if (i < 1) {
+                        return -1;
+                    }
+                } else {
+                    i = Math.min(i, position + 1);
+                }
+            }
+            while (i--) {
+                if (i in this && this[i] === anything) {
+                    return i;
+                }
             }
         }
         return -1;
