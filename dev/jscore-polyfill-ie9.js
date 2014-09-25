@@ -1,4 +1,4 @@
-/* jsCore JavaScript polyfill v0.5.1 IE9+
+/* jsCore JavaScript polyfill v0.6.0 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -135,6 +135,36 @@ if (!Array.prototype.fill) {
     };
 }
 
+if (!Array.prototype.contains) {
+    Array.prototype.contains = function (anything, position) {
+        var length = this.length,
+            i;
+        if (!length) {
+            return false;
+        }
+        if (Number.isNaN(anything)) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
+            }
+            while (i < length) {
+                if (i in this && Number.isNaN(this[i])) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
+        }
+        return -1 != this.indexOf(anything, position);
+    };
+}
+
 if (!String.prototype.startsWith) {
     String.prototype.startsWith = function (string, position) {
         if (!position) {
@@ -255,7 +285,7 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift'
+        'some', 'sort', 'splice', 'unshift', 'contains'
     ]));
 
     implement(String, createGenerics(String.prototype, [
@@ -1101,7 +1131,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
         };
 
     function isContains(root, element, selector) {
-        return -1 != Array.indexOf(root.querySelectorAll(selector), element);
+        return Array.contains(root.querySelectorAll(selector), element);
     }
 
     function mutationMacro(nodes) {
@@ -1187,7 +1217,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
                 this._update();
                 length = this.length;
                 Array.forEach(arguments, function (token) {
-                    if (-1 == Array.indexOf(this, token)) {
+                    if (!Array.contains(this, token)) {
                         Array.push(this, token);
                     }
                 }, this);
@@ -1223,7 +1253,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
 
             contains: function (token) {
                 this._update();
-                return -1 != Array.indexOf(this, token);
+                return Array.contains(this, token);
             },
 
             toString: function () {

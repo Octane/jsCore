@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.5.1 IE8+
+/* jsCore JavaScript library v0.6.0 IE8+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -149,25 +149,50 @@ if (!Array.prototype.map) {
 }
 
 if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (anything) {
+    Array.prototype.indexOf = function (anything, position) {
         var length = this.length,
-            i = 0;
-        while (i < length) {
-            if (i in this && this[i] === anything) {
-                return i;
+            i;
+        if (length) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
             }
-            i++;
+            while (i < length) {
+                if (i in this && this[i] === anything) {
+                    return i;
+                }
+                i++;
+            }
         }
         return -1;
     };
 }
 
 if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (anything) {
+    Array.prototype.lastIndexOf = function (anything, position) {
         var i = this.length;
-        while (i--) {
-            if (i in this && this[i] === anything) {
-                return i;
+        if (i) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i += position + 1;
+                    if (i < 1) {
+                        return -1;
+                    }
+                } else {
+                    i = Math.min(i, position + 1);
+                }
+            }
+            while (i--) {
+                if (i in this && this[i] === anything) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -506,6 +531,36 @@ if (!Array.prototype.fill) {
     };
 }
 
+if (!Array.prototype.contains) {
+    Array.prototype.contains = function (anything, position) {
+        var length = this.length,
+            i;
+        if (!length) {
+            return false;
+        }
+        if (Number.isNaN(anything)) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
+            }
+            while (i < length) {
+                if (i in this && Number.isNaN(this[i])) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
+        }
+        return -1 != this.indexOf(anything, position);
+    };
+}
+
 if (!String.prototype.startsWith) {
     String.prototype.startsWith = function (string, position) {
         if (!position) {
@@ -626,7 +681,7 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift'
+        'some', 'sort', 'splice', 'unshift', 'contains'
     ]));
 
     implement(String, createGenerics(String.prototype, [
@@ -1521,7 +1576,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
         };
 
     function isContains(root, element, selector) {
-        return -1 != Array.indexOf(root.querySelectorAll(selector), element);
+        return Array.contains(root.querySelectorAll(selector), element);
     }
 
     function mutationMacro(nodes) {
@@ -1607,7 +1662,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
                 this._update();
                 length = this.length;
                 Array.forEach(arguments, function (token) {
-                    if (-1 == Array.indexOf(this, token)) {
+                    if (!Array.contains(this, token)) {
                         Array.push(this, token);
                     }
                 }, this);
@@ -1643,7 +1698,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
 
             contains: function (token) {
                 this._update();
-                return -1 != Array.indexOf(this, token);
+                return Array.contains(this, token);
             },
 
             toString: function () {
@@ -2015,7 +2070,7 @@ window.addEventListener || new function () {
             events[eventType] = event;
             this.attachEvent('on' + eventType, listener);
         }
-        if (-1 == event.callbacks.indexOf(callback)) {
+        if (!event.callbacks.contains(callback)) {
             event.callbacks.push(callback);
         }
     }
@@ -2511,10 +2566,6 @@ lib.array = {
         }, 0);
     },
 
-    contains: function (iterable, anything, position) {
-        return -1 != Array.indexOf(iterable, anything, position);
-    },
-
     unique: function (iterable) {
         var result = [],
             anything,
@@ -2523,7 +2574,7 @@ lib.array = {
             j = 0;
         while (i < length) {
             anything = iterable[i];
-            if (-1 == result.indexOf(anything)) {
+            if (!result.contains(anything)) {
                 result[j++] = anything;
             }
             i++;
@@ -2950,7 +3001,7 @@ lib.event = Object.assign({
             return newNames;
         }
         return newNames.reduce(function (names, name) {
-            if (-1 == oldNames.indexOf(name)) {
+            if (!oldNames.contains(name)) {
                 names.push(name);
             }
             return names;
