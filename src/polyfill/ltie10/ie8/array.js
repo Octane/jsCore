@@ -42,7 +42,6 @@ if (!Array.prototype.indexOf) {
                 position = Number(position) || 0;
                 if (position < 0) {
                     i = Math.max(length + position, 0);
-                    //todo test -x
                 } else {
                     i = position;
                 }

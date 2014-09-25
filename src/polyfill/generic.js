@@ -42,7 +42,7 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift'
+        'some', 'sort', 'splice', 'unshift', 'contains'
     ]));
 
     implement(String, createGenerics(String.prototype, [
