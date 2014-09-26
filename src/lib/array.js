@@ -19,7 +19,7 @@ lib.array = {
             j = 0;
         while (i < length) {
             anything = iterable[i];
-            if (!result.contains(anything)) {
+            if (-1 == result.indexOf(anything)) {
                 result[j++] = anything;
             }
             i++;

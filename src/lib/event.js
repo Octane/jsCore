@@ -108,7 +108,7 @@ lib.event = Object.assign({
             return newNames;
         }
         return newNames.reduce(function (names, name) {
-            if (!oldNames.contains(name)) {
+            if (-1 == oldNames.indexOf(name)) {
                 names.push(name);
             }
             return names;

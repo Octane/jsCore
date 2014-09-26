@@ -75,7 +75,7 @@ window.addEventListener || new function () {
             events[eventType] = event;
             this.attachEvent('on' + eventType, listener);
         }
-        if (!event.callbacks.contains(callback)) {
+        if (-1 == event.callbacks.indexOf(callback)) {
             event.callbacks.push(callback);
         }
     }
