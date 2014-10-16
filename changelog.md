@@ -1,5 +1,12 @@
 #jsCore changelog
 
+##v0.6.1
+
+ - fix: `.find()` and `.findIndex()` no longer ignore array element holes
+ - fix: `Object.assign()` ignores null and undefined source arguments
+ - new: `.request({advanced: function (xhr) {…}})`
+ - del: `.addEventListener()`, `.removeEventListener()` and `.dispatchEvent()` from polyfill for XMLHttpRequest (IE8)
+
 ##v0.6.0
 
  - new: `Array.prototype.contains()` polyfill

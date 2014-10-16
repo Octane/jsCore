@@ -27,6 +27,7 @@ lib.request = new function () {
 
     function unbind(xhr) {
         xhr.onload = null;
+        xhr.onabort = null;
         xhr.onerror = null;
         xhr.ontimeout = null;
     }
@@ -43,7 +44,8 @@ lib.request = new function () {
          *     caching:  Boolean,
          *     credentials: Boolean,
          *     mimeType: String,
-         *     headers: Object
+         *     headers: Object,
+         *     advanced: Function
          * }
         */
         var method = (params.method || 'GET').toUpperCase(),
@@ -56,6 +58,7 @@ lib.request = new function () {
             caching = false !== params.caching,
             credentials = true === params.credentials,
             mimeType = params.mimeType,
+            advanced = params.advanced,
             headers = {
                 'X-Requested-With': 'XMLHttpRequest'
             };
@@ -93,6 +96,10 @@ lib.request = new function () {
                     reject(new Error(this.statusText));
                 }
             }
+            function onAbort() {
+                unbind(this);
+                reject(new Error('cancelled'));
+            }
             function onError() {
                 unbind(this);
                 reject(new Error(this.statusText));
@@ -115,10 +122,14 @@ lib.request = new function () {
                     xhr.setRequestHeader(key, headers[key]);
                 });
                 xhr.onload = onLoad;
+                xhr.onabort = onAbort;
                 xhr.onerror = onError;
                 if (timeout) {
                     xhr.timeout = timeout;
                     xhr.ontimeout = onTimeout;
+                }
+                if (advanced) {
+                    advanced(xhr);
                 }
                 xhr.send(data);
             };

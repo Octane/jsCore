@@ -233,7 +233,7 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
         };
 
     function isContains(root, element, selector) {
-        return Array.contains(root.querySelectorAll(selector), element);
+        return -1 != Array.indexOf(root.querySelectorAll(selector), element);
     }
 
     function mutationMacro(nodes) {
