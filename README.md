@@ -92,7 +92,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `document` | `.head`, `.createEvent()`<sup>[11](#document.createEvent)</sup>
 `FormData.prototype` | `.append()`
 `Event.prototype`<sup>[13](#Event.prototype)</sup> | `.initEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initUIEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initMouseEvent()`<sup>[14](#Event.prototype.initEvent)</sup>, `.initCustomEvent()`, `.pageX`, `.pageY`, `.timeStamp`, `.target`, `.relatedTarget`
-`XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`, `.addEventListener()`, `.removeEventListener()`, `.dispatchEvent()`
+`XMLHttpRequest.prototype` | `.send()`<sup>[15](#XMLHttpRequest)</sup>, `.onload()`, `.onerror()`, `.onabort()`
 `Date` generics | `.now()`
 `Promise` generics | `.resolve()`, `.reject()`, `.all()`, `.race()`
 `Promise.prototype` | `.then`, `.catch`<sup>[17](#catch-delete)</sup>
@@ -555,7 +555,8 @@ lib.request({
     async:    boolean,
     caching:  boolean,
     mimeType: string,
-    headers:  Object
+    headers:  Object,
+    advanced: Function
 }) //→ promise
 ```
 `data` can be a string, object (automatically converted into a query string), or an instance of `FormData`

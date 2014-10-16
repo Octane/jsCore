@@ -1,5 +1,10 @@
 #jsCore changelog
 
+##v0.6.1
+
+ - new: `.request({advanced: function (xhr) {…}})`
+ - del: `.addEventListener()`, `.removeEventListener()` and `.dispatchEvent()` from polyfill for XMLHttpRequest (IE8)
+
 ##v0.6.0
 
  - new: `Array.prototype.contains()` polyfill

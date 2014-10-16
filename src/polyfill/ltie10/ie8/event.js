@@ -232,7 +232,7 @@ window.addEventListener || new function () {
         }
     });
 
-    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].
+    [HTMLElement, HTMLDocument, Window/*, XMLHttpRequest*/].
         forEach(function (eventTarget) {
             var proto = eventTarget.prototype;
             proto.dispatchEvent = dispatchEvent;
@@ -279,15 +279,16 @@ window.addEventListener || new function () {
         },
 
         _fireEvent: function (eventType) {
-            var event = document.createEvent('CustomEvent');
-            event.initEvent(eventType, false, false);
-            this.dispatchEvent(event);
-            eventType = 'on' + eventType;
-            if (this[eventType]) {
-                window.setImmediate(function () {
-                    event.target[eventType](event);
-                });
-            }
+            window.setImmediate(function (xhr, eventType) {
+                var listener = xhr[eventType],
+                    event;
+                if (listener) {
+                    event = document.createEvent('CustomEvent');
+                    event.initEvent(eventType, false, false);
+                    event.target = xhr;
+                    xhr[eventType](event);
+                }
+            }, this, 'on' + eventType);
         },
 
         _onReadyStateChange: function () {
