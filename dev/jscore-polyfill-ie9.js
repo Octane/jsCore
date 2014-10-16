@@ -1,4 +1,4 @@
-/* jsCore JavaScript polyfill v0.5.1 IE9+
+/* jsCore JavaScript polyfill v0.6.1 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -34,9 +34,11 @@ new function () {'use strict';
 if (!Object.assign) {
     Object.assign = function (target) {
         Array.prototype.slice.call(arguments, 1).forEach(function (source) {
-            Object.keys(source).forEach(function (key) {
-                target[key] = source[key];
-            });
+            if (source) {
+                Object.keys(source).forEach(function (key) {
+                    target[key] = source[key];
+                });
+            }
         });
         return target;
     };
@@ -84,11 +86,9 @@ if (!Array.prototype.find) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return value;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return value;
             }
             i++;
         }
@@ -102,11 +102,9 @@ if (!Array.prototype.findIndex) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return i;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return i;
             }
             i++;
         }
@@ -132,6 +130,36 @@ if (!Array.prototype.fill) {
             i++;
         }
         return this;
+    };
+}
+
+if (!Array.prototype.contains) {
+    Array.prototype.contains = function (anything, position) {
+        var length = this.length,
+            i;
+        if (!length) {
+            return false;
+        }
+        if (Number.isNaN(anything)) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
+            }
+            while (i < length) {
+                if (i in this && Number.isNaN(this[i])) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
+        }
+        return -1 != this.indexOf(anything, position);
     };
 }
 
@@ -255,7 +283,7 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift'
+        'some', 'sort', 'splice', 'unshift', 'contains'
     ]));
 
     implement(String, createGenerics(String.prototype, [

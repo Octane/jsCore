@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.5.1 IE8+
+/* jsCore JavaScript library v0.6.1 IE8+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -149,25 +149,50 @@ if (!Array.prototype.map) {
 }
 
 if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (anything) {
+    Array.prototype.indexOf = function (anything, position) {
         var length = this.length,
-            i = 0;
-        while (i < length) {
-            if (i in this && this[i] === anything) {
-                return i;
+            i;
+        if (length) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
             }
-            i++;
+            while (i < length) {
+                if (i in this && this[i] === anything) {
+                    return i;
+                }
+                i++;
+            }
         }
         return -1;
     };
 }
 
 if (!Array.prototype.lastIndexOf) {
-    Array.prototype.lastIndexOf = function (anything) {
+    Array.prototype.lastIndexOf = function (anything, position) {
         var i = this.length;
-        while (i--) {
-            if (i in this && this[i] === anything) {
-                return i;
+        if (i) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i += position + 1;
+                    if (i < 1) {
+                        return -1;
+                    }
+                } else {
+                    i = Math.min(i, position + 1);
+                }
+            }
+            while (i--) {
+                if (i in this && this[i] === anything) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -405,9 +430,11 @@ if (!Date.now) {
 if (!Object.assign) {
     Object.assign = function (target) {
         Array.prototype.slice.call(arguments, 1).forEach(function (source) {
-            Object.keys(source).forEach(function (key) {
-                target[key] = source[key];
-            });
+            if (source) {
+                Object.keys(source).forEach(function (key) {
+                    target[key] = source[key];
+                });
+            }
         });
         return target;
     };
@@ -455,11 +482,9 @@ if (!Array.prototype.find) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return value;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return value;
             }
             i++;
         }
@@ -473,11 +498,9 @@ if (!Array.prototype.findIndex) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return i;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return i;
             }
             i++;
         }
@@ -503,6 +526,36 @@ if (!Array.prototype.fill) {
             i++;
         }
         return this;
+    };
+}
+
+if (!Array.prototype.contains) {
+    Array.prototype.contains = function (anything, position) {
+        var length = this.length,
+            i;
+        if (!length) {
+            return false;
+        }
+        if (Number.isNaN(anything)) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
+            }
+            while (i < length) {
+                if (i in this && Number.isNaN(this[i])) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
+        }
+        return -1 != this.indexOf(anything, position);
     };
 }
 
@@ -626,7 +679,7 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift'
+        'some', 'sort', 'splice', 'unshift', 'contains'
     ]));
 
     implement(String, createGenerics(String.prototype, [
@@ -2172,7 +2225,7 @@ window.addEventListener || new function () {
         }
     });
 
-    [HTMLElement, HTMLDocument, Window, XMLHttpRequest].
+    [HTMLElement, HTMLDocument, Window/*, XMLHttpRequest*/].
         forEach(function (eventTarget) {
             var proto = eventTarget.prototype;
             proto.dispatchEvent = dispatchEvent;
@@ -2219,15 +2272,16 @@ window.addEventListener || new function () {
         },
 
         _fireEvent: function (eventType) {
-            var event = document.createEvent('CustomEvent');
-            event.initEvent(eventType, false, false);
-            this.dispatchEvent(event);
-            eventType = 'on' + eventType;
-            if (this[eventType]) {
-                window.setImmediate(function () {
-                    event.target[eventType](event);
-                });
-            }
+            window.setImmediate(function (xhr, eventType) {
+                var listener = xhr[eventType],
+                    event;
+                if (listener) {
+                    event = document.createEvent('CustomEvent');
+                    event.initEvent(eventType, false, false);
+                    event.target = xhr;
+                    xhr[eventType](event);
+                }
+            }, this, 'on' + eventType);
         },
 
         _onReadyStateChange: function () {
@@ -2509,10 +2563,6 @@ lib.array = {
         return Array.reduce(iterable, function (length) {
             return length + 1;
         }, 0);
-    },
-
-    contains: function (iterable, anything, position) {
-        return -1 != Array.indexOf(iterable, anything, position);
     },
 
     unique: function (iterable) {
@@ -3126,6 +3176,7 @@ lib.request = new function () {
 
     function unbind(xhr) {
         xhr.onload = null;
+        xhr.onabort = null;
         xhr.onerror = null;
         xhr.ontimeout = null;
     }
@@ -3142,7 +3193,8 @@ lib.request = new function () {
          *     caching:  Boolean,
          *     credentials: Boolean,
          *     mimeType: String,
-         *     headers: Object
+         *     headers: Object,
+         *     advanced: Function
          * }
         */
         var method = (params.method || 'GET').toUpperCase(),
@@ -3155,6 +3207,7 @@ lib.request = new function () {
             caching = false !== params.caching,
             credentials = true === params.credentials,
             mimeType = params.mimeType,
+            advanced = params.advanced,
             headers = {
                 'X-Requested-With': 'XMLHttpRequest'
             };
@@ -3192,6 +3245,10 @@ lib.request = new function () {
                     reject(new Error(this.statusText));
                 }
             }
+            function onAbort() {
+                unbind(this);
+                reject(new Error('cancelled'));
+            }
             function onError() {
                 unbind(this);
                 reject(new Error(this.statusText));
@@ -3214,10 +3271,14 @@ lib.request = new function () {
                     xhr.setRequestHeader(key, headers[key]);
                 });
                 xhr.onload = onLoad;
+                xhr.onabort = onAbort;
                 xhr.onerror = onError;
                 if (timeout) {
                     xhr.timeout = timeout;
                     xhr.ontimeout = onTimeout;
+                }
+                if (advanced) {
+                    advanced(xhr);
                 }
                 xhr.send(data);
             };

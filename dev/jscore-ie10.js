@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.5.1 IE10+
+/* jsCore JavaScript library v0.6.1 IE10+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -34,9 +34,11 @@ new function () {'use strict';
 if (!Object.assign) {
     Object.assign = function (target) {
         Array.prototype.slice.call(arguments, 1).forEach(function (source) {
-            Object.keys(source).forEach(function (key) {
-                target[key] = source[key];
-            });
+            if (source) {
+                Object.keys(source).forEach(function (key) {
+                    target[key] = source[key];
+                });
+            }
         });
         return target;
     };
@@ -84,11 +86,9 @@ if (!Array.prototype.find) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return value;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return value;
             }
             i++;
         }
@@ -102,11 +102,9 @@ if (!Array.prototype.findIndex) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return i;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return i;
             }
             i++;
         }
@@ -132,6 +130,36 @@ if (!Array.prototype.fill) {
             i++;
         }
         return this;
+    };
+}
+
+if (!Array.prototype.contains) {
+    Array.prototype.contains = function (anything, position) {
+        var length = this.length,
+            i;
+        if (!length) {
+            return false;
+        }
+        if (Number.isNaN(anything)) {
+            if (1 in arguments) {
+                position = Number(position) || 0;
+                if (position < 0) {
+                    i = Math.max(length + position, 0);
+                } else {
+                    i = position;
+                }
+            } else {
+                i = 0;
+            }
+            while (i < length) {
+                if (i in this && Number.isNaN(this[i])) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
+        }
+        return -1 != this.indexOf(anything, position);
     };
 }
 
@@ -255,7 +283,7 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift'
+        'some', 'sort', 'splice', 'unshift', 'contains'
     ]));
 
     implement(String, createGenerics(String.prototype, [
@@ -1169,10 +1197,6 @@ lib.array = {
         }, 0);
     },
 
-    contains: function (iterable, anything, position) {
-        return -1 != Array.indexOf(iterable, anything, position);
-    },
-
     unique: function (iterable) {
         var result = [],
             anything,
@@ -1784,6 +1808,7 @@ lib.request = new function () {
 
     function unbind(xhr) {
         xhr.onload = null;
+        xhr.onabort = null;
         xhr.onerror = null;
         xhr.ontimeout = null;
     }
@@ -1800,7 +1825,8 @@ lib.request = new function () {
          *     caching:  Boolean,
          *     credentials: Boolean,
          *     mimeType: String,
-         *     headers: Object
+         *     headers: Object,
+         *     advanced: Function
          * }
         */
         var method = (params.method || 'GET').toUpperCase(),
@@ -1813,6 +1839,7 @@ lib.request = new function () {
             caching = false !== params.caching,
             credentials = true === params.credentials,
             mimeType = params.mimeType,
+            advanced = params.advanced,
             headers = {
                 'X-Requested-With': 'XMLHttpRequest'
             };
@@ -1850,6 +1877,10 @@ lib.request = new function () {
                     reject(new Error(this.statusText));
                 }
             }
+            function onAbort() {
+                unbind(this);
+                reject(new Error('cancelled'));
+            }
             function onError() {
                 unbind(this);
                 reject(new Error(this.statusText));
@@ -1872,10 +1903,14 @@ lib.request = new function () {
                     xhr.setRequestHeader(key, headers[key]);
                 });
                 xhr.onload = onLoad;
+                xhr.onabort = onAbort;
                 xhr.onerror = onError;
                 if (timeout) {
                     xhr.timeout = timeout;
                     xhr.ontimeout = onTimeout;
+                }
+                if (advanced) {
+                    advanced(xhr);
                 }
                 xhr.send(data);
             };
