@@ -22,11 +22,9 @@ if (!Array.prototype.find) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return value;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return value;
             }
             i++;
         }
@@ -40,11 +38,9 @@ if (!Array.prototype.findIndex) {
             length = this.length,
             i = 0;
         while (i < length) {
-            if (i in this) {
-                value = this[i];
-                if (func.call(boundThis, value, i, this)) {
-                    return i;
-                }
+            value = this[i];
+            if (func.call(boundThis, value, i, this)) {
+                return i;
             }
             i++;
         }
