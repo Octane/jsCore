@@ -29,9 +29,11 @@
 if (!Object.assign) {
     Object.assign = function (target) {
         Array.prototype.slice.call(arguments, 1).forEach(function (source) {
-            Object.keys(source).forEach(function (key) {
-                target[key] = source[key];
-            });
+            if (source) {
+                Object.keys(source).forEach(function (key) {
+                    target[key] = source[key];
+                });
+            }
         });
         return target;
     };
