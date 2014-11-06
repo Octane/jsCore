@@ -1,25 +1,23 @@
 'use strict';
 
-//example: new lib.Template('Hi, {NAME}').match({name: 'John'}) → 'Hi, John'
+//example: var tmpl = new lib.Template('Hi, {NAME}');
+//         tmpl({name: 'John'}) → 'Hi, John'
 lib.Template = new function () {
 
-    function Template(template) {
-        this.template = template;
-    }
-
-    Template.match = function (template, replacements) {
-        if (Array.isArray(template)) {
-            template = template.join('');
-        }
+    function match(template, replacements) {
         return Object.keys(replacements).reduceRight(function (template, key) {
             var value = replacements[key];
             return template.split('{' + key.toUpperCase() + '}').join(value);
         }, template);
-    };
+    }
 
-    Template.prototype.match = function (replacements) {
-        return Template.match(this.template, replacements);
-    };
+    function Template(template) {
+        return function (replacements) {
+            return match(template, replacements)
+        };
+    }
+
+    Template.match = match;
 
     return Template;
 

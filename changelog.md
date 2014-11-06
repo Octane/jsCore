@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.7.0
+
+ - `lib.Template()` now returns a function
+
 ##v0.6.1
 
  - fix: `.find()` and `.findIndex()` no longer ignore array element holes

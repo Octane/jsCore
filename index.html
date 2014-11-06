@@ -41,73 +41,29 @@
                     }
                 };
             }
+            function addScript(src, timestamp) {
+                document.writeln('<script src="' + src + '?no-cache=' + timestamp + '"></scr' + 'ipt>');
+            }
+            function addScripts(files) {
+                var timestamp = (new Date).getTime().toString(35),
+                    length = files.length,
+                    i = 0;
+                while (i < length) {
+                    addScript('src/' + files[i], timestamp);
+                    i++;
+                }
+                addScript('test/test.js', timestamp);
+            }
+            var xhr = new XMLHttpRequest;
+            xhr.open('GET', '/build/file-order.json', false);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status < 400) {
+                    addScripts(JSON.parse(xhr.responseText));
+                }
+            };
+            xhr.send();
         };
     </script>
-
-
-    <script src="src/polyfill/ltie10/ie8/htmlelement.js"></script>
-    <script src="src/polyfill/ltie10/ie8/text.js"></script>
-    <script src="src/polyfill/ltie10/ie8/head.js"></script>
-    <script src="src/polyfill/ltie10/ie8/object.js"></script>
-    <script src="src/polyfill/ltie10/ie8/array.js"></script>
-    <script src="src/polyfill/ltie10/ie8/function.js"></script>
-    <script src="src/polyfill/ltie10/ie8/string.js"></script>
-    <script src="src/polyfill/ltie10/ie8/date.js"></script>
-
-
-    <script src="src/polyfill/object.js"></script>
-    <script src="src/polyfill/array.js"></script>
-    <script src="src/polyfill/string.js"></script>
-    <script src="src/polyfill/number.js"></script>
-    <script src="src/polyfill/math.js"></script>
-    <script src="src/polyfill/generic.js"></script>
-    <script src="src/polyfill/set.js"></script>
-    <script src="src/polyfill/map.js"></script>
-    <script src="src/polyfill/weakset.js"></script>
-    <script src="src/polyfill/weakmap.js"></script>
-
-
-    <script src="src/polyfill/ltie10/ie8/setimmediate.js"></script>
-
-
-    <script src="src/polyfill/setimmediate.js"></script>
-    <script src="src/polyfill/promise.js"></script>
-    <script src="src/polyfill/requestanimationframe.js"></script>
-    <script src="src/polyfill/htmlelement.js"></script>
-
-
-    <script src="src/polyfill/ltie10/htmlelement.js"></script>
-    <script src="src/polyfill/ltie10/formdata.js"></script>
-
-
-    <script src="src/polyfill/ltie10/ie8/fix/slice.js"></script>
-    <script src="src/polyfill/ltie10/ie8/fix/splice.js"></script>
-    <script src="src/polyfill/ltie10/ie8/fix/dataset.js"></script>
-    <script src="src/polyfill/ltie10/ie8/fix/children.js"></script>
-    <script src="src/polyfill/ltie10/ie8/event.js"></script>
-    <script src="src/polyfill/ltie10/ie8/cssstyledeclaration.js"></script>
-    <script src="src/polyfill/ltie10/ie8/getcomputedstyle.js"></script>
-
-
-    <script src="src/polyfill/ltie10/history.js"></script>
-
-
-    <script src="src/lib/namespace.js"></script>
-    <script src="src/lib/class.js"></script>
-    <script src="src/lib/array.js"></script>
-    <script src="src/lib/date.js"></script>
-    <script src="src/lib/html.js"></script>
-    <script src="src/lib/template.js"></script>
-    <script src="src/lib/i18n.js"></script>
-    <script src="src/lib/css.js"></script>
-    <script src="src/lib/event.js"></script>
-    <script src="src/lib/dom.js"></script>
-    <script src="src/lib/request.js"></script>
-    <script src="src/lib/cookie.js"></script>
-
-
-    <script src="test/test.js"></script>
-
 
 </body>
 </html>

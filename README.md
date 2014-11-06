@@ -162,8 +162,8 @@ Class.Super //→ SuperClass
 `.Template()` is a very simple string templating tool (not to be confused with HTML templating)
 ```javascript
 var tmpl = new lib.Template('Hi, {NAME}');
-tmpl.match({name: 'John'}) //→ 'Hi, John'
-tmpl.match({name: 'Luke'}) //→ 'Hi, Luke'
+tmpl({name: 'John'}) //→ 'Hi, John'
+tmpl({name: 'Luke'}) //→ 'Hi, Luke'
 ```
 
 ###lib.I18n()
