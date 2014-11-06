@@ -11,6 +11,8 @@ Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octan
 bower install jscore
 ```
 
+This is designed to be run in a browser and it depends on there being a document. It does not work in a Node.js or worker environment.
+
 ##Contents
  - [`Polyfill`](#polyfill)
     - [`Notes/known issues`](#notesknown-issues)
