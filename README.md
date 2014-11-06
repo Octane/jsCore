@@ -17,7 +17,6 @@ bower install jscore
  - [Namespace `lib`](#lib)
     - [Method `.classExtends`](#libclassextends)
     - [Constructor `.Template()`](#libtemplate)
-        - [Instance method `.match()`](#libtemplate)
     - [Constructor `.I18n()`](#libi18n)
         - [Instance methods `.add()` and `.use()`](#libi18n)
     - [Namespace `.html`](#libhtml)
