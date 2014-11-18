@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.6.1 IE9+
+/* jsCore JavaScript library v0.7.0 IE9+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -159,7 +159,7 @@ if (!Array.prototype.contains) {
             }
             return false;
         }
-        return -1 != this.indexOf(anything, position);
+        return -1 != Array.prototype.indexOf.call(this, anything, position);
     };
 }
 
@@ -1043,138 +1043,52 @@ Object.defineProperty(HTMLElement.prototype, 'dataset', {
 
 };
 
-//DOM4 w3c.github.io/dom
-'append' in document.createDocumentFragment() || new function () {
+document.documentElement.matches || new function () {
 
-    var ELEMENT_NODE = 1,
-        proto = HTMLElement.prototype,
-        api  = {
+    var proto = HTMLElement.prototype;
 
-            before: function (/* ...nodes */) {
-                //todo IE8 removedNode.parentNode ≠ null
-                var parentNode = this.parentNode;
-                if (parentNode) {
-                    parentNode.insertBefore(mutationMacro(arguments), this);
-                }
-            },
+    proto.matches = [
+        proto.matchesSelector,
+        proto.oMatchesSelector,
+        proto.msMatchesSelector,
+        proto.mozMatchesSelector,
+        proto.webkitMatchesSelector
+    ].find(Boolean);
 
-            after: function (/* ...nodes */) {
-                var parentNode = this.parentNode,
-                    nextSibling,
-                    nodes;
-                if (parentNode) {
-                    nodes = mutationMacro(arguments);
-                    nextSibling = this.nextSibling;
-                    if (nextSibling) {
-                        parentNode.insertBefore(nodes, nextSibling);
-                    } else {
-                        parentNode.appendChild(nodes);
-                    }
-                }
-            },
-
-            replace: function (/* ...nodes */) {
-                var parentNode = this.parentNode;
-                if (parentNode) {
-                    parentNode.replaceChild(mutationMacro(arguments), this);
-                }
-            },
-
-            remove: function () {
-                var parentNode = this.parentNode;
-                if (parentNode) {
-                    parentNode.removeChild(this);
-                }
-            },
-
-            append: function (/* ...nodes */) {
-                this.appendChild(mutationMacro(arguments));
-            },
-
-            prepend: function () {
-                this.insertBefore(mutationMacro(arguments), this.firstChild);
-            },
-
-            querySelector: proto.querySelector,
-
-            querySelectorAll: proto.querySelectorAll,
-
-            matches: [
-                proto.matchesSelector,
-                proto.oMatchesSelector,
-                proto.msMatchesSelector,
-                proto.mozMatchesSelector,
-                proto.webkitMatchesSelector,
-                function (selector) {
-                    var contains,
-                        root;
-                    if (this === document) {
-                        //if docFragment.constructor ≡ document.constructor
-                        return false;
-                    }
+    if (!proto.matches) {
+        proto.matches = new function () {
+            var ELEMENT_NODE = 1;
+            function isContains(root, element, selector) {
+                return Array.contains(root.querySelectorAll(selector), element);
+            }
+            return function (selector) {
+                var contains,
                     root = this.parentNode;
-                    if (root) {
-                        if (ELEMENT_NODE == root.nodeType) {
-                            root = root.ownerDocument;
-                        }
-                        return isContains(root, this, selector);
+                if (root) {
+                    if (ELEMENT_NODE == root.nodeType) {
+                        root = root.ownerDocument;
                     }
-                    root = document.createDocumentFragment();
-                    root.appendChild(this);
-                    contains = isContains(root, this, selector);
-                    root.removeChild(this);
+                    return isContains(root, this, selector);
                 }
-            ].find(Boolean)
-
+                root = document.createDocumentFragment();
+                root.appendChild(this);
+                contains = isContains(root, this, selector);
+                root.removeChild(this);
+            };
         };
-
-    function isContains(root, element, selector) {
-        return -1 != Array.indexOf(root.querySelectorAll(selector), element);
     }
 
-    function mutationMacro(nodes) {
-        var node,
-            fragment,
-            length = nodes.length,
-            i;
-        if (1 == length) {
-            node = nodes[0];
-            if ('string' == typeof node) {
-                return document.createTextNode(node);
-            }
-            return node;
-        }
-        fragment = document.createDocumentFragment();
-        nodes = Array.from(nodes);
-        i = 0;
-        while (i < length) {
-            node = nodes[i];
-            if ('string' == typeof node) {
-                node = document.createTextNode(node);
-            }
-            fragment.appendChild(node);
-            i++;
-        }
-        return fragment;
+};
+
+new function () {
+
+    var docFragment = document.createDocumentFragment(),
+        target = docFragment.constructor.prototype,
+        source = HTMLElement.prototype;
+    if (!docFragment.querySelector) {
+        target.querySelector = source.querySelector;
+        target.querySelectorAll = source.querySelectorAll;
     }
-
-    function implement(key) {
-        if (!(key in proto)) {
-            proto[key] = api[key];
-        }
-    }
-
-    Object.keys(api).forEach(implement);
-
-    proto = document.constructor.prototype;
-    ['querySelector', 'querySelectorAll'].forEach(implement);
-
-    proto = document.createDocumentFragment().constructor.prototype;
-    [
-        'append', 'prepend',
-        'querySelector', 'querySelectorAll',
-        'matches'
-    ].forEach(implement);
 
 };
 
@@ -1215,7 +1129,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
                 this._update();
                 length = this.length;
                 Array.forEach(arguments, function (token) {
-                    if (-1 == Array.indexOf(this, token)) {
+                    if (!Array.contains(this, token)) {
                         Array.push(this, token);
                     }
                 }, this);
@@ -1251,7 +1165,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
 
             contains: function (token) {
                 this._update();
-                return -1 != Array.indexOf(this, token);
+                return Array.contains(this, token);
             },
 
             toString: function () {
@@ -1605,26 +1519,24 @@ lib.html = {
 
 };
 
-//example: new lib.Template('Hi, {NAME}').match({name: 'John'}) → 'Hi, John'
+//example: var tmpl = new lib.Template('Hi, {NAME}');
+//         tmpl({name: 'John'}) → 'Hi, John'
 lib.Template = new function () {
 
-    function Template(template) {
-        this.template = template;
-    }
-
-    Template.match = function (template, replacements) {
-        if (Array.isArray(template)) {
-            template = template.join('');
-        }
+    function match(template, replacements) {
         return Object.keys(replacements).reduceRight(function (template, key) {
             var value = replacements[key];
             return template.split('{' + key.toUpperCase() + '}').join(value);
         }, template);
-    };
+    }
 
-    Template.prototype.match = function (replacements) {
-        return Template.match(this.template, replacements);
-    };
+    function Template(template) {
+        return function (replacements) {
+            return match(template, replacements)
+        };
+    }
+
+    Template.match = match;
 
     return Template;
 

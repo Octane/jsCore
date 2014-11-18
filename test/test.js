@@ -55,7 +55,7 @@ lib.dom.ready().then(function () {
 
             '</body>',
             '</html>'
-        ]);
+        ].join(''));
 
     function closeAll() {
         windows.forEach(function (win) {
@@ -66,7 +66,7 @@ lib.dom.ready().then(function () {
     function testAll() {
         closeAll();
         files.forEach(function (jsCore, index) {
-            var win = window.open('', 'test' + index, options.match({
+            var win = window.open('', 'test' + index, options({
                     width: width,
                     height: height,
                     top: top,
@@ -74,7 +74,7 @@ lib.dom.ready().then(function () {
                 })),
                 doc = win.document;
             doc.open();
-            doc.write(html.match({
+            doc.write(html({
                 jsCore: jsCore,
                 test: 'test/test' + (jsCore.contains('polyfill') ?
                                     '-polyfill' : '') + '.js'
@@ -101,7 +101,7 @@ lib.dom.ready().then(function () {
                     appendChild(document.createElement('pre')).
                         appendChild(document.createTextNode('')),
         handleEvent: function (event) {
-            this.node.nodeValue = this.coords.match({
+            this.node.nodeValue = this.coords({
                 x: event.pageX,
                 y: event.pageY
             });

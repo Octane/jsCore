@@ -11,13 +11,14 @@ Download the [latest jsCore from GitHub](https://raw.githubusercontent.com/Octan
 bower install jscore
 ```
 
+This is designed to be run in a browser and it depends on there being a document. It does not work in a Node.js or worker environment.
+
 ##Contents
  - [`Polyfill`](#polyfill)
     - [`Notes/known issues`](#notesknown-issues)
  - [Namespace `lib`](#lib)
     - [Method `.classExtends`](#libclassextends)
     - [Constructor `.Template()`](#libtemplate)
-        - [Instance method `.match()`](#libtemplate)
     - [Constructor `.I18n()`](#libi18n)
         - [Instance methods `.add()` and `.use()`](#libi18n)
     - [Namespace `.html`](#libhtml)
@@ -86,7 +87,7 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `Math` generics | `.trunc()`, `.sign()`
 `Function.prototype` | `.bind()`
 `Text.prototype` | `.textContent`
-`HTMLElement.prototype` | `.append()`, `.prepend()`, `.after()`, `.before()`, `.replace()`, `.remove()`, `.matches()`, `.addEventListener()`, `.removeEventListner()`, `.dispatchEvent()`, `.children`<sup>[7](#HTMLElement.prototype.children)</sup>, `.firstElementChild`, `.lastElementChild`, `.childElementCount`, `.nextElementSibling`, `.previousElementSibling`, `.textContent`, `.classList`<sup>[8](#HTMLElement.prototype.classList)</sup>, `.dataset`<sup>[9](#HTMLElement.prototype.dataset)</sup>
+`HTMLElement.prototype` | `.matches()`, `.addEventListener()`, `.removeEventListner()`, `.dispatchEvent()`, `.children`<sup>[7](#HTMLElement.prototype.children)</sup>, `.firstElementChild`, `.lastElementChild`, `.childElementCount`, `.nextElementSibling`, `.previousElementSibling`, `.textContent`, `.classList`<sup>[8](#HTMLElement.prototype.classList)</sup>, `.dataset`<sup>[9](#HTMLElement.prototype.dataset)</sup>
 `HTMLScriptElement.prototype` | `.onload()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>, `.onerror()`<sup>[10](#HTMLScriptElement.prototype.onload)</sup>
 `CSSStyleDeclaration.prototype` | `.getPropertyValue()`, `.removeProperty()`, `.setProperty()`, `.cssFloat`, `.opacity`
 `document` | `.head`, `.createEvent()`<sup>[11](#document.createEvent)</sup>
@@ -162,8 +163,8 @@ Class.Super //→ SuperClass
 `.Template()` is a very simple string templating tool (not to be confused with HTML templating)
 ```javascript
 var tmpl = new lib.Template('Hi, {NAME}');
-tmpl.match({name: 'John'}) //→ 'Hi, John'
-tmpl.match({name: 'Luke'}) //→ 'Hi, Luke'
+tmpl({name: 'John'}) //→ 'Hi, John'
+tmpl({name: 'Luke'}) //→ 'Hi, Luke'
 ```
 
 ###lib.I18n()
@@ -202,7 +203,7 @@ i18n('currency', {cost: 100}) // → '100 руб.'
 `.parse()` converts a HTML code into a document fragment
 ```javascript
 var docFragment = lib.html.parse('<h1>Example</h1><p>...</p>');
-document.body.append(docFragment);
+document.body.appendChild(docFragment);
 ```
 
 ####lib.html.escape()
