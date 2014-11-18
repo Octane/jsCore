@@ -95,6 +95,6 @@ if (!Array.prototype.contains) {
             }
             return false;
         }
-        return -1 != this.indexOf(anything, position);
+        return -1 != Array.prototype.indexOf.call(this, anything, position);
     };
 }

@@ -2,6 +2,8 @@
 
 ##v0.7.0
 
+ - fix: `Array.contains()` for non-Array objects
+ - del: `.prepend()`, `.append()`, `.before()`, `.after()` and `.replace()` methods ([excluded from the W3C DOM 4 editor's draft](https://github.com/w3c/dom/commit/87000ba632e83f40a2384a4a15f3b913ef167653))
  - `lib.Template()` now returns a function
 
 ##v0.6.1
