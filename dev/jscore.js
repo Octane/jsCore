@@ -1,4 +1,4 @@
-/* jsCore JavaScript library v0.7.0 IE8+
+/* jsCore JavaScript library v0.8.0 IE8+
  * © 2014 Dmitry Korobkin
  * Released under the MIT license
  * github.com/Octane/jsCore
@@ -529,8 +529,8 @@ if (!Array.prototype.fill) {
     };
 }
 
-if (!Array.prototype.contains) {
-    Array.prototype.contains = function (anything, position) {
+if (!Array.prototype.includes) {
+    Array.prototype.includes = function (anything, position) {
         var length = this.length,
             i;
         if (!length) {
@@ -578,8 +578,8 @@ if (!String.prototype.endsWith) {
     };
 }
 
-if (!String.prototype.contains) {
-    String.prototype.contains = function (string, position) {
+if (!String.prototype.includes) {
+    String.prototype.includes = function (string, position) {
         return -1 != this.indexOf(string, position || 0);
     };
 }
@@ -679,11 +679,11 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift', 'contains'
+        'some', 'sort', 'splice', 'unshift', 'includes'
     ]));
 
     implement(String, createGenerics(String.prototype, [
-        'charAt', 'charCodeAt', 'concat', 'contains','endsWith',
+        'charAt', 'charCodeAt', 'concat', 'includes','endsWith',
         'indexOf', 'lastIndexOf', 'match', 'repeat', 'replace',
         'search', 'slice', 'split', 'startsWith', 'substr',
         'substring', 'toLowerCase', 'toUpperCase', 'trim'
@@ -1504,7 +1504,7 @@ document.documentElement.matches || new function () {
         proto.matches = new function () {
             var ELEMENT_NODE = 1;
             function isContains(root, element, selector) {
-                return Array.contains(root.querySelectorAll(selector), element);
+                return Array.includes(root.querySelectorAll(selector), element);
             }
             return function (selector) {
                 var contains,
@@ -1574,7 +1574,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
                 this._update();
                 length = this.length;
                 Array.forEach(arguments, function (token) {
-                    if (!Array.contains(this, token)) {
+                    if (!Array.includes(this, token)) {
                         Array.push(this, token);
                     }
                 }, this);
@@ -1610,7 +1610,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
 
             contains: function (token) {
                 this._update();
-                return Array.contains(this, token);
+                return Array.includes(this, token);
             },
 
             toString: function () {
@@ -2293,7 +2293,7 @@ window instanceof Object || new function () {
     }
 
     function hasAlphaFilter(filter) {
-        return filter.toLowerCase().contains('alpha');
+        return filter.toLowerCase().includes('alpha');
     }
 
     Object.defineProperty(proto, 'cssFloat', {

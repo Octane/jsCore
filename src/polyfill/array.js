@@ -69,8 +69,8 @@ if (!Array.prototype.fill) {
     };
 }
 
-if (!Array.prototype.contains) {
-    Array.prototype.contains = function (anything, position) {
+if (!Array.prototype.includes) {
+    Array.prototype.includes = function (anything, position) {
         var length = this.length,
             i;
         if (!length) {

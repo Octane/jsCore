@@ -36,7 +36,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
                 this._update();
                 length = this.length;
                 Array.forEach(arguments, function (token) {
-                    if (!Array.contains(this, token)) {
+                    if (!Array.includes(this, token)) {
                         Array.push(this, token);
                     }
                 }, this);
@@ -72,7 +72,7 @@ Object.defineProperty(HTMLElement.prototype, 'classList', {
 
             contains: function (token) {
                 this._update();
-                return Array.contains(this, token);
+                return Array.includes(this, token);
             },
 
             toString: function () {

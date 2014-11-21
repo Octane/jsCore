@@ -31,7 +31,7 @@ window instanceof Object || new function () {
     }
 
     function hasAlphaFilter(filter) {
-        return filter.toLowerCase().contains('alpha');
+        return filter.toLowerCase().includes('alpha');
     }
 
     Object.defineProperty(proto, 'cssFloat', {

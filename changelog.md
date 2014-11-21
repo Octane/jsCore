@@ -1,5 +1,9 @@
 #jsCore changelog
 
+##v0.8.0
+
+- `.contains()` renamed to `.includes()` ([more info](https://twitter.com/mathias/status/535350698918297600))
+
 ##v0.7.0
 
  - fix: `Array.contains()` for non-Array objects
