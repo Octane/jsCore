@@ -80,9 +80,9 @@ global | `FormData()`<sup>[12](#FormData)</sup>, `Set()`, `Map()`, `WeakSet()`, 
 `window` | `.setImmediate()`, `.clearImmediate()`, `.requestAnimationFrame()`, `.cancelAnimationFrame()`, `.getComputedStyle()`
 `Object` generics | `.create()`<sup>[1](#Object.create)</sup>, `.assign()`<sup>[2](#Object.assign)</sup>, `.is()`, `.keys()`<sup>[3](#Object.keys)</sup>, `.setPrototypeOf()`<sup>[16](#Object.setPrototypeOf)</sup>
 `Array` generics<sup>[4](#Array_generics)</sup> | `.isArray()`, `.from()`, `.of()`, `.concat()`, `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.join()`, `.lastIndexOf()`, `.map()`, `.pop()`, `.push()`, `.reduce()`, `.reduceRight()`, `.reverse()`, `.shift()`, `.slice()`<sup>[5](#Array.slice)</sup>, `.some()`, `.sort()`, `.splice()`<sup>[6](#Array.splice)</sup>, `.unshift()`
-`Array.prototype` | `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.lastIndexOf()`, `.map()`, `.reduce()`, `.reduceRight()`, `.some()`, `.contains()`
-`String` generics | `.charAt()`, `.charCodeAt()`, `.concat()`, `.contains()`, `.endsWith()`, `.indexOf()`, `.lastIndexOf()`, `.match()`, `.repeat()`, `.replace()`, `.search()`, `.slice()`, `.split()`, `.startsWith()`, `.substr()`, `.substring()`, `.toLowerCase()`, `.toUpperCase()`, `.trim()`
-`String.prototype` | `.contains()`, `.endsWith()`, `.repeat()`, `.startsWith()`, `.trim()`
+`Array.prototype` | `.every()`, `.fill()`, `.filter()`, `.find()`, `.findIndex()`, `.forEach()`, `.indexOf()`, `.lastIndexOf()`, `.map()`, `.reduce()`, `.reduceRight()`, `.some()`, `.includes()`
+`String` generics | `.charAt()`, `.charCodeAt()`, `.concat()`, `.includes()`, `.endsWith()`, `.indexOf()`, `.lastIndexOf()`, `.match()`, `.repeat()`, `.replace()`, `.search()`, `.slice()`, `.split()`, `.startsWith()`, `.substr()`, `.substring()`, `.toLowerCase()`, `.toUpperCase()`, `.trim()`
+`String.prototype` | `.includes()`, `.endsWith()`, `.repeat()`, `.startsWith()`, `.trim()`
 `Number` generics | `.isInteger()`, `.isFinite()`, `.isNaN()`, `.parseInt()`, `.parseFloat()`
 `Math` generics | `.trunc()`, `.sign()`
 `Function.prototype` | `.bind()`
