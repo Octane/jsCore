@@ -76,7 +76,7 @@ lib.dom.ready().then(function () {
             doc.open();
             doc.write(html({
                 jsCore: jsCore,
-                test: 'test/test' + (jsCore.contains('polyfill') ?
+                test: 'test/test' + (jsCore.includes('polyfill') ?
                                     '-polyfill' : '') + '.js'
             }));
             doc.close();

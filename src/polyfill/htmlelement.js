@@ -163,7 +163,7 @@ document.documentElement.matches || new function () {
         proto.matches = new function () {
             var ELEMENT_NODE = 1;
             function isContains(root, element, selector) {
-                return Array.contains(root.querySelectorAll(selector), element);
+                return Array.includes(root.querySelectorAll(selector), element);
             }
             return function (selector) {
                 var contains,

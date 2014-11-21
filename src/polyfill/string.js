@@ -19,8 +19,8 @@ if (!String.prototype.endsWith) {
     };
 }
 
-if (!String.prototype.contains) {
-    String.prototype.contains = function (string, position) {
+if (!String.prototype.includes) {
+    String.prototype.includes = function (string, position) {
         return -1 != this.indexOf(string, position || 0);
     };
 }

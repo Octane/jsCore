@@ -42,11 +42,11 @@ new function () {
         'findIndex', 'forEach', 'indexOf', 'join',
         'lastIndexOf', 'map', 'pop', 'push', 'reduce',
         'reduceRight', 'reverse', 'shift', 'slice',
-        'some', 'sort', 'splice', 'unshift', 'contains'
+        'some', 'sort', 'splice', 'unshift', 'includes'
     ]));
 
     implement(String, createGenerics(String.prototype, [
-        'charAt', 'charCodeAt', 'concat', 'contains','endsWith',
+        'charAt', 'charCodeAt', 'concat', 'includes','endsWith',
         'indexOf', 'lastIndexOf', 'match', 'repeat', 'replace',
         'search', 'slice', 'split', 'startsWith', 'substr',
         'substring', 'toLowerCase', 'toUpperCase', 'trim'
